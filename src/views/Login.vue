@@ -15,7 +15,7 @@
         <el-input placeholder="请输入验证码" class="vartify-input"></el-input>
         <img src="@/assets/LoginAjax.png" />
       </div>
-      <el-button class="login-btn" type="primary" @click="loginApi">
+      <el-button class="login-btn" type="primary" @click="handleLogin">
         登 录
       </el-button>
     </el-card>
@@ -26,7 +26,7 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import * as THREE from "three";
 import Clouds from "vanta/src/vanta.clouds";
-import axios from "axios"; // 导入axios用于发送请求
+import loginApi from '../api/LoginApi'; // 导入API文件
 import router from "@/router";
 
 const username = ref("");
@@ -35,32 +35,19 @@ const user = ref("student");
 const vantaRef = ref(null);
 let vantaEffect = null;
 
-const loginApi = async () => {
-  const identification = user.value === "student" ? "1" : "0"; // 识别身份
-  const loginData = new URLSearchParams(); // 使用 URLSearchParams 构造表单数据
-  loginData.append('userNum', username.value); // 注意这里的字段名需要与后端一致
-  loginData.append('password', password.value);
-
-  try {
-    const response = await axios.post('http://localhost:8000/login', loginData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded' // 设置请求头为表单编码
+const handleLogin = async () => {
+      try {
+        const response = await loginApi(username.value, password.value, user.value);
+        if (response.success) {
+          console.log("Login successful:", response);
+          router.push('/'); // 跳转到主页面
+        } else {
+          console.error("Login failed:", response.message);
+        }
+      } catch (error) {
+        console.error(error.message);
       }
-    }); // 发送POST请求
-    if (response.data.success) {
-      // 处理登录成功的逻辑
-      console.log("Login successful:", response.data);
-      // 可能需要重定向或更新状态
-      router.push('/'); // 跳转到主页面
-    } else {
-      // 处理登录失败的逻辑
-      console.error("Login failed:", response.data.message);
-    }
-  } catch (error) {
-    console.error("Error during login:", error);
-  }
-};
-
+    };
 
 onMounted(() => {
   vantaEffect = Clouds({
@@ -85,6 +72,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (vantaEffect) vantaEffect.destroy();
 });
+
+
 </script>
 
 <style scoped>

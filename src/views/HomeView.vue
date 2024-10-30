@@ -98,6 +98,7 @@ watch(userNum, (newValue) => {
 // 获取课程数据
 const fetchCourses = async () => {
   try {
+    // TODO: 此处userNum作为参数，但是vuex的存储似乎有bug，导致这里取出有误
     const response = await getCourses("852464"); // 传递 userNum 作为参数
     courseList.value = response.courses; // 更新课程列表
     console.log(courseList.value);

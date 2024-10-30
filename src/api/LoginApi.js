@@ -1,4 +1,6 @@
 import axios from 'axios';
+//import API_BASE_URL from '@/config/apiConfig';
+
 const loginApi = async (username, password, userType) => {
   const identification = userType === "student" ? "1" : "0"; // 识别身份
   const loginData = new URLSearchParams();

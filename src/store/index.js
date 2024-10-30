@@ -6,6 +6,7 @@ export default createStore({
     userinfo: {
       name: "xxx",
       role: "学生",
+      userNum:"",
     },
   },
   getters: {},
@@ -14,9 +15,17 @@ export default createStore({
       state.pagename = pagename;
     },
     setUserInfo(state, userinfo) {
-      state.userinfo = userinfo;
+      // 这里使用 Object.assign 合并用户信息
+      Object.assign(state.userinfo, userinfo);
+    },
+    setUserNum(state, userNum) {
+      state.userinfo.userNum = userNum; // 单独设置 userNum
     },
   },
-  actions: {},
+  actions: {
+    updateUserNum({ commit }, userNum) {
+      commit("setUserNum", userNum); // 调用 mutation 设置 userNum
+    },
+  },
   modules: {},
 });

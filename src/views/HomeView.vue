@@ -9,14 +9,18 @@
         <span class="notification">{{ notificationList[0].info }}</span>
       </div>
       <div class="course-container">
-        <div class="course-item" v-for="(item, index) in courseList">
+        <div class="course-item" v-for="(item, index) in courseList" :key="index">
           <div class="course-item-img">
             <img src="@/assets/courseCover.png" />
           </div>
           <div class="course-item-title">
             <span>{{ item.name }}</span>
           </div>
-          <span class="course-id">{{ item.no }}</span>
+          <span class="course-id">{{ item.courseId }}</span>
+          <div class="teacher-info">
+            <span>讲师: {{ item.teacher.name }}</span>
+            <span>教师编号: {{ item.teacher.teacherNum }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -45,7 +49,6 @@
   </div>
   <el-dialog v-model="notificationDialogVisible" title="通知列表" width="70vw">
     <div class="info-box">
-      <!-- 数据表格 -->
       <el-table
         :data="paginatedData"
         :show-header="false"
@@ -55,7 +58,6 @@
         <el-table-column prop="info" label="通知" width="800" />
         <el-table-column prop="date" label="日期" width="200" />
       </el-table>
-      <!-- 分页组件 -->
       <el-pagination
         background
         layout="prev, pager, next"
@@ -71,64 +73,62 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useStore } from "vuex";
+import { getCourses, getNotifications } from "../api/HomePageApi";
+
 const store = useStore();
 const notificationDialogVisible = ref(false);
 const notificationList = ref([
-  {
-    info: "Welcome to the course platform",
-    date: "2023-05-01",
-  },
-  {
-    info: "这是一条测试通知",
-    date: "2023-06-01",
-  },
-  {
-    info: "this is a notification 2",
-    date: "2023-06-02",
-  },
-  {
-    info: "this is a notification 3",
-    date: "2023-06-03",
-  },
+  { info: "Welcome to the course platform", date: "2023-05-01" },
+  { info: "这是一条测试通知", date: "2023-06-01" },
+  { info: "this is a notification 2", date: "2023-06-02" },
+  { info: "this is a notification 3", date: "2023-06-03" },
 ]);
-const courseList = [
-  {
-    name: "Course 1",
-    description: "This is a course about something",
-    no: 10001,
-  },
-  {
-    name: "Course 2",
-    description: "This is a course about something",
-    no: 10001,
-  },
-  {
-    name: "Course 3",
-    description: "This is a course about something",
-    no: 10001,
-  },
-  {
-    name: "Course 4",
-    description: "This is a course about something",
-    no: 10001,
-  },
-];
+
+const courseList = ref([]); // 使用 ref 来响应式更新课程列表
+
+// 获取 userNum
+const userNum = computed(() => store.state.userinfo.userNum); // 从 Vuex 中获取 userNum
+// 观察 userNum 的变化
+watch(userNum, (newValue) => {
+  console.log('User Number:', newValue);
+});
+
+// 获取课程数据
+const fetchCourses = async () => {
+  try {
+    const response = await getCourses("852464"); // 传递 userNum 作为参数
+    courseList.value = response.courses; // 更新课程列表
+    console.log(courseList.value);
+  } catch (error) {
+    console.error("获取课程失败:", error);
+  }
+};
+
+// 页面挂载时获取课程
+onMounted(() => {
+  fetchCourses();
+});
+
 // 分页相关数据
 const currentPage = ref(1);
 const pageSize = ref(5);
+
 // 计算当前页的数据
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
   return notificationList.value.slice(start, end);
 });
+
 // 处理页码变化
 const handleCurrentChange = (page) => {
   currentPage.value = page;
 };
 </script>
+
+
 
 <style scoped>
 .homeview-container {

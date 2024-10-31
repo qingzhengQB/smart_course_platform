@@ -30,7 +30,7 @@ import loginApi from '../api/LoginApi'; // 导入API文件
 import router from "@/router";
 import { useStore } from "vuex"; // 导入 useStore
 
-const username = ref("");
+const userNum = ref("");
 const password = ref("");
 const user = ref("student");
 const vantaRef = ref(null);
@@ -38,7 +38,7 @@ let vantaEffect = null;
 const store = useStore();
 const handleLogin = async () => {
       try {
-        const response = await loginApi(username.value, password.value, user.value);
+        const response = await loginApi(userNum.value, password.value, user.value);
         if (response.success) {
           console.log("Login successful:", response);
           store.dispatch('updateUserNum', username.value); // 更新 Vuex store 中的用户信息

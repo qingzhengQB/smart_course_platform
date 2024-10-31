@@ -6,7 +6,7 @@
         @click="notificationDialogVisible = true"
       >
         <i class="fa-solid fa-bell"></i>
-        <span class="notification">{{ notificationList[0].info }}</span>
+        <span class="notification">通知消息有{{ notificationList.length }}条</span>
       </div>
       <div class="course-container">
         <div class="course-item" v-for="(item, index) in courseList" :key="index">
@@ -38,25 +38,23 @@
             >
               {{ store.state.userinfo.role }}
             </el-tag>
-            <span
-              ><span style="font-weight: bolder">用户名: </span>
-              {{ store.state.userinfo.name }}</span
-            >
+            <span><strong>用户名: </strong>{{ store.state.userinfo.name }}</span>
           </div>
         </div>
       </el-card>
     </div>
   </div>
+
   <el-dialog v-model="notificationDialogVisible" title="通知列表" width="70vw">
     <div class="info-box">
       <el-table
         :data="paginatedData"
-        :show-header="false"
-        :border="false"
+        :show-header="true"
         style="width: 100%"
+        border
       >
-        <el-table-column prop="info" label="通知" width="800" />
-        <el-table-column prop="date" label="日期" width="200" />
+        <el-table-column prop="content" label="通知内容" width="800" />
+        <el-table-column prop="createTime" label="创建时间" width="200" />
       </el-table>
       <el-pagination
         background
@@ -79,57 +77,52 @@ import { getCourses, getNotifications } from "../api/HomePageApi";
 
 const store = useStore();
 const notificationDialogVisible = ref(false);
-const notificationList = ref([
-  { info: "Welcome to the course platform", date: "2023-05-01" },
-  { info: "这是一条测试通知", date: "2023-06-01" },
-  { info: "this is a notification 2", date: "2023-06-02" },
-  { info: "this is a notification 3", date: "2023-06-03" },
-]);
+const notificationList = ref([]);
+const courseList = ref([]); 
+const userNum = computed(() => store.state.userinfo.userNum);
 
-const courseList = ref([]); // 使用 ref 来响应式更新课程列表
-// TODO：登录若成功就应该存储用户账户进入store中方面后续调用，此处功能待完善
-// 获取 userNum
-const userNum = computed(() => store.state.userinfo.userNum); // 从 Vuex 中获取 userNum
-// 观察 userNum 的变化
 watch(userNum, (newValue) => {
   console.log('User Number:', newValue);
 });
 
-// 获取课程数据
 const fetchCourses = async () => {
   try {
-    // TODO: 此处userNum作为参数，但是vuex的存储似乎有bug，导致这里取出有误
-    const response = await getCourses("852464"); // 传递 userNum 作为参数
-    courseList.value = response.courses; // 更新课程列表
+    const response = await getCourses("852464");
+    courseList.value = response.courses; 
     console.log(courseList.value);
   } catch (error) {
     console.error("获取课程失败:", error);
   }
 };
 
-// 页面挂载时获取课程
+const fetchNotifications = async () => {
+  try {
+    const response = await getNotifications("852464");
+    notificationList.value = response.notifications; 
+    console.log(notificationList.value);
+  } catch (error) {
+    console.error("获取通知失败", error);
+  }
+}
+
 onMounted(() => {
+  fetchNotifications();
   fetchCourses();
 });
 
-// 分页相关数据
 const currentPage = ref(1);
 const pageSize = ref(5);
 
-// 计算当前页的数据
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
   return notificationList.value.slice(start, end);
 });
 
-// 处理页码变化
 const handleCurrentChange = (page) => {
   currentPage.value = page;
 };
 </script>
-
-
 
 <style scoped>
 .homeview-container {
@@ -180,12 +173,7 @@ const handleCurrentChange = (page) => {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  /* 3 列，等分为 1/3 宽度 */
   grid-gap: 10px;
-  /* 网格间的间隙 */
-  /* border: var(--main-border);
-  box-shadow: var(--main-box-shadow);
-  padding: 10px 15px; */
 }
 
 .course-item {
@@ -210,15 +198,11 @@ const handleCurrentChange = (page) => {
 .course-item-img img {
   max-width: 100%;
   width: 100%;
-  /* 保持图片响应式 */
   height: 100%;
-  /* 保持图片宽高比 */
   margin: 0 auto;
   padding: 0;
   object-fit: cover;
-  /* 图片将被裁剪以填满容器，保持宽高比 */
   object-position: center;
-  /* 图片居中 */
 }
 
 .course-item-title {

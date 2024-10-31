@@ -1,5 +1,25 @@
 import Mock from 'mockjs';
 
+Mock.mock('http://localhost:8000/student/getNotification', 'get', (options) => {
+    return {
+        notifications: [
+            {
+                notificationId: 1,
+                teacherId: 1,
+                content: "作业1已布置",
+                createTime: "2024-10-31T22:15:58"
+            },
+            {
+                notificationId: 2,
+                teacherId: 1,
+                content: "周五补课",
+                createTime: "2024-10-31T22:55:05"
+            }
+        ],
+        notificationNum: 2
+    }
+});
+
 Mock.mock('http://localhost:8000/login', 'post', (options) => {
 
     return {

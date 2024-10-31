@@ -1,14 +1,19 @@
 import axios from 'axios';
 import API_BASE_URL from '@/config/apiConfig';
 // 获取通知列表的 API
-export const getNotifications = async () => {
-//   try {
-//     const response = await axios.get('${API_BASE_URL}/notifications'); // 替换为实际的 API 地址
-//     return response.data; // 返回通知列表数据
-//   } catch (error) {
-//     console.error("获取通知失败:", error);
-//     throw error; // 抛出错误以便调用者处理
-//   }
+export const getNotifications = async (userNum) => {
+  try {
+    const response = await axios.get('http://localhost:8000/student/getNotification', {
+        params:{
+          studentNum: userNum
+        }
+    }); 
+  
+    return response.data; // 返回通知列表数据
+  } catch (error) {
+    console.error("获取通知失败:", error);
+    throw error; // 抛出错误以便调用者处理
+  }
 };
 
 // 获取课程列表的 API

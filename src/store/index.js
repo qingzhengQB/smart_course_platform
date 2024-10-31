@@ -6,25 +6,37 @@ export default createStore({
     userinfo: {
       name: "xxx",
       role: "学生",
-      userNum:"",
+      userNum: "",
     },
   },
-  getters: {},
+  getters: {
+    // Getter to retrieve the user info
+    getUserInfo(state) {
+      return state.userinfo;
+    },
+    // Getter to retrieve the page name
+    getPagename(state) {
+      return state.pagename;
+    },
+  },
   mutations: {
     setPagename(state, pagename) {
       state.pagename = pagename;
     },
     setUserInfo(state, userinfo) {
-      // 这里使用 Object.assign 合并用户信息
+      // Merge user info into the existing state
       Object.assign(state.userinfo, userinfo);
     },
     setUserNum(state, userNum) {
-      state.userinfo.userNum = userNum; // 单独设置 userNum
+      state.userinfo.userNum = userNum; // Set userNum individually
     },
   },
   actions: {
     updateUserNum({ commit }, userNum) {
-      commit("setUserNum", userNum); // 调用 mutation 设置 userNum
+      commit("setUserNum", userNum); // Call mutation to set userNum
+    },
+    updateUserInfo({ commit }, userinfo) {
+      commit("setUserInfo", userinfo); // Call mutation to set userinfo
     },
   },
   modules: {},

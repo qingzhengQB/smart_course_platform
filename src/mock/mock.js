@@ -3,9 +3,11 @@ import Mock from 'mockjs';
 Mock.mock('http://localhost:8000/login', 'post', (options) => {
 
     return {
-            success:"true"
-        };
-
+        redirect: "/student/dashboard",
+        userNum: "852464",
+        success: true,
+        userName: "金安琪"
+    };
 });
 // 设置 Mock 的拦截请求
 Mock.mock(/\/student\/courses/, 'get', (options) => {

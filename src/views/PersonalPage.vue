@@ -5,8 +5,7 @@
       <img class="personal-cover" src="@/assets/head.png"></img></div>
       <div class="personal-head-info">
         <div class="head-info">
-          <div class="head-info-user-name">用户名</div>
-          <div class="info-introduce">个人简介</div>
+          <div class="head-info-user-name">{{personalInfo.userName}}</div>
         </div>
       </div>
       <img class="personal-avatar" src="@/assets/avatar.png" alt="头像"></img>
@@ -16,9 +15,8 @@
       <div class="personal-info-card">
         <div class="personal-info">
           <div class="info">
-            <div class="info-user-name">用户名</div>
-            <div>邮箱</div>
-            <div>注册时间</div>
+            <div class="info-user-name">{{personalInfo.userName}}</div>
+            <div>{{personalInfo.email}}</div>
           </div>
         </div>
         <div class="personal-action">
@@ -55,7 +53,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+const personalInfo = {
+  userName: "",
+  email:"",
+};
+
 const personalItem = [
   {
     item: "我的提问",
@@ -74,6 +77,10 @@ const personalItem = [
     url: "/personal/note",
   },
 ];
+// 页面挂载时获取用户信息
+onMounted(() => {
+  
+});
 </script>
 
 <style lang="scss" scoped>

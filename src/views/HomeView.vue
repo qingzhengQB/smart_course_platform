@@ -87,7 +87,7 @@ const notificationList = ref([
 ]);
 
 const courseList = ref([]); // 使用 ref 来响应式更新课程列表
-
+// TODO：登录若成功就应该存储用户账户进入store中方面后续调用，此处功能待完善
 // 获取 userNum
 const userNum = computed(() => store.state.userinfo.userNum); // 从 Vuex 中获取 userNum
 // 观察 userNum 的变化

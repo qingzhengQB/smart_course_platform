@@ -1,5 +1,32 @@
 import Mock from 'mockjs';
 
+Mock.mock('','get',(options)=>{
+    return{
+        postNum: 2,
+        posts: [
+            {
+                postId: 1,
+                courseId: 1,
+                studentId: 1,
+                teacherId: 1,
+                likeNum: 90,
+                favoNum: 5,
+                content: "迪杰斯特拉算法的具体过程",
+                title: "算法疑问"
+            },
+            {
+                postId: 2,
+                courseId: 2,
+                studentId: 1,
+                teacherId: 2,
+                likeNum: 1,
+                favoNum: 0,
+                content: "导论作业内容是什么",
+                title: "作业求助"
+            }
+    ]
+    }
+})
 Mock.mock('http://localhost:8000/student/getNotification', 'get', (options) => {
     return {
         notifications: [

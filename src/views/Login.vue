@@ -4,7 +4,7 @@
     <el-card class="login-card">
       <h1 class="login-title">智慧课程平台</h1>
       <div class="input-container">
-        <el-input class="info-input" placeholder="用户名" v-model="username" />
+        <el-input class="info-input" placeholder="用户名" v-model="userNum" />
         <el-input class="info-input" type="password" placeholder="密码" v-model="password" />
       </div>
       <el-radio-group class="user-group" v-model="user">
@@ -42,7 +42,7 @@ const handleLogin = async () => {
         if (response.success) {
           console.log("Login successful:", response);
           //TODO vuex存储用户信息
-          store.dispatch('updateUserNum', username.value); // 更新 Vuex store 中的用户信息
+          store.dispatch('updateUserNum', userNum.value); // 更新 Vuex store 中的用户信息
           router.push('/'); // 跳转到主页面
         } else {
           console.error("Login failed:", response.message);

@@ -5,7 +5,7 @@
         <div class="question-item">
           <div class="question-title">{{ item.title }}</div>
           <div class="question-content">{{ item.content }}</div>
-          <div class="question-time">{{ item.time }}</div>
+          <div class="question-likeNum">{{ item.likeNum }}</div>
         </div>
       </div>
       <div class="question-devide" v-if="index < questions.length - 1"></div>
@@ -14,25 +14,24 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-const questions = ref([
-  {
-    title: "问题1",
-    content: "问题1内容",
-    time: "2021-10-10",
-  },
-  {
-    title: "问题2",
-    content:
-      "问题2内容长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试",
-    time: "2021-10-11",
-  },
-  {
-    title: "问题3",
-    content: "问题3内容",
-    time: "2021-10-12",
-  },
-]);
+import { ref, onMounted } from "vue";
+import { getPosts } from "../../api/PersonalApi";
+//TODO 点赞数likenum待修改样式
+const questions = ref([]);
+//TODO vuex取出userNum
+const fetchPosts = async () => {
+  try {
+    const response = await getPosts("852464");
+    questions.value = response.posts;
+    console.log(questions.value);
+  } catch (error) {
+    console.error("获取问题失败", error);
+  }
+}
+onMounted(() => {
+  fetchPosts();
+});
+
 </script>
 
 <style scoped>

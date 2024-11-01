@@ -1,5 +1,4 @@
 import axios from 'axios';
-import API_BASE_URL from '@/config/apiConfig';
 // 获取通知列表的 API
 export const getNotifications = async (userNum) => {
   try {

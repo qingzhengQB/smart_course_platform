@@ -61,7 +61,7 @@ const personalInfo = {
 
 const personalItem = [
   {
-    item: "我的提问",
+    item: "我的帖子",
     url: "/personal/question",
   },
   {

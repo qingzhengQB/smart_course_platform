@@ -41,6 +41,7 @@ const handleLogin = async () => {
         const response = await loginApi(userNum.value, password.value, user.value);
         if (response.success) {
           console.log("Login successful:", response);
+          //TODO vuex存储用户信息
           store.dispatch('updateUserNum', username.value); // 更新 Vuex store 中的用户信息
           router.push('/'); // 跳转到主页面
         } else {

@@ -21,7 +21,6 @@ Mock.mock('http://localhost:8000/student/getNotification', 'get', (options) => {
 });
 
 Mock.mock('http://localhost:8000/login', 'post', (options) => {
-
     return {
         redirect: "/student/dashboard",
         userNum: "852464",
@@ -29,6 +28,7 @@ Mock.mock('http://localhost:8000/login', 'post', (options) => {
         userName: "金安琪"
     };
 });
+
 // 设置 Mock 的拦截请求
 Mock.mock(/\/student\/courses/, 'get', (options) => {
     const courses = [

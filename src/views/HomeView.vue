@@ -1,30 +1,43 @@
 <template>
   <div class="homeview-container">
     <div class="main-content-container">
-      <div
+      <!-- <div
         class="notification-container"
         @click="notificationDialogVisible = true"
       >
         <i class="fa-solid fa-bell"></i>
         <span class="notification">通知消息有{{ notificationList.length }}条</span>
-      </div>
-      <div class="course-container">
-        <div class="course-item" v-for="(item, index) in courseList" :key="index">
-          <div class="course-item-img">
-            <img src="@/assets/courseCover.png" />
+      </div> -->
+      <div class = "left-panel">
+        <component :is="currentComponent" />
+        <!-- <div class="course-container">
+          <div class="course-item" v-for="(item, index) in courseList" :key="index">
+            <div class="course-item-img">
+              <img src="@/assets/courseCover.png" />
+            </div>
+            <div class="course-item-title">
+              <span>{{ item.name }}</span>
+            </div>
+            <span class="course-id">{{ item.courseId }}</span>
+            <div class="teacher-info">
+              <span>讲师: {{ item.teacher.name }}</span>
+              <span>教师编号: {{ item.teacher.teacherNum }}</span>
+            </div>
           </div>
-          <div class="course-item-title">
-            <span>{{ item.name }}</span>
-          </div>
-          <span class="course-id">{{ item.courseId }}</span>
-          <div class="teacher-info">
-            <span>讲师: {{ item.teacher.name }}</span>
-            <span>教师编号: {{ item.teacher.teacherNum }}</span>
-          </div>
-        </div>
+        </div> -->
       </div>
     </div>
-    <div class="side-content-container">
+    <div class = "right-panel">
+      <UserInfo />
+      <div class="notification-section">
+        <button @click="toggleContent" class="notification-button">
+          <i :class="iconClass"></i> {{ showNotifications ? "返回课程" : "查看通知" }}
+        </button>
+        <NotificationSummary v-if="!showNotifications" />
+      </div>
+    </div>
+    
+    <!-- <div class="side-content-container">
       <el-card class="box-card">
         <div class="card-content">
           <img src="@/assets/avatar.png" alt="avatar" />
@@ -42,7 +55,7 @@
           </div>
         </div>
       </el-card>
-    </div>
+    </div> -->
   </div>
 
   <el-dialog v-model="notificationDialogVisible" title="通知列表" width="70vw">
@@ -74,12 +87,25 @@
 import { ref, computed, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { getCourses, getNotifications } from "../api/HomePageApi";
-
+import UserInfo from "@/components/HomePage/UserInfo.vue";
+import Notification from "@/components/HomePage/Notification.vue";
+import CourseList from "@/components/HomePage/CourseList.vue";
+import NotificationSummary from "@/components/HomePage/NotificationSummary.vue";
 const store = useStore();
 const notificationDialogVisible = ref(false);
 const notificationList = ref([]);
 const courseList = ref([]); 
 const userNum = computed(() => store.state.userinfo.userNum);
+const showNotifications = ref(false);
+const iconClass = computed(() => showNotifications.value ? 'icon-return' : 'icon-notification');
+// 根据showNotifications的值来决定显示哪个组件
+const currentComponent = computed(() => {
+  return showNotifications.value ? Notification : CourseList;
+});
+
+const toggleContent = () => {
+  showNotifications.value = !showNotifications.value;
+};
 
 watch(userNum, (newValue) => {
   console.log('User Number:', newValue);
@@ -255,5 +281,57 @@ const handleCurrentChange = (page) => {
   border-radius: 10px;
   margin: 0 10px;
   width: 28%;
+}
+/* 按钮样式 */
+.notification-button {
+  padding: 10px 20px; 
+  border-radius: 20px; 
+  border: 0;
+  color: black;
+  font-size: 16px;
+  display: flex;
+  align-items: center; 
+  cursor: pointer; /* 鼠标悬停时显示指针 */
+  transition: background-color 0.2s; 
+}
+.notification-button:hover {
+  background-color: #d1cece; 
+}
+
+/* 图标样式 */
+.icon-return, .icon-notification {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  background-size: cover;
+}
+
+.icon-return {
+  background-image: url('../assets/return.svg'); /* 替换为实际图标的URL */
+}
+
+.icon-notification {
+  background-image: url('../assets/notification.svg'); /* 替换为实际图标的URL */
+}
+/* 左侧和右侧面板的样式 */
+.left-panel {
+  flex: 1;
+  border-right: 1px solid #ccc;
+  padding: 20px;
+  overflow-y: auto; /* 允许内容滚动 */
+  height: 100vh; /* 确保面板高度占满视口 */
+}
+
+.right-panel {
+  width: 300px; /* 固定宽度 */
+  padding: 20px;
+  box-sizing: border-box; /* 包含内边距和边框在宽度内 */
+  position: sticky;
+  top: 0; /* 固定在顶部 */
+  height: 100vh; /* 确保面板高度占满视口 */
+  overflow-y: auto; /* 允许内容滚动 */
+}
+.notification-section {
+  margin-top: 20px;
 }
 </style>

@@ -58,17 +58,15 @@ onMounted(() => {
     THREE: THREE,
     backgroundColor: 0xffffff,
     mouseControls: true,
-    touchControls: true,
-    gyroControls: false,
-    minHeight: 200.0,
-    minWidth: 200.0,
-    skyColor: 0x95cae0,
-    cloudColor: 0xb2b2cc,
-    cloudShadowColor: 0x36495b,
-    sunColor: 0x68471b,
-    sunGlareColor: 0xbb7964,
-    sunlightColor: 0x474747,
-    speed: 2.1,
+  touchControls: true,
+  gyroControls: false,
+  minHeight: 200.00,
+  minWidth: 200.00,
+  cloudShadowColor: 0x6391c0,
+  sunColor: 0xff9817,
+  sunGlareColor: 0xff6b3a,
+  sunlightColor: 0xfc9b3a,
+  speed: 2.10
   });
 });
 

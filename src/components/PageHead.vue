@@ -17,7 +17,7 @@
           />
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="logout">个人信息</el-dropdown-item>
+              <el-dropdown-item @click="toPersonalPage">个人信息</el-dropdown-item>
               <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -28,9 +28,16 @@
 </template>
 
 <script setup>
+import router from "@/router";
 import { ref } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
+function toPersonalPage() {
+    router.push("/personal"); // 跳转到个人页面
+}
+function logout() {
+  router.push("/login");
+}
 </script>
 
 <style scoped>

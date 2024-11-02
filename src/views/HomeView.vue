@@ -124,12 +124,12 @@ const fetchCourses = async () => {
 const fetchNotifications = async () => {
   try {
     const response = await getNotifications("852464");
-    notificationList.value = response.notifications; 
+    notificationList.value = response.notifications;
     console.log(notificationList.value);
   } catch (error) {
     console.error("获取通知失败", error);
   }
-}
+};
 
 onMounted(() => {
   fetchNotifications();

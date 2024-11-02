@@ -43,10 +43,10 @@ const handleLogin = async () => {
           console.log(response)
           store.commit("setUserInfo",{
             name:response.userName,
-            role:user.value==="students"?"学生":"老师",
+            role:user.value==="student"?"学生":"老师",
             userNum:userNum.value,
           })
-          console.log(store.state.userInfo),
+          console.log("登录成功",store),
           router.push('/'); // 跳转到主页面
         } else {
           console.error("Login failed:", response.message);

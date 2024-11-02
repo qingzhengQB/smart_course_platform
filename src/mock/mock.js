@@ -1,7 +1,7 @@
 import Mock from 'mockjs';
-Mock.mock('http://localhost:8000/comment/getComments', 'get', (options) => {
-    return 
-        {
+
+Mock.mock(/\/comment\/getComments/, 'get', (options) => {
+    return {
             commentList: [
                 {
                     commentId: 1,
@@ -28,7 +28,8 @@ Mock.mock('http://localhost:8000/comment/getComments', 'get', (options) => {
             ]
         }
 })
-Mock.mock('http://localhost:8000/post/getPosts','get',(options)=>{
+
+Mock.mock(/\/post\/getPosts/,'get',(options)=>{
     return{
         postNum: 2,
         posts: [

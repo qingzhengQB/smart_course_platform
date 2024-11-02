@@ -67,6 +67,36 @@ Mock.mock(/\/student\/courses/, 'get', (options) => {
                 password: "252797",
                 teacherNum: "6429"
             }
+        },
+        {
+            courseId: 3,
+            name: "计算机导论",
+            intro: "2024学期课程",
+            outline: "无",
+            teacherInfo: "无",
+            calendar: "无",
+            resource: null,
+            teacher: {
+                id: 2,
+                name: "廖岚",
+                password: "252797",
+                teacherNum: "6429"
+            }
+        },
+        {
+            courseId: 4,
+            name: "计算机导论",
+            intro: "2024学期课程",
+            outline: "无",
+            teacherInfo: "无",
+            calendar: "无",
+            resource: null,
+            teacher: {
+                id: 2,
+                name: "廖岚",
+                password: "252797",
+                teacherNum: "6429"
+            }
         }
     ];
 
@@ -75,7 +105,7 @@ Mock.mock(/\/student\/courses/, 'get', (options) => {
     };
 });
 // 模拟获取我的收藏的接口
-Mock.mock('http://localhost:8000/favourite/getFavourite', 'get', (options) => {
+Mock.mock('http://localhost:8000/favourite/getFavourite', 'post', (options) => {
     const params = new URLSearchParams(options.body);
     const userNum = params.get('studentNum'); // 获取请求参数 studentNum
     // 这里可以根据 userNum 做不同的返回
@@ -110,7 +140,7 @@ Mock.mock('http://localhost:8000/favourite/getFavourite', 'get', (options) => {
 });
 
 // 模拟获取评论的接口
-Mock.mock('http://localhost:8000/comment/getComments', 'get', (options) => {
+Mock.mock(/\/comment\/getComments/, 'get', (options) => {
     const params = new URLSearchParams(options.body);
     const userNum = params.get('userNum'); // 获取请求参数 userNum
 
@@ -145,7 +175,7 @@ Mock.mock('http://localhost:8000/comment/getComments', 'get', (options) => {
 });
 
 // 模拟获取帖子列表的接口
-Mock.mock('http://localhost:8000/post/getPosts', 'get', (options) => {
+Mock.mock(/\/post\/getPosts/, 'get', (options) => {
     const params = new URLSearchParams(options.body);
     const studentNum = params.get('studentNum'); // 获取请求参数 studentNum
 

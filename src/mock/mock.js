@@ -1,62 +1,9 @@
 import Mock from 'mockjs';
 
-Mock.mock(/\/comment\/getComments/, 'get', (options) => {
-    return {
-            commentList: [
-                {
-                    commentId: 1,
-                    postId: 3,
-                    likeNum: 1,
-                    content: "同求",
-                    commentedNum: "342680",
-                    commentedName: "韩嘉伦",
-                    teacherId: null,
-                    studentId: 1,
-                    postTitle: "求电子版教材资源"
-                },
-                {
-                    commentId: 2,
-                    postId: 3,
-                    likeNum: 0,
-                    content: "蹲有回复踢我",
-                    commentedNum: "342680",
-                    commentedName: "韩嘉伦",
-                    teacherId: null,
-                    studentId: 1,
-                    postTitle: "求电子版教材资源"
-                }
-            ]
-        }
-})
-
-Mock.mock(/\/post\/getPosts/,'get',(options)=>{
-    return{
-        postNum: 2,
-        posts: [
-            {
-                postId: 1,
-                courseId: 1,
-                studentId: 1,
-                teacherId: 1,
-                likeNum: 90,
-                favoNum: 5,
-                content: "迪杰斯特拉算法的具体过程",
-                title: "算法疑问"
-            },
-            {
-                postId: 2,
-                courseId: 2,
-                studentId: 1,
-                teacherId: 2,
-                likeNum: 1,
-                favoNum: 0,
-                content: "导论作业内容是什么",
-                title: "作业求助"
-            }
-    ]
-    }
-})
-Mock.mock('http://localhost:8000/student/getNotification', 'get', (options) => {
+Mock.setup({ timeout: '200-600' }); // 设置延迟
+// 修正正则表达式并模拟获取通知的接口
+Mock.mock(/\/student\/getNotification/, 'get', (options) => {
+    console.log('请求通知接口'); // 调试信息
     return {
         notifications: [
             {
@@ -73,10 +20,12 @@ Mock.mock('http://localhost:8000/student/getNotification', 'get', (options) => {
             }
         ],
         notificationNum: 2
-    }
+    };
 });
 
+// 模拟登录接口
 Mock.mock('http://localhost:8000/login', 'post', (options) => {
+    console.log('请求登录接口'); // 调试信息
     return {
         redirect: "/student/dashboard",
         userNum: "852464",
@@ -85,8 +34,9 @@ Mock.mock('http://localhost:8000/login', 'post', (options) => {
     };
 });
 
-// 设置 Mock 的拦截请求
+// 模拟获取课程列表的接口
 Mock.mock(/\/student\/courses/, 'get', (options) => {
+    console.log('请求课程接口'); // 调试信息
     const courses = [
         {
             courseId: 1,
@@ -124,6 +74,108 @@ Mock.mock(/\/student\/courses/, 'get', (options) => {
         courses, // 返回课程列表数据
     };
 });
+// 模拟获取我的收藏的接口
+Mock.mock('http://localhost:8000/favourite/getFavourite', 'get', (options) => {
+    const params = new URLSearchParams(options.body);
+    const userNum = params.get('studentNum'); // 获取请求参数 studentNum
+    // 这里可以根据 userNum 做不同的返回
+    // 目前我们返回固定的数据
+    return {
+        postList: [
+            {
+                postTitle: "算法疑问",
+                courseName: "数据结构",
+                likeNum: 90,
+                favoNum: 5,
+                content: "迪杰斯特拉算法的具体过程",
+                favoriteName: "金的收藏夹"
+            },
+            {
+                postTitle: "求电子版教材资源",
+                courseName: "数据结构",
+                likeNum: 1,
+                favoNum: 0,
+                content: "求电子版教材资源，各个版本都可以",
+                favoriteName: "金的收藏夹"
+            }
+        ],
+        othersFavos: [
+            {
+                otherFavoNum: "234567",
+                otherFavoName: "韩的收藏夹",
+                otherFavoCreaterName: "韩嘉伦"
+            }
+        ]
+    };
+});
 
+// 模拟获取评论的接口
+Mock.mock('http://localhost:8000/comment/getComments', 'get', (options) => {
+    const params = new URLSearchParams(options.body);
+    const userNum = params.get('userNum'); // 获取请求参数 userNum
+
+    // 这里可以根据 userNum 做不同的返回
+    // 目前我们返回固定的数据
+    return {
+        commentList: [
+            {
+                commentId: 1,
+                postId: 3,
+                likeNum: 1,
+                content: "同求",
+                commentedNum: "342680",
+                commentedName: "韩嘉伦",
+                teacherId: null,
+                studentId: 1,
+                postTitle: "求电子版教材资源"
+            },
+            {
+                commentId: 2,
+                postId: 3,
+                likeNum: 0,
+                content: "蹲有回复踢我",
+                commentedNum: "342680",
+                commentedName: "韩嘉伦",
+                teacherId: null,
+                studentId: 1,
+                postTitle: "求电子版教材资源"
+            }
+        ]
+    };
+});
+
+// 模拟获取帖子列表的接口
+Mock.mock('http://localhost:8000/post/getPosts', 'get', (options) => {
+    const params = new URLSearchParams(options.body);
+    const studentNum = params.get('studentNum'); // 获取请求参数 studentNum
+
+    // 这里可以根据 studentNum 做不同的返回
+    // 目前我们返回固定的数据
+    return {
+        postNum: 2,
+        posts: [
+            {
+                postId: 1,
+                courseId: 1,
+                studentId: 1,
+                teacherId: 1,
+                likeNum: 90,
+                favoNum: 5,
+                content: "迪杰斯特拉算法的具体过程",
+                title: "算法疑问"
+            },
+            {
+                postId: 2,
+                courseId: 2,
+                studentId: 1,
+                teacherId: 2,
+                likeNum: 1,
+                favoNum: 0,
+                content: "导论作业内容是什么",
+                title: "作业求助"
+            }
+        ]
+    };
+});
 
 export default Mock;

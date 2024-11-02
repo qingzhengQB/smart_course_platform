@@ -1,5 +1,17 @@
 import axios from "axios";
 
+export const getMyFavourite = async (userNum) => {
+    try {
+        const response = await axios.get('http://localhost:8000/favourite/getFavourite', {
+            params: {
+                studentNum: userNum
+            }
+        });
+        return response.data;
+        } catch(error) {
+        console.error("获取我的收藏失败", error);
+    }
+}
 export const getPosts = async (userNum) => {
     try {
         const response = await axios.get('http://localhost:8000/post/getPosts', {

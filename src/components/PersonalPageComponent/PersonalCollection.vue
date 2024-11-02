@@ -3,13 +3,24 @@
     <template v-for="(item, index) in notes">
       <div class="note-item-container">
         <div class="note-item">
-          <div class="note-title">{{ item.title }}</div>
+          <div class="note-title">{{ item.postTitle }}</div>
           <div class="note-content">{{ item.content }}</div>
+          <div class="course-name">来自课程{{ item.courseName }}</div>
+          <div>点赞数 {{ item.likeNum }}</div>
+          <div>收藏数 {{ item.favoNum }}</div>
           <div class="note-footer">
-            <div class="note-time">{{ item.time }}</div>
-            <div class="note-author">
-              {{ item.author }}
-            </div>
+          </div>
+        </div>
+      </div>
+      <div class="note-devide" v-if="index < notes.length - 1"></div>
+    </template>
+    <template v-for="(item, index) in otherFavo">
+      <div class="note-item-container">
+        <div class="note-item">
+          <div class="note-title">{{ item.otherFavoName }}</div>
+          <div class="note-content">编号 {{ item.otherFavoNum }}</div>
+          <div class="course-name">创建者{{ item.otherFavoCreaterName }}</div>
+          <div class="note-footer">
           </div>
         </div>
       </div>
@@ -19,28 +30,26 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-const notes = ref([
-  {
-    title: "笔记1",
-    content: "笔记1内容",
-    time: "2021-10-10",
-    author: "作者1",
-  },
-  {
-    title: "笔记2",
-    content:
-      "笔记2内容长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试",
-    time: "2021-10-11",
-    author: "作者2",
-  },
-  {
-    title: "笔记3",
-    content: "笔记3内容",
-    time: "2021-10-12",
-    author: "作者3",
-  },
-]);
+import { ref, onMounted, computed } from "vue";
+import { getMyFavourite } from "@/api/PersonalApi";
+import { useStore } from 'vuex';
+const store = useStore();
+// 使用 computed 获取 userNum
+const userNum = computed(() => store.getters.getUserInfo.userNum);
+const notes = ref([]);
+const otherFavo = ref([]);
+const fetchMyFavourites = async () => {
+  try {
+    const response = await getMyFavourite(userNum.value);
+    notes.value = response.postList;
+    otherFavo.value = response.othersFavos;
+  } catch (error) {
+    console.error("获取收藏的帖子失败", error);
+  }
+}
+onMounted(() => {
+  fetchMyFavourites();
+})
 </script>
 
 <style scoped>

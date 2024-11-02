@@ -14,14 +14,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { getPosts } from "../../api/PersonalApi";
+import { useStore } from 'vuex';
+
+const store = useStore();
+// 使用 computed 获取 userNum
+const userNum = computed(() => store.getters.getUserInfo.userNum);
 //TODO 点赞数likenum待修改样式
 const questions = ref([]);
-//TODO vuex取出userNum
 const fetchPosts = async () => {
   try {
-    const response = await getPosts("852464");
+    const response = await getPosts(userNum.value);
     questions.value = response.posts;
     console.log(questions.value);
   } catch (error) {

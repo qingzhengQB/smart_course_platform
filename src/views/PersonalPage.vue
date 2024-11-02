@@ -5,7 +5,7 @@
       <img class="personal-cover" src="@/assets/head.png"></img></div>
       <div class="personal-head-info">
         <div class="head-info">
-          <div class="head-info-user-name">{{personalInfo.userName}}</div>
+          <div class="head-info-user-name">{{store.state.userinfo.name}}</div>
         </div>
       </div>
       <img class="personal-avatar" src="@/assets/avatar.png" alt="头像"></img>
@@ -15,8 +15,8 @@
       <div class="personal-info-card">
         <div class="personal-info">
           <div class="info">
-            <div class="info-user-name">{{personalInfo.userName}}</div>
-            <div>{{personalInfo.email}}</div>
+            <div class="info-user-name">{{store.state.userinfo.name}}</div>
+            <div>{{store.state.userinfo.userNum}} @bjtu.edu.cn</div>
           </div>
         </div>
         <div class="personal-action">
@@ -54,6 +54,8 @@
 
 <script setup>
 import { onMounted, ref } from "vue";
+import { useStore } from "vuex";
+const store = useStore();
 const personalInfo = {
   userName: "",
   email:"",

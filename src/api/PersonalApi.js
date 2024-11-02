@@ -13,6 +13,19 @@ export const getPosts = async (userNum) => {
     }
 };
 
+export const getMyComments = async (userNum) => {
+    try {
+        const response = await axios.get('http://localhost:8000/comment/getComments', {
+            params: {
+                userNum: userNum
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("我的评论获取失败", error);
+    }
+}
 export default {
-  getPosts,  
+    getPosts,  
+    getMyComments,
 };

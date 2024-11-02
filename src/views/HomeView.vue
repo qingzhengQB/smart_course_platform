@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import { getCourses, getNotifications } from "../api/HomePageApi";
 import UserInfo from "@/components/HomePage/UserInfo.vue";
@@ -107,13 +107,9 @@ const toggleContent = () => {
   showNotifications.value = !showNotifications.value;
 };
 
-watch(userNum, (newValue) => {
-  console.log('User Number:', newValue);
-});
-
 const fetchCourses = async () => {
   try {
-    const response = await getCourses("852464");
+    const response = await getCourses(userNum.value);
     courseList.value = response.courses; 
     console.log(courseList.value);
   } catch (error) {
@@ -123,7 +119,7 @@ const fetchCourses = async () => {
 
 const fetchNotifications = async () => {
   try {
-    const response = await getNotifications("852464");
+    const response = await getNotifications(userNum.value);
     notificationList.value = response.notifications;
     console.log(notificationList.value);
   } catch (error) {

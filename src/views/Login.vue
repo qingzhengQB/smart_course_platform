@@ -40,13 +40,11 @@ const handleLogin = async () => {
       try {
         const response = await loginApi(userNum.value, password.value, user.value);
         if (response.success) {
-       // console.log("Login successful:", response);
-          // store.commit('updateUserNum', username.value); // 更新 Vuex store 中的用户信息
           console.log(response)
           store.commit("setUserInfo",{
             name:response.userName,
             role:user.value==="students"?"学生":"老师",
-            userNum:username.value,
+            userNum:userNum.value,
           })
           console.log(store.state.userInfo),
           router.push('/'); // 跳转到主页面

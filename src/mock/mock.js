@@ -1,10 +1,38 @@
 import Mock from 'mockjs';
-
-Mock.mock('','get',(options)=>{
+Mock.mock('http://localhost:8000/comment/getComments', 'get', (options) => {
+    return 
+        {
+            commentList: [
+                {
+                    commentId: 1,
+                    postId: 3,
+                    likeNum: 1,
+                    content: "同求",
+                    commentedNum: "342680",
+                    commentedName: "韩嘉伦",
+                    teacherId: null,
+                    studentId: 1,
+                    postTitle: "求电子版教材资源"
+                },
+                {
+                    commentId: 2,
+                    postId: 3,
+                    likeNum: 0,
+                    content: "蹲有回复踢我",
+                    commentedNum: "342680",
+                    commentedName: "韩嘉伦",
+                    teacherId: null,
+                    studentId: 1,
+                    postTitle: "求电子版教材资源"
+                }
+            ]
+        }
+})
+Mock.mock('http://localhost:8000/post/getPosts','get',(options)=>{
     return{
         postNum: 2,
         posts: [
-            {
+            {
                 postId: 1,
                 courseId: 1,
                 studentId: 1,
@@ -52,7 +80,7 @@ Mock.mock('http://localhost:8000/login', 'post', (options) => {
         redirect: "/student/dashboard",
         userNum: "852464",
         success: true,
-        userName: "金安琪"
+        userName: "金安琪",
     };
 });
 

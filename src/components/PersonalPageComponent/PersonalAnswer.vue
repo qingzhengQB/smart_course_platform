@@ -3,9 +3,9 @@
     <template v-for="(item, index) in answers">
       <div class="answer-item-container">
         <div class="answer-item">
-          <div class="answer-title">{{ `回答问题: ${item.title}` }}</div>
+          <div class="answer-title">{{ `标题: ${item.postTitle}` }}</div>
+          <div class="answer-user">你回复了 {{ item.commentedName }} </div>
           <div class="answer-content">{{ `回答内容: ${item.content}` }}</div>
-          <div class="answer-time">{{ item.time }}</div>
         </div>
       </div>
       <div class="answer-devide" v-if="index < answers.length - 1"></div>
@@ -14,25 +14,26 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-const answers = ref([
-  {
-    title: "问题1",
-    content: "答案1内容",
-    time: "2021-10-10",
-  },
-  {
-    title: "问题2",
-    content:
-      "答案2内容长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试",
-    time: "2021-10-11",
-  },
-  {
-    title: "问题3",
-    content: "答案3内容",
-    time: "2021-10-12",
-  },
-]);
+import { ref, onMounted, computed } from "vue";
+import { getMyComments } from "@/api/PersonalApi";
+import { useStore } from 'vuex';
+
+const store = useStore();
+// 使用 computed 获取 userNum
+const userNum = computed(() => store.getters.getUserInfo.userNum);
+const answers = ref([]);
+const fetchMyComments = async () => {
+  console.log(userNum);
+  try {
+    const response = await getMyComments(userNum.value);
+    answers.value = response.commentList;
+  } catch (error) {
+    console.error("获取回复失败", error);
+  }
+}
+onMounted(() => {
+  fetchMyComments();
+})
 </script>
 
 <style scoped>

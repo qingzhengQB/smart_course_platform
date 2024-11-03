@@ -3,9 +3,8 @@
     <template v-for="(item, index) in notes">
       <div class="note-item-container">
         <div class="note-item">
-          <div class="note-title">{{ item.title }}</div>
+          <div class="note-title">{{ item.noteTitle }}</div>
           <div class="note-content">{{ item.content }}</div>
-          <div class="note-time">{{ item.time }}</div>
         </div>
       </div>
       <div class="note-devide" v-if="index < notes.length - 1"></div>
@@ -14,25 +13,26 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-const notes = ref([
-  {
-    title: "笔记1",
-    content: "笔记1内容",
-    time: "2021-10-10",
-  },
-  {
-    title: "笔记2",
-    content:
-      "笔记2内容长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试长内容测试",
-    time: "2021-10-11",
-  },
-  {
-    title: "笔记3",
-    content: "笔记3内容",
-    time: "2021-10-12",
-  },
-]);
+import { ref, onMounted, computed } from "vue";
+import { getMyNote } from "@/api/PersonalApi";
+import { useStore } from 'vuex';
+
+const store = useStore();
+const userNum = computed(() => store.getters.getUserInfo.userNum);
+const notes = ref([]);
+
+const fetchMyNote = async () => {
+  try {
+    const response = await getMyNote(userNum.value);
+    notes.value = response.notes;
+    console.log(notes.value);
+  } catch (error) {
+    console.error("获取笔记失败", error);
+  }
+}
+onMounted(() => {
+  fetchMyNote();
+})
 </script>
 
 <style scoped>

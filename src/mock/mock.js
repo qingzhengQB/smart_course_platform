@@ -208,4 +208,24 @@ Mock.mock(/\/post\/getPosts/, 'get', (options) => {
     };
 });
 
+Mock.mock(/\/note\/getNote/, 'get', (options) => {
+    return {
+        notes: [
+                {
+                    noteId: 1,
+                    studentId: 1,
+                    courseId: 1,
+                    content: "第三次课教学笔记",
+                    noteTitle: "数据结构笔记"
+                },
+                {
+                    noteId: 2,
+                    studentId: 1,
+                    courseId: 1,
+                    content: "第四次笔记",
+                    noteTitle: " 数据结构笔记2"
+                }
+        ]  
+    }
+})
 export default Mock;

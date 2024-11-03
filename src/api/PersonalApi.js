@@ -1,5 +1,18 @@
 import axios from "axios";
 
+export const getMyNote = async (userNum) => {
+    try {
+        const response = await axios.get('http://localhost:8000/note/getNote', {
+            params: {
+                studentNum: userNum
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("笔记获取失败", error);
+    } 
+}
+
 export const getMyFavourite = async (userNum) => {
     try {
         const response = await axios.get('http://localhost:8000/favourite/getFavourite', {
@@ -40,4 +53,6 @@ export const getMyComments = async (userNum) => {
 export default {
     getPosts,  
     getMyComments,
+    getMyFavourite,
+    getMyNote,
 };

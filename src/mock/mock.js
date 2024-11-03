@@ -105,7 +105,7 @@ Mock.mock(/\/student\/courses/, 'get', (options) => {
     };
 });
 // 模拟获取我的收藏的接口
-Mock.mock('http://localhost:8000/favourite/getFavourite', 'post', (options) => {
+Mock.mock(/\/favourite\/getFavourite/, 'get', (options) => {
     const params = new URLSearchParams(options.body);
     const userNum = params.get('studentNum'); // 获取请求参数 studentNum
     // 这里可以根据 userNum 做不同的返回
@@ -208,4 +208,24 @@ Mock.mock(/\/post\/getPosts/, 'get', (options) => {
     };
 });
 
+Mock.mock(/\/note\/getNote/, 'get', (options) => {
+    return {
+        notes: [
+                {
+                    noteId: 1,
+                    studentId: 1,
+                    courseId: 1,
+                    content: "第三次课教学笔记",
+                    noteTitle: "数据结构笔记"
+                },
+                {
+                    noteId: 2,
+                    studentId: 1,
+                    courseId: 1,
+                    content: "第四次笔记",
+                    noteTitle: " 数据结构笔记2"
+                }
+        ]  
+    }
+})
 export default Mock;

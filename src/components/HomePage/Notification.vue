@@ -14,7 +14,14 @@ const notificationList = ref([]);
 const fetchNotifications = async () => {
   try {
     const response = await getNotifications("852464");
-    notificationList.value = response.notifications;
+    notificationList.value = response.notifications.map(notification => {
+      const [date, time] = notification.createTime.split('T');
+      return {
+        ...notification,
+        date,
+        time
+      };
+    });
   } catch (error) {
     console.error("获取通知失败", error);
   }

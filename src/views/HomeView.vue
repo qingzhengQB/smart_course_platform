@@ -36,26 +36,6 @@
         <NotificationSummary :notificationList="notificationList" />
       </div>
     </div>
-    
-    <!-- <div class="side-content-container">
-      <el-card class="box-card">
-        <div class="card-content">
-          <img src="@/assets/avatar.png" alt="avatar" />
-          <div class="user-info">
-            <el-tag
-              :key="role"
-              type="primary"
-              effect="dark"
-              class="role-tag"
-              size="large"
-            >
-              {{ store.state.userinfo.role }}
-            </el-tag>
-            <span><strong>用户名: </strong>{{ store.state.userinfo.name }}</span>
-          </div>
-        </div>
-      </el-card>
-    </div> -->
   </div>
 </template>
 
@@ -287,11 +267,11 @@ const handleCurrentChange = (page) => {
 }
 
 .icon-return {
-  background-image: url('../assets/return.svg'); /* 替换为实际图标的URL */
+  background-image: url('../assets/return.svg'); 
 }
 
 .icon-notification {
-  background-image: url('../assets/notification.svg'); /* 替换为实际图标的URL */
+  background-image: url('../assets/notification.svg'); 
 }
 /* 左侧和右侧面板的样式 */
 .left-panel {

@@ -23,17 +23,9 @@
           <el-button type="primary">编辑资料</el-button>
         </div>
       </div>
-      <div class="followers-card">
-        <div class="f-info follower-info">
-          <div>正在关注</div>
-          <div>{{ 666 }}</div>
-        </div>
-        <div class="follower-info-devide"></div>
-        <div class="f-info followered-info">
-          <div>关注者</div>
-          <div>{{ 999 }}</div>
-        </div>
-      </div>
+      <button class="return-button">
+        <i class="icon-return"></i>返回主页
+      </button>
     </div>
       <div class="personal-filter-card">
         <div class="personal-item-filter">
@@ -56,6 +48,7 @@
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
+const userNum = store.state.userinfo.userNum;
 const personalInfo = {
   userName: "",
   email:"",
@@ -81,7 +74,6 @@ const personalItem = [
 ];
 // 页面挂载时获取用户信息
 onMounted(() => {
-  
 });
 </script>
 
@@ -183,14 +175,29 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
 }
-.followers-card{
-  @include cardSheet;
+.return-button{
   display: flex;
+  border: 2;
+  border-color: #d1cece;
+  border-radius: 20px;
   justify-content: space-evenly;
+  background-color: #ffffff;
+  align-items: center;
   width: 100%;
   height: 8vh;
-  padding: 20px 0;
-  text-align: center;
+  padding: 20px 20px;
+  font-size: 100%;
+  cursor: pointer; 
+  transition: background-color 0.2s; 
+}
+.return-button:hover {
+  background-color: #d1cece; 
+}
+.icon-return{
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  background-size: cover;
 }
 .f-info{
   display: flex;
@@ -236,5 +243,8 @@ onMounted(() => {
 }
 .filter-direct-active::after {
   opacity: 1;
+}
+.icon-return {
+  background-image: url('../assets/return.svg'); 
 }
 </style>

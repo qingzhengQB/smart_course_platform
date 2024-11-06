@@ -33,54 +33,10 @@
         <button @click="toggleContent" class="notification-button">
           <i :class="iconClass"></i> {{ showNotifications ? "返回课程" : "查看通知" }}
         </button>
-        <NotificationSummary v-if="!showNotifications" />
+        <NotificationSummary :notificationList="notificationList" />
       </div>
     </div>
-    
-    <!-- <div class="side-content-container">
-      <el-card class="box-card">
-        <div class="card-content">
-          <img src="@/assets/avatar.png" alt="avatar" />
-          <div class="user-info">
-            <el-tag
-              :key="role"
-              type="primary"
-              effect="dark"
-              class="role-tag"
-              size="large"
-            >
-              {{ store.state.userinfo.role }}
-            </el-tag>
-            <span><strong>用户名: </strong>{{ store.state.userinfo.name }}</span>
-          </div>
-        </div>
-      </el-card>
-    </div> -->
   </div>
-
-  <el-dialog v-model="notificationDialogVisible" title="通知列表" width="70vw">
-    <div class="info-box">
-      <el-table
-        :data="paginatedData"
-        :show-header="true"
-        style="width: 100%"
-        border
-      >
-        <el-table-column prop="content" label="通知内容" width="800" />
-        <el-table-column prop="createTime" label="创建时间" width="200" />
-      </el-table>
-      <el-pagination
-        background
-        layout="prev, pager, next"
-        :total="notificationList.length"
-        :page-size="pageSize"
-        :current-page="currentPage"
-        @current-change="handleCurrentChange"
-        style="margin-top: 20px"
-        class="page-divide"
-      />
-    </div>
-  </el-dialog>
 </template>
 
 <script setup>
@@ -111,7 +67,7 @@ const fetchCourses = async () => {
   try {
     const response = await getCourses(userNum.value);
     courseList.value = response.courses; 
-    console.log(courseList.value);
+    console.log("课程",courseList.value);
   } catch (error) {
     console.error("获取课程失败:", error);
   }
@@ -120,8 +76,14 @@ const fetchCourses = async () => {
 const fetchNotifications = async () => {
   try {
     const response = await getNotifications(userNum.value);
-    notificationList.value = response.notifications;
-    console.log(notificationList.value);
+    notificationList.value = response.notifications.map(notification => {
+      const [date, time] = notification.createTime.split('T');
+      return {
+        ...notification,
+        date,
+        time
+      };
+    });
   } catch (error) {
     console.error("获取通知失败", error);
   }
@@ -130,6 +92,8 @@ const fetchNotifications = async () => {
 onMounted(() => {
   fetchNotifications();
   fetchCourses();
+
+  console.log("角色",store.state);
 });
 
 const currentPage = ref(1);
@@ -303,11 +267,11 @@ const handleCurrentChange = (page) => {
 }
 
 .icon-return {
-  background-image: url('../assets/return.svg'); /* 替换为实际图标的URL */
+  background-image: url('../assets/return.svg'); 
 }
 
 .icon-notification {
-  background-image: url('../assets/notification.svg'); /* 替换为实际图标的URL */
+  background-image: url('../assets/notification.svg'); 
 }
 /* 左侧和右侧面板的样式 */
 .left-panel {

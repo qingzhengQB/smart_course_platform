@@ -23,8 +23,8 @@
           <el-button type="primary">编辑资料</el-button>
         </div>
       </div>
-      <button class="return-button">
-        <i class="icon-return"></i>返回主页
+      <button class="return-button" @click="returnHomePage">
+        <i class="icon-return" ></i>返回主页
       </button>
     </div>
       <div class="personal-filter-card">
@@ -45,6 +45,7 @@
 </template>
 
 <script setup>
+import router from "@/router";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
@@ -72,6 +73,9 @@ const personalItem = [
     url: "/personal/note",
   },
 ];
+function returnHomePage(){
+  router.push('/')
+};
 // 页面挂载时获取用户信息
 onMounted(() => {
 });

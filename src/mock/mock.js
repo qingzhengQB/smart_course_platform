@@ -1,6 +1,14 @@
 import Mock from 'mockjs';
 
 Mock.setup({ timeout: '200-600' }); // 设置延迟
+Mock.mock(/\/ai\/courseAi/, 'get', (options) => {
+    const userInput = JSON.parse(options.body).question;
+    return {
+      code: 200,
+      message: 'Success',
+      answer: `Mocked AI response to: "${userInput}" - This is a simulated response from Mock.js.`,
+    };
+  });
 // 修正正则表达式并模拟获取通知的接口
 Mock.mock(/\/student\/getNotification/, 'get', (options) => {
     console.log('请求通知接口'); // 调试信息

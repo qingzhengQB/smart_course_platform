@@ -1,7 +1,16 @@
 <template>
   <router-view />
+  <AiButton/>
 </template>
-
+<script>
+import AiButton from "./components/AiButton.vue"
+export default {
+  name: 'App',
+  components: {
+    AiButton  // Register aiButton to be used in the template
+  },
+}
+</script>
 <style lang="scss">
 :root {
   --main-page-bg: #f7f9fe;

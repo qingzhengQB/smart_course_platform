@@ -7,7 +7,6 @@ export const getNotifications = async (userNum) => {
           studentNum: userNum
         }
     }); 
-  
     return response.data; // 返回通知列表数据
   } catch (error) {
     console.error("获取通知失败:", error);

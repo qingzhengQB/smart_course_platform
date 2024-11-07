@@ -46,7 +46,7 @@ const handleLogin = async () => {
             role:user.value==="student"?"学生":"老师",
             userNum:userNum.value,
           })
-          console.log("登录成功",store),
+          console.log("登录成功"),
           router.push('/'); // 跳转到主页面
         } else {
           console.error("Login failed:", response.message);

@@ -236,7 +236,7 @@ Mock.mock(/\/note\/getNote/, 'get', (options) => {
         ]  
     }
 })
-export default Mock;
+
 Mock.mock(/\/course\/homework/,'get',(options)=>{
     return {
         homeworkList: [
@@ -255,3 +255,22 @@ Mock.mock(/\/course\/homework/,'get',(options)=>{
         ] 
     }
 })
+// 提交作业接口
+Mock.mock(/\/course\/submitHomework/, 'post', (options) => {
+    const requestBody = JSON.parse(options.body);
+    const { homeworkId, content, attachments } = requestBody;
+    
+    console.log("收到提交请求:", requestBody);
+  
+    // 模拟一个成功的响应
+    return {
+      success: true,
+      message: "作业提交成功",
+      data: {
+        homeworkId,
+        submittedContent: content,
+        submittedAttachments: attachments,
+      },
+    };
+  });
+export default Mock;

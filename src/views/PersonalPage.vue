@@ -23,9 +23,9 @@
           <el-button type="primary">编辑资料</el-button>
         </div>
       </div>
-      <button class="return-button">
-        <i class="icon-return"></i>返回主页
-      </button>
+      <button class="return-button" @click="() => router.push('/')">
+  <i class="icon-return"></i>返回主页
+</button>
     </div>
       <div class="personal-filter-card">
         <div class="personal-item-filter">
@@ -47,7 +47,10 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from 'vue-router';  // 修改这里
+
 const store = useStore();
+const router = useRouter();  // 修改这里
 const userNum = store.state.userinfo.userNum;
 const personalInfo = {
   userName: "",
@@ -175,24 +178,32 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
 }
-.return-button{
+.return-button {
+  position: relative;
+  z-index: 1;
   display: flex;
-  border: 2;
-  border-color: #d1cece;
+  border: 1px solid #d1cece;  // 修改 border 属性
   border-radius: 20px;
-  justify-content: space-evenly;
+  justify-content: center;  // 修改为 center
   background-color: #ffffff;
   align-items: center;
   width: 100%;
   height: 8vh;
-  padding: 20px 20px;
+  padding: 20px;
   font-size: 100%;
-  cursor: pointer; 
-  transition: background-color 0.2s; 
+  cursor: pointer;
+  transition: background-color 0.2s;
+  outline: none;  // 添加这行
+  
+  &:hover {
+    background-color: #d1cece;
+  }
+  
+  &:active {
+    background-color: #c0c0c0;  // 添加点击效果
+  }
 }
-.return-button:hover {
-  background-color: #d1cece; 
-}
+
 .icon-return{
   width: 20px;
   height: 20px;
@@ -215,6 +226,7 @@ onMounted(() => {
   @include cardSheet;
   width: 74%;
 }
+
 .personal-item-filter {
   display: flex;
   align-items: center;

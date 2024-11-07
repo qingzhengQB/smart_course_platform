@@ -1,30 +1,8 @@
 <template>
   <div class="homeview-container">
     <div class="main-content-container">
-      <!-- <div
-        class="notification-container"
-        @click="notificationDialogVisible = true"
-      >
-        <i class="fa-solid fa-bell"></i>
-        <span class="notification">通知消息有{{ notificationList.length }}条</span>
-      </div> -->
       <div class = "left-panel">
         <component :is="currentComponent" />
-        <!-- <div class="course-container">
-          <div class="course-item" v-for="(item, index) in courseList" :key="index">
-            <div class="course-item-img">
-              <img src="@/assets/courseCover.png" />
-            </div>
-            <div class="course-item-title">
-              <span>{{ item.name }}</span>
-            </div>
-            <span class="course-id">{{ item.courseId }}</span>
-            <div class="teacher-info">
-              <span>讲师: {{ item.teacher.name }}</span>
-              <span>教师编号: {{ item.teacher.teacherNum }}</span>
-            </div>
-          </div>
-        </div> -->
       </div>
     </div>
     <div class = "right-panel">

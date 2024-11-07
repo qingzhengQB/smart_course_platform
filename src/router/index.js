@@ -34,6 +34,14 @@ const routes = [
                 component: () =>
                   import("@/components/CourceDetailComponent/CourseInfo.vue"),
               },
+              {
+                path: "homework",
+                name: "homework",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseHomework.vue"
+                  )
+              },
             ],
           },
         ],
@@ -42,7 +50,6 @@ const routes = [
         path: "personal",
         name: "personal",
         component: () => import("@/views/PersonalPage.vue"),
-        redirect: "/personal/question",
         children: [
           {
             path: "question",

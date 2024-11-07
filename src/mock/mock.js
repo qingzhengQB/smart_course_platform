@@ -229,3 +229,21 @@ Mock.mock(/\/note\/getNote/, 'get', (options) => {
     }
 })
 export default Mock;
+Mock.mock(/\/course\/homework/,'get',(options)=>{
+    return {
+        homeworkList: [
+            {
+            homeworkId: 1,
+            title: "作业1",
+            submissionTime: "2023-10-01",
+            content: "这是作业1的内容"
+            },
+            {
+            homeworkId: 2,
+            title: "作业2",
+            submissionTime: "2023-10-02",
+            content: "这是作业2的内容"
+            }
+        ] 
+    }
+})

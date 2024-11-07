@@ -1,87 +1,109 @@
 <template>
-    <div class="course-container">
-      <div class="course-item" v-for="(item, index) in courseList" :key="index">
-        <div class="course-item-img">
-          <img src="@/assets/courseCover.png" />
-        </div>
-        <div class="course-item-title">
-          <span>{{ item.name }}</span>
-        </div>
-        <span class="course-id">{{ item.courseId }}</span>
-        <div class="teacher-info">
-          <span>讲师: {{ item.teacher.name }}</span>
-          <span>教师编号: {{ item.teacher.teacherNum }}</span>
-        </div>
+  <div class="course-container">
+    <div 
+      class="course-item" 
+      v-for="(item, index) in courseList" 
+      :key="index"
+      @click="openCourseDetail(item.courseId)"  
+    >
+      <div class="course-item-img">
+        <img :src="courseCover" alt="Course Cover" />
+      </div>
+      <div class="course-item-title">
+        <span>{{ item.name }}</span>
+      </div>
+      <span class="course-id">课程编号: {{ item.courseId }}</span>
+      <div class="teacher-info">
+        <span>讲师: {{ item.teacher.name }}</span>
+        <span>教师编号: {{ item.teacher.teacherNum }}</span>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import { getCourses } from "../../api/HomePageApi";
-  
-  const courseList = ref([]);
-  
-  const fetchCourses = async () => {
-    try {
-      const response = await getCourses("852464");
-      courseList.value = response.courses;
-    } catch (error) {
-      console.error("获取课程失败:", error);
-    }
-  };
-  
-  onMounted(() => {
-    fetchCourses();
-  });
-  </script>
-  
-  <style scoped>
-  .course-container {
-    margin: 2vh 0;
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 10px;
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { getCourses } from "../../api/HomePageApi";
+
+// 课程列表数据
+const courseList = ref([]);
+// 引入课程封面图片
+const courseCover = require('@/assets/courseCover.png');
+
+// 获取课程列表
+const fetchCourses = async () => {
+  try {
+    const response = await getCourses("852464");
+    courseList.value = response.courses;
+  } catch (error) {
+    console.error("获取课程失败:", error);
   }
-  
-  .course-item {
-    border-radius: var(--main-border-radius);
-    border: var(--main-border);
-    overflow: hidden;
-    transition: 0.3s;
-    background-color: #fff;
-    text-align: center;
-  }
-  
-  .course-item:hover {
-    box-shadow: var(--main-box-shadow);
-    border-color: var(--main-color);
-  }
-  
-  .course-item-img {
-    width: 100%;
-    height: 50%;
-  }
-  
-  .course-item-img img {
-    max-width: 100%;
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-    padding: 0;
-    object-fit: cover;
-    object-position: center;
-  }
-  
-  .course-item-title {
-    font-size: 25px;
-    margin: 10px 0;
-    font-weight: bolder;
-  }
-  
-  .course-id {
-    font-weight: bolder;
-    font-size: 1.2rem;
-  }
-  </style>
+};
+
+// 跳转到课程详情页
+const openCourseDetail = (courseId) => {
+  const url = `/course/${courseId}`;
+  window.open(url, '_blank'); // 新标签页打开
+};
+
+onMounted(() => {
+  fetchCourses();
+});
+</script>
+
+<style scoped>
+.course-container {
+  margin: 2vh 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+}
+
+.course-item {
+  border-radius: var(--main-border-radius);
+  border: var(--main-border);
+  overflow: hidden;
+  transition: 0.3s;
+  background-color: #fff;
+  text-align: center;
+  cursor: pointer; /* 鼠标悬停时显示指针 */
+}
+
+.course-item:hover {
+  box-shadow: var(--main-box-shadow);
+  border-color: var(--main-color);
+}
+
+.course-item-img {
+  width: 100%;
+  height: 150px; /* 固定高度 */
+}
+
+.course-item-img img {
+  max-width: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.course-item-title {
+  font-size: 20px;
+  margin: 10px 0;
+  font-weight: bolder;
+}
+
+.course-id {
+  font-weight: bolder;
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.teacher-info {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+</style>

@@ -237,40 +237,43 @@ Mock.mock(/\/note\/getNote/, 'get', (options) => {
     }
 })
 
-Mock.mock(/\/course\/homework/,'get',(options)=>{
+Mock.mock(/\/student\/course\/homework/,'get',(options)=>{
     return {
         homeworkList: [
             {
-            homeworkId: 1,
-            title: "作业1",
-            submissionTime: "2023-10-01",
-            content: "这是作业1的内容"
+                homeworkId: 7,
+                courseId: 1,
+                studentNum: "852464",
+                grade: null,
+                avgGrade: null,
+                mutualGrade: null,
+                content: "请尽快提交",
+                homeworkNum: 1,
+                submissionDeadline: "2024-11-08T23:59:59.000+00:00",
+                studentContent: null
             },
             {
-            homeworkId: 2,
-            title: "作业2",
-            submissionTime: "2023-10-02",
-            content: "这是作业2的内容"
+                homeworkId: 1,
+                courseId: 1,
+                studentNum: "852464",
+                grade: null,
+                avgGrade: null,
+                mutualGrade: null,
+                content: "请尽快提交作业2",
+                homeworkNum: 2,
+                submissionDeadline: "2024-11-08T23:59:59.000+00:00",
+                studentContent: null
             }
-        ] 
+        ]
+
     }
 })
 // 提交作业接口
-Mock.mock(/\/course\/submitHomework/, 'post', (options) => {
-    const requestBody = JSON.parse(options.body);
-    const { homeworkId, content, attachments } = requestBody;
-    
-    console.log("收到提交请求:", requestBody);
-  
+Mock.mock(/\/student\/course\/homework\/upload/, 'post', (options) => {
+
     // 模拟一个成功的响应
     return {
-      success: true,
-      message: "作业提交成功",
-      data: {
-        homeworkId,
-        submittedContent: content,
-        submittedAttachments: attachments,
-      },
+      message: "作业上传成功",
     };
   });
 export default Mock;

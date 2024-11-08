@@ -1,23 +1,4 @@
 import axios from "axios";
-
-// todo
-/*
-{
-  "homework": [
-    {
-        "homeworkId": 1,
-        "courseId": 1,
-        "studentNum": "852464",
-        "grade": null,
-        "avgGrade": null,
-        "mutualGrade": null,
-        "content": "无",
-        "studentHomework": null,
-        "homeworkNum": 1,
-        "submissionDeadline": "2024-11-08T23:59:59.000+00:00"
-    }
-]
-}*/
 export const fetchMyHomework = async (userNum,courseId) => {
     try {
         const response = await axios.get('http://localhost:8000/student/course/homework', {

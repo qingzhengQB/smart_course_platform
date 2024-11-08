@@ -15,6 +15,7 @@
           <div v-for="homework in homeworks" :key="homework.homeworkId" class="homework-item">
             <el-card>
               <h3 @click="viewHomeworkDetails(homework)" class="homework-title">作业 {{ homework.homeworkNum }}</h3>
+              <p>{{ homework.content }}</p>
               <p>提交时间: {{ homework.submissionDeadline }}</p>
               <el-button type="primary" @click="openSubmitModal(homework)">提交作业</el-button>
             </el-card>
@@ -76,6 +77,7 @@
   import { ref, onMounted, computed } from "vue";
   import { fetchMyHomework, submitHomework } from "@/api/CoursePageApi";
   import { useStore } from 'vuex';
+  import { ElMessage } from 'element-plus';  // 引入 element-plus 的消息组件
   
   const store = useStore();
   // 使用 computed 获取 userNum
@@ -140,10 +142,19 @@
 
     console.log("提交结果:", response);
     closeModal();  // 提交后关闭模态框
-  } catch (error) {
-    console.error("提交失败", error);
-  }
-  };
+    // 提交成功后，显示成功的提示信息
+    ElMessage({
+        message: '作业提交成功！',
+        type: 'success',
+        duration: 1000  // 0.5秒后自动消失
+      });
+
+    } catch (error) {
+      console.error("提交失败", error);
+      // 提交失败时显示错误信息
+      ElMessage.error('提交失败，请重试！');
+    }
+};
   </script>
   
   <style scoped>

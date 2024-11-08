@@ -14,8 +14,8 @@
         <div v-else class="homework-list-container">
           <div v-for="homework in homeworks" :key="homework.homeworkId" class="homework-item">
             <el-card>
-              <h3 @click="viewHomeworkDetails(homework)" class="homework-title">{{ homework.title }}</h3>
-              <p>提交时间: {{ homework.submissionTime }}</p>
+              <h3 @click="viewHomeworkDetails(homework)" class="homework-title">作业 {{ homework.homeworkNum }}</h3>
+              <p>提交时间: {{ homework.submissionDeadline }}</p>
               <el-button type="primary" @click="openSubmitModal(homework)">提交作业</el-button>
             </el-card>
           </div>
@@ -55,12 +55,12 @@
         </el-dialog>
   
         <!-- 作业详情对话框 -->
-        <el-dialog v-model="isDetailVisible" title="作业详情" width="40%">
+        <el-dialog v-model="isDetailVisible" title="作业详情" width="60%">
           <template #header>
-            <h2>{{ detailHomework.title }}</h2>
+            <h2>作业 {{ detailHomework.homeworkNum }}</h2>
           </template>
           <div>
-            <p><strong>提交时间:</strong> {{ detailHomework.submissionTime }}</p>
+            <p><strong>提交时间:</strong> {{ detailHomework.submissionDeadline }}</p>
             <p><strong>作业内容:</strong></p>
             <p>{{ detailHomework.content }}</p>
           </div>
@@ -80,11 +80,11 @@
   const store = useStore();
   // 使用 computed 获取 userNum
   const userNum = computed(() => store.getters.getUserInfo.userNum);
-  
+  const courseId = "1"; //TODO router中传来的courseId
   const homeworks = ref([]);
   const getMyHomework = async () => {
     try {
-      const response = await fetchMyHomework(userNum.value);
+      const response = await fetchMyHomework("852464",courseId);
       homeworks.value = response.homeworkList;
     } catch (error) {
       console.error("获取作业失败", error);
@@ -128,16 +128,21 @@
   
   const submit = async () => {
     try {
-      const response = await submitHomework(
-        currentHomework.value.homeworkId,
-        homeworkContent.value,
-        attachments.value.map(file => ({ name: file.name, size: file.size }))
-      );
-      console.log("提交结果:", response);
-      closeModal(); // 提交后关闭模态框
-    } catch (error) {
-      console.error("提交失败", error);
-    }
+    // 获取作业 ID 和内容
+    const homeworkId = currentHomework.value.homeworkId;
+    const studentContent = homeworkContent.value;
+
+    // 获取附件文件数组（确保 raw 是 `File` 对象）
+    const files = attachments.value.map(file => file.raw);
+
+    // 调用 submitHomework 函数，传递作业 ID、内容和附件（文件对象数组）
+    const response = await submitHomework(homeworkId, studentContent, files);
+
+    console.log("提交结果:", response);
+    closeModal();  // 提交后关闭模态框
+  } catch (error) {
+    console.error("提交失败", error);
+  }
   };
   </script>
   

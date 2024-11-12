@@ -194,7 +194,8 @@ function updateAdjacentMenuItems() {
         menuItems[currentIndex].parentElement.parentElement.children[
           menuItems[currentIndex].parentElement.parentElement.children.length -
             1
-        ] == menuItems[currentIndex].parentElement
+        ] == menuItems[currentIndex].parentElement ||
+        menuItems[currentIndex].parentElement.nextElementSibling.tagName == "LI"
       ) {
         console.log("last");
         // const nextDiv =

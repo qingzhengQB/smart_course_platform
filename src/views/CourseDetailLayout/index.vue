@@ -24,6 +24,10 @@ store.commit("setPagename", courseinfo.name);
 </script>
 
 <style scoped>
+.content-container{
+  width: 100%;
+  height: 100%;
+}
 .content {
   display: flex;
   width: 100%;

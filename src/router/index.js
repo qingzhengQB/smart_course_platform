@@ -19,33 +19,113 @@ const routes = [
         // 不使用函数会重定到course/:id/info，:id不会转换
         redirect: (to) => {
           const { id } = to.params;
-          return `/course/${id}/info`;
+          return `/course/${id}/course-info/coursedescription`;
         },
         children: [
           {
-            path: "info",
-            name: "info",
-            // component: () =>
-            //   import("@/components/CourceDetailComponent/CourseInfo.vue"),
+            path: "course-info",
+            name: "course-info",
             children: [
               {
-                path: "main",
-                name: "main",
-                component: () =>
-                  import("@/components/CourceDetailComponent/CourseInfo.vue"),
-              },
-              {
-                path: "homework",
-                name: "homework",
+                path: "coursedescription",
+                name: "coursedescription",
                 component: () =>
                   import(
-                    "@/components/CourceDetailComponent/CourseHomework.vue"
-                  )
+                    "@/components/CourceDetailComponent/CourseInfo/CourseDescription.vue"
+                  ),
+              },
+              {
+                path: "teacherinformation",
+                name: "teacherinformation",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/TeacherInformation.vue"
+                  ),
+              },
+              {
+                path: "syllabus",
+                name: "syllabus",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/Syllabus.vue"
+                  ),
+              },
+              {
+                path: "teachingcalendar",
+                name: "teachingcalendar",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/TeachingCalendar.vue"
+                  ),
               },
             ],
           },
+          {
+            path: "resource",
+            name: "resource",
+            children: [
+              {
+                path: "courseware",
+                name: "courseware",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/CourseWare.vue"
+                  ),
+              },
+              {
+                path: "preview/:id",
+                name: "preview",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/PreviewPage.vue"
+                  ),
+                props: true,
+              },
+              {
+                path: "exercisebank",
+                name: "exercisebank",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/ExerciseBank.vue"
+                  ),
+              },
+              {
+                path: "paper",
+                name: "paper",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/Paper.vue"
+                  ),
+              },
+            ],
+          },
+          {
+            path: "homework",
+            name: "homework",
+            component: () =>
+              import(
+                "@/components/CourceDetailComponent/CourseHomework/Homework.vue"
+              ),
+          },
+          {
+            name: "notifications",
+            path: "notifications",
+            component: () =>
+              import(
+                "@/components/CourceDetailComponent/CourseNotification/Notification.vue"
+              ),
+          },
+          {
+            name: "discussion",
+            path: "discussion",
+            component: () =>
+              import(
+                "@/components/CourceDetailComponent/CourseDisscussion/CourseDiscussion.vue"
+              ),
+          },
         ],
       },
+
       {
         path: "personal",
         name: "personal",

@@ -1,15 +1,15 @@
 <template>
   <router-view />
-  <AiButton/>
+  <AiButton />
 </template>
 <script>
-import AiButton from "./components/AiButton.vue"
+import AiButton from "./components/AiButton.vue";
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    AiButton  // Register aiButton to be used in the template
+    AiButton, // Register aiButton to be used in the template
   },
-}
+};
 </script>
 <style lang="scss">
 :root {
@@ -21,7 +21,7 @@ export default {
   --main-border: var(--main-border-width) solid var(--main-border-color);
   --main-box-shadow: 0px 0px 5px rgb(176, 176, 176);
   --page-head-height: 7vh;
-  --menu-color: #66b1ff;
+  --menu-color: var(--main-color);
   --menu-color-hover: #409eff;
   --font-color: #2c3e50;
 }

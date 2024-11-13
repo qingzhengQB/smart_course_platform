@@ -11,7 +11,9 @@
           {{ postItem.author }}
         </div>
         <div class="post-content">{{ postItem.content }}</div>
-        <span class="read-more">阅读全文</span>
+        <span class="read-more" @click="goToDiscussionDetail(postItem.id)"
+          >阅读全文</span
+        >
       </div>
     </div>
   </div>
@@ -19,40 +21,55 @@
 
 <script setup>
 import { ref } from "vue";
+import { useRoute } from "vue-router";
+import { useRouter } from "vue-router";
 
+const route = useRoute();
+const router = useRouter();
+const courseID = route.params.id;
 const postList = ref([
   {
     title: "Post 1",
     author: "Author 1",
     content: "This is the content of post 1",
+    id: 1,
   },
   {
     title: "Post 2",
     author: "Author 2",
     content: "This is the content of post 2",
+    id: 1,
   },
   {
     title: "Post 3",
     author: "Author 3",
     content:
       "This is the content of post 3. 长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！",
+    id: 1,
   },
   {
     title: "Post 2",
     author: "Author 2",
     content: "This is the content of post 2",
+    id: 1,
   },
   {
     title: "Post 2",
     author: "Author 2",
     content: "This is the content of post 2",
+    id: 1,
   },
   {
     title: "Post 2",
     author: "Author 2",
     content: "This is the content of post 2",
+    id: 1,
   },
 ]);
+function goToDiscussionDetail(id) {
+  console.log("go to discussion detail");
+  router.push(`/course/${courseID}/discussion/${id}`);
+}
 </script>
 
 <style scoped>

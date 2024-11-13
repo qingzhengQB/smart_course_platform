@@ -1,33 +1,48 @@
-
 <template>
   <div class="container">
     <div class="pdf-preview">
-      <div v-if="pdfLoaded" class="pdf-viewer">
+      <div
+        v-if="pdfLoaded"
+        :class="['pdf-viewer', { 'pdf-previewr-teacher': isTeacher }]"
+      >
         <div v-for="(page, index) in pages" :key="index" class="pdf-page">
           <!-- 使用 :ref 确保每个 canvas 元素引用到 pageRefs 数组中 -->
-          <canvas :ref="el => pageRefs[index] = el"></canvas>
+          <canvas :ref="(el) => (pageRefs[index] = el)"></canvas>
         </div>
       </div>
       <div v-else>
         <p>加载中...</p>
       </div>
     </div>
+    <div v-if="isTeacher" class="upload-file-container">
+      <div class="upload-file">
+        <el-upload
+          v-model:file-list="fileList"
+          class="upload-files"
+          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          :limit="1"
+          ><el-button type="primary">上传文件</el-button>
+        </el-upload>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watchEffect } from 'vue';
-import * as pdfjsLib from 'pdfjs-dist/webpack';
+import { ref, onMounted, nextTick, watchEffect } from "vue";
+import * as pdfjsLib from "pdfjs-dist/webpack";
+
+const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
 
 // 配置 PDF.js worker 文件
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
 
-const pages = ref([]);        // 存储页数
-const pageRefs = [];           // 存储每个页的 canvas 引用
-const pdfLoaded = ref(false);  // 表示 PDF 是否加载完成
+const pages = ref([]); // 存储页数
+const pageRefs = []; // 存储每个页的 canvas 引用
+const pdfLoaded = ref(false); // 表示 PDF 是否加载完成
 
 // 预设的 PDF 文件 URL
-const pdfUrl = '/2411.02310v1.pdf';
+const pdfUrl = "/2411.02310v1.pdf";
 
 // 组件加载时自动渲染 PDF
 onMounted(async () => {
@@ -57,15 +72,17 @@ const renderPDF = async (url) => {
 
     pdfLoaded.value = true; // 设置加载完成标记
   } catch (error) {
-    console.error('PDF 渲染失败:', error);
-    alert('无法加载 PDF 文件');
+    console.error("PDF 渲染失败:", error);
+    alert("无法加载 PDF 文件");
   }
 };
 
 // 渲染所有页面到各自的 canvas 上
 const renderAllPages = async () => {
   for (let pageNum = 1; pageNum <= pages.value.length; pageNum++) {
-    const page = await pdfjsLib.getDocument(pdfUrl).promise.then(pdf => pdf.getPage(pageNum));
+    const page = await pdfjsLib
+      .getDocument(pdfUrl)
+      .promise.then((pdf) => pdf.getPage(pageNum));
     const canvas = pageRefs[pageNum - 1];
     if (!canvas) {
       console.error(`Canvas 元素未找到：页码 ${pageNum}`);
@@ -73,7 +90,7 @@ const renderAllPages = async () => {
     }
 
     const viewport = page.getViewport({ scale: 1.5 });
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     canvas.height = viewport.height;
     canvas.width = viewport.width;
 
@@ -102,7 +119,6 @@ const renderAllPages = async () => {
   height: 100%;
   overflow: hidden;
 }
-
 .pdf-viewer {
   width: 100%;
   max-width: 1000px;
@@ -113,7 +129,21 @@ const renderAllPages = async () => {
   overflow-y: auto;
   overflow-x: hidden;
 }
-
+.pdf-previewr-teacher {
+  height: 80vh;
+}
+.upload-file-container {
+  width: 75vw;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 15px;
+}
+.upload-file {
+}
+.el-upload {
+  margin-left: auto;
+}
 .pdf-page {
   margin-bottom: 20px;
 }

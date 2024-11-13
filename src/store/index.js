@@ -18,6 +18,10 @@ export default createStore({
     getPagename(state) {
       return state.pagename;
     },
+    geiIsTeacher(state) {
+      console.log(state.role);
+      return state.userinfo.role == "老师";
+    },
   },
   mutations: {
     setPagename(state, pagename) {

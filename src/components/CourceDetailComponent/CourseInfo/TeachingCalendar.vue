@@ -18,7 +18,7 @@
       </div>
       <div v-else></div>
     </div>
-
+    
     <div v-if="isTeacher" class="upload-file-container">
       <div class="upload-file">
         <el-upload

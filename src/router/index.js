@@ -123,6 +123,14 @@ const routes = [
                 "@/components/CourceDetailComponent/CourseDisscussion/CourseDiscussion.vue"
               ),
           },
+          {
+            name: "discussion-detail",
+            path: "discussion/:id",
+            component: () =>
+              import(
+                "@/components/CourceDetailComponent/CourseDisscussion/CourseDiscussionDetail.vue"
+              ),
+          },
         ],
       },
 

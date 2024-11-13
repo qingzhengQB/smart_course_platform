@@ -135,6 +135,150 @@ const routes = [
       },
 
       {
+        path: "teacher-course/:id",
+        name: "teacher-course",
+        component: CourseDetailLayout,
+        redirect: (to) => {
+          const { id } = to.params;
+          return `/teacher-course/${id}/course-info/coursedescription`;
+        },
+        children: [
+          {
+            name: "teacher-course-info",
+            path: "course-info",
+            children: [
+              {
+                path: "coursedescription",
+                name: "teacher-coursedescription",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/CourseDescription.vue"
+                  ),
+              },
+              {
+                path: "teacherinformation",
+                name: "teacher-teacherinformation",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/TeacherInformation.vue"
+                  ),
+              },
+              {
+                path: "syllabus",
+                name: "teacher-syllabus",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/Syllabus.vue"
+                  ),
+              },
+              {
+                path: "teachingcalendar",
+                name: "teacher-teachingcalendar",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseInfo/TeachingCalendar.vue"
+                  ),
+              },
+            ],
+          },
+          {
+            path: "resource",
+            name: "teaacher-resource",
+            children: [
+              {
+                path: "courseware",
+                name: "teacher-courseware",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/CourseWare.vue"
+                  ),
+              },
+              {
+                path: "preview/:id",
+                name: "teacher-preview",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/PreviewPage.vue"
+                  ),
+                props: true,
+              },
+              {
+                path: "exercisebank",
+                name: "teacher-exercisebank",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/ExerciseBank.vue"
+                  ),
+              },
+              {
+                path: "paper",
+                name: "teacher-paper",
+                component: () =>
+                  import(
+                    "@/components/CourceDetailComponent/CourseResource/Paper.vue"
+                  ),
+              },
+            ],
+          },
+          {
+            path: "homework",
+            name: "teacher-homework",
+            children: [
+              {
+                name: "publish-homework",
+                path: "publish",
+                component: () =>
+                  import(
+                    "@/components/TeacherCourseDetailComponent/Homework/PublishHomework.vue"
+                  ),
+              },
+              {
+                name: "correctting-homework",
+                path: "correcting",
+                component: () =>
+                  import(
+                    "@/components/TeacherCourseDetailComponent/Homework/CorrectingHomework.vue"
+                  ),
+              },
+              {
+                name: "statistics-homework",
+                path: "statistics",
+                component: () =>
+                  import(
+                    "@/components/TeacherCourseDetailComponent/Homework/StatisticsHomework.vue"
+                  ),
+              },
+            ],
+          },
+
+          {
+            name: "teacher-notifications",
+            path: "notifications",
+            component: () =>
+              import(
+                "@/components/TeacherCourseDetailComponent/SendNotification.vue"
+              ),
+          },
+          {
+            name: "teacher-discussion",
+            path: "discussion",
+            component: () =>
+              import(
+                "@/components/CourceDetailComponent/CourseDisscussion/CourseDiscussion.vue"
+              ),
+          },
+          {
+            name: "teacher-discussion-detail",
+            path: "discussion/:id",
+            component: () =>
+              import(
+                "@/components/CourceDetailComponent/CourseDisscussion/CourseDiscussionDetail.vue"
+              ),
+          },
+        ],
+      },
+
+      {
         path: "personal",
         name: "personal",
         component: () => import("@/views/PersonalPage.vue"),

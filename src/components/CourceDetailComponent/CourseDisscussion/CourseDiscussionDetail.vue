@@ -33,7 +33,7 @@
                       />
                     </div>
                     <div class="comment-author">
-                      {{ commentItem.auther }}
+                      {{ commentItem.name }}
                     </div>
                   </div>
                   <div class="comment-options-container">
@@ -49,9 +49,6 @@
                     ></i>
                     <i class="fa-regular fa-comment"></i>
                   </div>
-                </div>
-                <div class="comment-time">
-                  {{ commentItem.time }}
                 </div>
                 <div class="comment-content">
                   {{ commentItem.content }}

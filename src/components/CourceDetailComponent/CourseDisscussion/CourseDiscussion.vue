@@ -20,56 +20,29 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
-
+import { getCourseDiscussion } from "@/api/CoursePageApi";
 const route = useRoute();
 const router = useRouter();
 const courseID = route.params.id;
-const postList = ref([
-  {
-    title: "Post 1",
-    author: "Author 1",
-    content: "This is the content of post 1",
-    id: 1,
-  },
-  {
-    title: "Post 2",
-    author: "Author 2",
-    content: "This is the content of post 2",
-    id: 1,
-  },
-  {
-    title: "Post 3",
-    author: "Author 3",
-    content:
-      "This is the content of post 3. 长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！长文本测试！",
-    id: 1,
-  },
-  {
-    title: "Post 2",
-    author: "Author 2",
-    content: "This is the content of post 2",
-    id: 1,
-  },
-  {
-    title: "Post 2",
-    author: "Author 2",
-    content: "This is the content of post 2",
-    id: 1,
-  },
-  {
-    title: "Post 2",
-    author: "Author 2",
-    content: "This is the content of post 2",
-    id: 1,
-  },
-]);
+const postList = ref([]);
 function goToDiscussionDetail(id) {
   console.log("go to discussion detail");
   router.push(`/course/${courseID}/discussion/${id}`);
 }
+const fetchDiscussion = async () => {
+  try {
+    const response = await getCourseDiscussion(courseID);
+    postList.value=response.posts;
+  } catch (error) {
+    console.error("获取讨论失败", error);
+  }
+};
+onMounted(() => {
+  fetchDiscussion();
+});
 </script>
 
 <style scoped>

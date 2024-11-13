@@ -57,7 +57,7 @@ export const submitHomework = async (homeworkId, homeworkContent, attachments) =
 
 export const getCourseNotification = async (courseId) => {
   try {
-    const response = await axios.get('http://localhost:8000/student/course/notification', {
+    const response = await axios.get('http://localhost:8000/course/notification', {
       params: {
           courseId:Number(courseId),
         }
@@ -68,9 +68,23 @@ export const getCourseNotification = async (courseId) => {
     } 
 };
 
+export const getCourseDiscussion = async (courseId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/discussion', {
+      params: {
+        courseId: Number(courseId),
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取讨论区失败", error);
+  }
+};
+
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
   submitHomework,
-  getCourseNotification
+  getCourseNotification,
+  getCourseDiscussion
 };

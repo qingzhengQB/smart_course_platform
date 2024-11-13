@@ -1,10 +1,10 @@
 <template>
   <div class="course-container">
-    <div 
-      class="course-item" 
-      v-for="(item, index) in courseList" 
+    <div
+      class="course-item"
+      v-for="(item, index) in courseList"
       :key="index"
-      @click="openCourseDetail(item.courseId)"  
+      @click="openCourseDetail(item.courseId)"
     >
       <div class="course-item-img">
         <img :src="courseCover" alt="Course Cover" />
@@ -22,13 +22,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 import { getCourses } from "../../api/HomePageApi";
+import { useStore } from "vuex";
 
 // 课程列表数据
 const courseList = ref([]);
 // 引入课程封面图片
-const courseCover = require('@/assets/courseCover.png');
+const courseCover = require("@/assets/courseCover.png");
+const store = useStore();
 
 // 获取课程列表
 const fetchCourses = async () => {
@@ -42,8 +44,10 @@ const fetchCourses = async () => {
 
 // 跳转到课程详情页
 const openCourseDetail = (courseId) => {
-  const url = `/course/${courseId}`;
-  window.open(url, '_blank'); // 新标签页打开
+  const url = `/${
+    store.getters.geiIsTeacher ? "teacher-course" : "course"
+  }/${courseId}`;
+  window.open(url, "_blank"); // 新标签页打开
 };
 
 onMounted(() => {

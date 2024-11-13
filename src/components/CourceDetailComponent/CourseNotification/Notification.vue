@@ -2,7 +2,7 @@
   <div class="n-container">
     <div class="x-notification-container">
       <div class="notice-table">
-        <el-table :data="notices" style="width: 100%">
+        <el-table :data="notificationList" style="width: 100%">
           <el-table-column prop="title" label="通知标题" width="500">
             <template v-slot="{ row }">
               <span>{{ row.title }}</span>
@@ -34,7 +34,7 @@
           <el-pagination
             background
             layout="prev, pager, next"
-            :total="notices.length"
+            :total="notificationList.length"
             :page-size="pageSize"
             :current-page.sync="currentPage"
             @current-change="handlePageChange"
@@ -50,22 +50,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-
-const notices = ref([
-  {
-    title: "通知1",
-    submissionTime: "2024-11-06 21:50:46",
-    content:
-      "通知内容1111111111111111111111111111111111111111111111111111111111111111",
-  },
-  {
-    title: "通知2",
-    submissionTime: "2024-10-22 23:51:14",
-    content: "通知内容2",
-  },
-]);
-let currentNotificaiton = notices[0];
+import { ref, onMounted } from "vue";
+import { getCourseNotification } from "../../../api/CoursePageApi"
+import { useRoute } from 'vue-router'; // 导入 useRoute 钩子
+ // 使用 useRoute 获取当前路由对象
+ const route = useRoute();
+ // 从 route.params 获取 courseId
+const courseId = route.params.id;
+console.log(courseId);
+const notificationList = ref([]);
+let currentNotificaiton = notificationList[0];
 
 const pageSize = 5;
 const currentPage = ref(1);
@@ -83,6 +77,27 @@ const openSubmitDialog = (row) => {
 const handlePageChange = (page) => {
   currentPage.value = page;
 };
+
+const fetchNotifications = async () => {
+  try {
+    const response = await getCourseNotification(courseId);
+    notificationList.value = response.notifications.map(notification => {
+      const [date, time] = notification.createTime.split('T');
+      return {
+        ...notification,
+        date,
+        time
+      };
+    });
+  } catch (error) {
+    console.error("获取通知失败", error);
+  }
+};
+
+onMounted(() => {
+  fetchNotifications();
+});
+
 </script>
 
 <style scoped>

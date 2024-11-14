@@ -45,6 +45,7 @@
     <el-dialog title="通知详情" v-model="dialogVisible" width="50%" center>
       <h2>{{ currentNotificaiton.title }}</h2>
       <p>{{ currentNotificaiton.content }}</p>
+      <p> 发布时间：{{ currentNotificaiton.date }} {{ currentNotificaiton.time }}</p>
     </el-dialog>
   </div>
 </template>

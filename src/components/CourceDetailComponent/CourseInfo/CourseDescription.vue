@@ -32,32 +32,31 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useStore } from "vuex";
-
+import { ref, onMounted } from "vue";
+import { getCourseIntro } from "../../../api/CoursePageApi"
+import { useRoute } from "vue-router";
+const route = useRoute();
 const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
-
+const courseId = route.params.id;
 const dialogVisible = ref(false);
 
-const description = ref(
-  "这是一个关于课程主题的课程，旨在帮助学生掌握课程目标。\n课程大纲涵盖了等重要知识点。"
-);
+const description = ref();
 function handleModify() {
   dialogVisible.value = true;
 }
-// 注释掉API获取数据的逻辑
-// const fetchCourseInfo = async () => {
-//   try {
-//     const response = await getCourseInfo(course.value.id);
-//     course.value = response.course;
-//  } catch (error) {
-//   console.error("获取课程信息失败:", error);
-// }
-// };
 
-// onMounted(() => {
-//  fetchCourseInfo();
-// });
+const fetchCourseInfo = async () => {
+  try {
+    const response = await getCourseIntro(courseId);
+    description.value = response.intro;
+ } catch (error) {
+  console.error("获取课程信息失败:", error);
+}
+};
+
+onMounted(() => {
+ fetchCourseInfo();
+});
 </script>
 
 <style scoped>

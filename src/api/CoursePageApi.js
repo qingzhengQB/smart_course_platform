@@ -94,6 +94,18 @@ export const getCoursePostDetial = async (postId) => {
   }
 };
 
+export const getCourseIntro = async (courseId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/intro', {
+      params: {
+        courseId:Number(courseId),
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取课程介绍失败", error);
+  }
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -101,4 +113,5 @@ export default {
   getCourseNotification,
   getCourseDiscussion,
   getCoursePostDetial,
+  getCourseIntro,
 };

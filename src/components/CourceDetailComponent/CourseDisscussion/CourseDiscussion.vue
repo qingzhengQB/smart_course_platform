@@ -11,7 +11,7 @@
           {{ postItem.author }}
         </div>
         <div class="post-content">{{ postItem.content }}</div>
-        <span class="read-more" @click="goToDiscussionDetail(postItem.id)"
+        <span class="read-more" @click="goToDiscussionDetail(postItem.postId)"
           >阅读全文</span
         >
       </div>

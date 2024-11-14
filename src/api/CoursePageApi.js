@@ -81,10 +81,24 @@ export const getCourseDiscussion = async (courseId) => {
   }
 };
 
+export const getCoursePostDetial = async (postId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/discussionById', {
+      params: {
+        postId: Number(postId),
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取帖子详情失败");
+  }
+};
+
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
   submitHomework,
   getCourseNotification,
-  getCourseDiscussion
+  getCourseDiscussion,
+  getCoursePostDetial,
 };

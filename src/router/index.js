@@ -19,7 +19,7 @@ const routes = [
         component: CourseDetailLayout,
         // 不使用函数会重定到course/:id/info，:id不会转换
         beforeEnter: (to, from, next) => {
-          if (store.getters.geiIsTeacher) {
+          if (store.getters.getIsTeacher) {
             next({ path: `/login` });
           } else {
             next();
@@ -147,7 +147,7 @@ const routes = [
         name: "teacher-course",
         component: CourseDetailLayout,
         beforeEnter: (to, from, next) => {
-          if (!store.getters.geiIsTeacher) {
+          if (!store.getters.getIsTeacher) {
             next({ path: `/login` });
           } else {
             next();

@@ -18,7 +18,7 @@ export default createStore({
     getPagename(state) {
       return state.pagename;
     },
-    geiIsTeacher(state) {
+    getIsTeacher(state) {
       console.log(state.role);
       return state.userinfo.role == "老师";
     },

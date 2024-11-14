@@ -275,5 +275,104 @@ Mock.mock(/\/student\/course\/homework\/upload/, 'post', (options) => {
     return {
       message: "作业上传成功",
     };
-  });
+});
+  
+//课程介绍
+Mock.mock(/\/course\/intro/, 'get', (options) => {
+    return {
+        intro: "2024学期课程,主要讲解常见的数据结构，如栈堆等。"
+    }
+})
+//课程通知
+Mock.mock(/\/course\/notification/, 'get', (options) => {
+    return {
+        notifications : {
+            notificationId: 1,
+            teacherId: 1,
+            content: "作业1已布置",
+            createTime: "2024-10-31T22:15:58",
+            title: "通知1",
+            courseId: 1
+          }
+    }
+})
+//课程评论
+Mock.mock(/\/course\/discussion/, 'get', (options) => {
+    return {
+        posts: [
+            {
+                postId: 1,
+                courseId: 1,
+                studentName: "金安琪",
+                likeNum: 90,
+                favoNum: 5,
+                content: "迪杰斯特拉算法的具体过程",
+                title: "算法疑问"
+            },
+            {
+                postId: 3,
+                courseId: 1,
+                studentName: "韩嘉伦",
+                likeNum: 1,
+                favoNum: 0,
+                content: "求电子版教材资源，各个版本都可以",
+                title: "求电子版教材资源"
+            }
+        ]
+    }
+})
+//课程评论详情
+Mock.mock(/\/course\/discussionById/, 'get', (options) => {
+    return {
+        postComments: [
+            {
+              commentId: 1,
+              postId: 3,
+              likeNum: 1,
+              content: "同求",
+              commentedNum: "342680",
+              teacherId: null,
+              studentId: 1,
+              commentedName: "韩嘉伦",
+              studentName: "金安琪",
+              teacherName: null
+            },
+            {
+              commentId: 2,
+              postId: 3,
+              likeNum: 0,
+              content: "蹲有回复踢我",
+              commentedNum: "342680",
+              teacherId: null,
+              studentId: 1,
+              commentedName: "韩嘉伦",
+              studentName: "金安琪",
+              teacherName: null
+            },
+            {
+              commentId: 3,
+              postId: 3,
+              likeNum: 5,
+              content: "老师评论测试",
+              commentedNum: "342680",
+              teacherId: 1,
+              studentId: null,
+              commentedName: "韩嘉伦",
+              studentName: null,
+              teacherName: "孙詩涵"
+            }
+          ],
+          postDetial: [
+            {
+              postId: 3,
+              courseId: 1,
+              studentName: "韩嘉伦",
+              likeNum: 1,
+              favoNum: 0,
+              content: "求电子版教材资源，各个版本都可以",
+              title: "求电子版教材资源"
+              }
+          ]
+    }
+})
 export default Mock;

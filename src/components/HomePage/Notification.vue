@@ -8,12 +8,13 @@
   import { ref, computed, onMounted } from 'vue';
   import { getNotifications } from "../../api/HomePageApi";
   import NotificationList from './NotificationList.vue'; 
-
+  import { useStore } from "vuex";
+const store = useStore();
 const notificationList = ref([]);
-
+const userNum = computed(() => store.state.userinfo.userNum);
 const fetchNotifications = async () => {
   try {
-    const response = await getNotifications("852464");
+    const response = await getNotifications(userNum);
     notificationList.value = response.notifications.map(notification => {
       const [date, time] = notification.createTime.split('T');
       return {

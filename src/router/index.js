@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import layout from "@/views/layout/index.vue";
 import CourseDetailLayout from "@/views/CourseDetailLayout/index.vue";
+import store from "@/store";
 
 const routes = [
   {
@@ -17,6 +18,13 @@ const routes = [
         name: "course",
         component: CourseDetailLayout,
         // 不使用函数会重定到course/:id/info，:id不会转换
+        beforeEnter: (to, from, next) => {
+          if (store.getters.geiIsTeacher) {
+            next({ path: `/login` });
+          } else {
+            next();
+          }
+        },
         redirect: (to) => {
           const { id } = to.params;
           return `/course/${id}/course-info/coursedescription`;
@@ -138,6 +146,13 @@ const routes = [
         path: "teacher-course/:id",
         name: "teacher-course",
         component: CourseDetailLayout,
+        beforeEnter: (to, from, next) => {
+          if (!store.getters.geiIsTeacher) {
+            next({ path: `/login` });
+          } else {
+            next();
+          }
+        },
         redirect: (to) => {
           const { id } = to.params;
           return `/teacher-course/${id}/course-info/coursedescription`;

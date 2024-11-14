@@ -19,7 +19,7 @@ export default createStore({
       return state.pagename;
     },
     getIsTeacher(state) {
-      console.log(state.role);
+      console.log(state.userinfo.role);
       return state.userinfo.role == "老师";
     },
   },

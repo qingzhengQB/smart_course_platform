@@ -1,14 +1,14 @@
 <template>
   <div class="answer-container">
     <template v-for="(item, index) in answers">
-      <div class="answer-item-container">
+      <div class="answer-item-container" @click="navigateToPost(item.courseId, item.postId)" >
         <div class="answer-item">
-          <div class="answer-title">{{ `标题: ${item.postTitle}` }}</div>
-          <div class="answer-user">你回复了 {{ item.commentedName }} </div>
-          <div class="answer-content">{{ `回答内容: ${item.content}` }}</div>
+          <div class="answer-title">标题: {{ item.postTitle }}</div>
+          <div class="answer-user">你回复了 {{ item.commentedName }}</div>
+          <div class="answer-content">回答内容: {{ item.content }}</div>
         </div>
       </div>
-      <div class="answer-devide" v-if="index < answers.length - 1"></div>
+      <div class="answer-divide" v-if="index < answers.length - 1"></div>
     </template>
   </div>
 </template>
@@ -17,6 +17,7 @@
 import { ref, onMounted, computed } from "vue";
 import { getMyComments } from "@/api/PersonalApi";
 import { useStore } from 'vuex';
+import router from "@/router";
 
 const store = useStore();
 // 使用 computed 获取 userNum
@@ -30,6 +31,11 @@ const fetchMyComments = async () => {
   } catch (error) {
     console.error("获取回复失败", error);
   }
+}
+//回答详情帖子跳转
+const navigateToPost = (courseId, postId) => {
+  console.log("点击")
+  router.push({ name: 'discussion-detail', params: { id: postId, courseId } });
 }
 onMounted(() => {
   fetchMyComments();

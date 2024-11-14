@@ -45,7 +45,7 @@ const fetchCourses = async () => {
 // 跳转到课程详情页
 const openCourseDetail = (courseId) => {
   const url = `/${
-    store.getters.geiIsTeacher ? "teacher-course" : "course"
+    store.getters.getIsTeacher ? "teacher-course" : "course"
   }/${courseId}`;
   window.open(url, "_blank"); // 新标签页打开
 };

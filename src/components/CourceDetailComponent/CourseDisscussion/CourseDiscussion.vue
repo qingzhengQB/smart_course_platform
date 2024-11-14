@@ -20,22 +20,28 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import { getCourseDiscussion } from "@/api/CoursePageApi";
+import { useStore } from "vuex";
 const route = useRoute();
 const router = useRouter();
+const store = useStore();
 const courseID = route.params.id;
 const postList = ref([]);
 function goToDiscussionDetail(id) {
   console.log("go to discussion detail");
-  router.push(`/course/${courseID}/discussion/${id}`);
+  router.push(
+    `/${
+      store.getters.getIsTeacher ? "teacher-course" : "course"
+    }/${courseID}/discussion/${id}`
+  );
 }
 const fetchDiscussion = async () => {
   try {
     const response = await getCourseDiscussion(courseID);
-    postList.value=response.posts;
+    postList.value = response.posts;
   } catch (error) {
     console.error("获取讨论失败", error);
   }

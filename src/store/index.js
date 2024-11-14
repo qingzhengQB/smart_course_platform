@@ -18,8 +18,8 @@ export default createStore({
     getPagename(state) {
       return state.pagename;
     },
-    geiIsTeacher(state) {
-      console.log(state.role);
+    getIsTeacher(state) {
+      console.log(state.userinfo.role);
       return state.userinfo.role == "老师";
     },
   },

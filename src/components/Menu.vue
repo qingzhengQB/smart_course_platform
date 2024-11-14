@@ -76,50 +76,38 @@ const menuList = location.pathname.startsWith("/course/")
     ]
   : // 待修改
     [
-      { name: "课程通知", url: "/notification" },
       {
-        name: "课程资源",
+        name: "课程信息",
+        url: "/course-info",
+        children: [
+          { name: "课程介绍", url: "/coursedescription" },
+          { name: "教学大纲", url: "/syllabus" },
+          { name: "教师信息", url: "/teacherinformation" },
+          { name: "教学日历", url: "/teachingcalendar" },
+        ],
+      },
+      { name: "发布课程通知", url: "/notifications" },
+      {
+        name: "上传课程资源",
         url: "/resource",
         children: [
-          { name: "电子课件", url: "/ppt" },
-          { name: "电子教材", url: "/textbook" },
-          { name: "实验", url: "/experiment" },
-          { name: "试题库", url: "/question-bank" },
-          { name: "课程视频", url: "/video" },
+          { name: "上传电子课件", url: "/courseware" },
+          { name: "上传习题库", url: "/exercisebank" },
+          { name: "上传历年试卷库", url: "/paper" },
         ],
       },
       {
         name: "课程作业",
         url: "/homework",
         children: [
-          { name: "作业", url: "/assignment" },
-          { name: "实验", url: "/experiment" },
-          { name: "测试", url: "/test" },
-          { name: "考试", url: "/exam" },
+          { name: "发布作业", url: "/publish" },
+          { name: "批改作业", url: "/correcting" },
+          { name: "作业成绩统计", url: "/statistics" },
         ],
       },
       { name: "答疑讨论", url: "/discussion" },
-      {
-        name: "课程信息",
-        url: "/course-info",
-        children: [
-          { name: "课程介绍", url: "/intro" },
-          { name: "教学大纲", url: "/syllabus" },
-          { name: "配套教案", url: "/teaching-plan" },
-          { name: "教师信息", url: "/teacher-info" },
-          { name: "学生名单", url: "/student-list" },
-        ],
-      },
-      {
-        name: "教师功能",
-        url: "/teacher-functions",
-        children: [
-          { name: "发送通知", url: "/send-notification" },
-          { name: "布置作业", url: "/assign-homework" },
-          { name: "管理资源", url: "/manage-resources" },
-        ],
-      },
     ];
+console.log(menuList);
 const activeIndex = ref(
   basePath() + menuList[0].url + menuList[0].children[0].url
 );

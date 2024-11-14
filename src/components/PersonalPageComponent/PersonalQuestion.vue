@@ -3,7 +3,7 @@
     <template v-for="(item, index) in questions">
       <div class="question-item-container">
         <div class="question-item">
-          <div class="question-title">{{ item.title }}</div>
+          <div class="question-title" @click ="navigateToPost(item.courseId, item.postId)">{{ item.title }}</div>
           <div class="question-content">{{ item.content }}</div>
           <div class="question-likeNum">{{ item.likeNum }}</div>
         </div>
@@ -17,6 +17,7 @@
 import { ref, onMounted, computed } from "vue";
 import { getPosts } from "../../api/PersonalApi";
 import { useStore } from 'vuex';
+import router from "@/router";
 
 const store = useStore();
 // 使用 computed 获取 userNum
@@ -31,6 +32,11 @@ const fetchPosts = async () => {
   } catch (error) {
     console.error("获取问题失败", error);
   }
+}
+//详情帖子跳转
+const navigateToPost = (courseId, postId) => {
+  console.log("点击")
+  router.push({ name: 'discussion-detail', params: { id: postId, courseId } });
 }
 onMounted(() => {
   fetchPosts();

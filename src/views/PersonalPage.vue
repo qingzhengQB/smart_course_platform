@@ -103,7 +103,7 @@ onMounted(() => {
 }
 .personal-cover-container{
   width: 100%;
-  height: 40%;
+  height: 50%;
 }
 .personal-cover{
   width: 100%;
@@ -117,7 +117,7 @@ onMounted(() => {
   object-position: center;
 }
 .personal-head-info{
-  height: 60%;
+  height: 50%;
   width: 100%;
 }
 .head-info{
@@ -180,30 +180,34 @@ onMounted(() => {
   align-items: center;
 }
 .return-button {
-  position: relative;
-  z-index: 1;
   display: flex;
-  border: 1px solid #d1cece;  // 修改 border 属性
-  border-radius: 20px;
-  justify-content: center;  // 修改为 center
-  background-color: #ffffff;
   align-items: center;
+  justify-content: center;
   width: 100%;
   height: 8vh;
-  padding: 20px;
-  font-size: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #ffffff;
+  border: 1px solid #d1cece;
+  border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.2s;
-  outline: none;  // 添加这行
+  transition: all 0.3s ease;
   
   &:hover {
-    background-color: #d1cece;
+    background-color: #e0e0e0; // 鼠标悬浮时变灰
   }
   
   &:active {
-    background-color: #c0c0c0;  // 添加点击效果
+    background-color: #d0d0d0; // 点击时变深
+    transform: scale(0.98); // 添加点击缩放效果
   }
 }
+:root {
+  --main-color: #5c9ea6;
+  --font-color: #333;
+  --main-border-color: #d1cece;
+}
+
 
 .icon-return{
   width: 20px;
@@ -245,6 +249,12 @@ onMounted(() => {
   text-decoration: none;
   height: 30px;
   color: var(--font-color);
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: scale(1.05); // 鼠标悬浮时轻微放大
+    color: #5c9ea6; // 改变文字颜色
+  }
 }
 .filter-direct::after {
   content: "";

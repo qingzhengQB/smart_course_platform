@@ -32,7 +32,7 @@ export const getCoursesOfStudent = async (userNum) => {
 // 获取课程列表的 API
 export const getCoursesOfTeacher = async (userNum) => {
   try {
-    const response = await axios.get('http://localhost:8000/student/courses', {
+    const response = await axios.get('http://localhost:8000/teacher/courses', {
         params: {
             teacherNum: userNum
         }

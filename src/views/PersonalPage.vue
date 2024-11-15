@@ -3,12 +3,15 @@
     <div class="personal-head">
       <div class="personal-cover-container">
       <img class="personal-cover" src="@/assets/head.png"></img></div>
+      <div>
+      <img class="personal-avatar" src="@/assets/avatar.png" alt="头像"></img>
+      </div>
       <div class="personal-head-info">
         <div class="head-info">
           <div class="head-info-user-name">{{store.state.userinfo.name}}</div>
         </div>
       </div>
-      <img class="personal-avatar" src="@/assets/avatar.png" alt="头像"></img>
+      
     </div>
     <div class="personal-page-container">
       <div class="left-part">
@@ -121,11 +124,11 @@ onMounted(() => {
   width: 100%;
 }
 .head-info{
-  display: flex;
+  display: absolute;
   justify-content: space-around;
   flex-direction: column;
   height: 80%;
-  margin-left: 20%;
+  margin-left: 30%;
 }
 .head-info-user-name{
   font-size: 1.5rem;

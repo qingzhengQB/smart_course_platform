@@ -8,7 +8,12 @@
               <span>{{ row.title }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="submissionTime" label="发布时间" width="565" />
+          <!-- Bind the formatted date and time -->
+          <el-table-column label="发布时间" width="565">
+            <template v-slot="{ row }">
+              <span>{{ row.date }} {{ row.time }}</span>
+            </template>
+          </el-table-column>          
           <el-table-column label="操作" width="100">
             <template v-slot="{ row }">
               <el-button type="text" @click="openSubmitDialog(row)"

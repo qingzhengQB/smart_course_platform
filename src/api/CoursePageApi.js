@@ -120,6 +120,7 @@ export const getCourseWareList = async (courseId) => {
   }
 }
 
+//下载课程资源接口
 export const downLoadCourseResource = async (resourceId) => {
   try {
     const response = await axios.get('http://localhost:8000/course/downLoadResource', {
@@ -145,6 +146,20 @@ export const getCourseWorkSetList = async (courseId) => {
     console.error("获取课件列表失败", error);
   }
 }
+
+//获取大纲接口
+export const getCourseOutLine = async (courseId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/outline', {
+      params: {
+        courseId: Number(courseId),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取资源URL失败", error);
+  }
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -156,4 +171,5 @@ export default {
   getCourseWareList,
   downLoadCourseResource,
   getCourseWorkSetList,
+  getCourseOutLine
 };

@@ -27,12 +27,15 @@
     </div>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, nextTick, watchEffect } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+import { getCourseOutLine } from "@/api/CoursePageApi";
+import { useRoute } from 'vue-router';
 
 const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
+const route = useRoute();
+const courseId = route.params.id;
 
 // 配置 PDF.js worker 文件
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
@@ -41,23 +44,41 @@ const pages = ref([]); // 存储页数
 const pageRefs = []; // 存储每个页的 canvas 引用
 const pdfLoaded = ref(false); // 表示 PDF 是否加载完成
 
-// 预设的 PDF 文件 URL
-const pdfUrl = "/2411.02310v1.pdf";
+const pdfUrl = ref(""); // 使用 ref 来存储 pdfUrl，以保证响应式更新
+
+// 获取课程大纲 URL
+const fetchCourseOutLineUrl = async () => {
+  try {
+    const response = await getCourseOutLine(courseId);
+    // 预设的 PDF 文件 URL
+    pdfUrl.value = response.URL; // 更新为响应式变量
+  } catch (error) {
+    console.error("大纲url获取失败", error);
+  }
+};
 
 // 组件加载时自动渲染 PDF
 onMounted(async () => {
-  await renderPDF(pdfUrl);
+  await fetchCourseOutLineUrl();
+  if (pdfUrl.value) {
+    await renderPDF(pdfUrl.value); // 确保传入的 URL 是最新的
+  }
 });
 
 // 使用 watchEffect 监控 pages 数组的变化，确保 canvas 元素已挂载
 watchEffect(async () => {
-  if (pages.value.length > 0) {
+  if (pages.value.length > 0 && pdfUrl.value) { // 确保 pdfUrl 已经有值
     await renderAllPages();
   }
 });
 
 // PDF 渲染函数：加载 PDF 并创建页面列表
 const renderPDF = async (url) => {
+  if (!url) {
+    console.error("PDF URL 无效");
+    alert("无法加载 PDF 文件，请检查文件路径");
+    return;
+  }
   try {
     pdfLoaded.value = false;
     pages.value = []; // 重置页面
@@ -81,7 +102,7 @@ const renderPDF = async (url) => {
 const renderAllPages = async () => {
   for (let pageNum = 1; pageNum <= pages.value.length; pageNum++) {
     const page = await pdfjsLib
-      .getDocument(pdfUrl)
+      .getDocument(pdfUrl.value) // 使用响应式的 pdfUrl
       .promise.then((pdf) => pdf.getPage(pageNum));
     const canvas = pageRefs[pageNum - 1];
     if (!canvas) {

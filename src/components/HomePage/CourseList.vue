@@ -25,6 +25,7 @@
 import { defineProps } from "vue";
 import { useStore } from "vuex";
 
+import { useRouter } from 'vue-router';
 // 引入课程封面图片
 const courseCover = require("@/assets/courseCover.png");
 
@@ -38,12 +39,18 @@ const props = defineProps({
 
 const store = useStore();
 
-// 跳转到课程详情页
+
+// 获取 router 实例
+const router = useRouter();
+
+// 跳转到相应的页面
 const openCourseDetail = (courseId) => {
-  const url = `/${
+  const path = `/${
     store.getters.getIsTeacher ? "teacher-course" : "course"
   }/${courseId}`;
-  window.open(url, "_blank"); // 新标签页打开
+  
+  // 使用 router.push 进行跳转
+  router.push(path);
 };
 </script>
 

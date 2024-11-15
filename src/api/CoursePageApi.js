@@ -136,7 +136,7 @@ export const downLoadCourseResource = async (resourceId) => {
 //获取试题集列表
 export const getCourseWorkSetList = async (courseId) => {
   try {
-    const response = await axios.get('http://localhost:8000//course/resource/workSet', {
+    const response = await axios.get('http://localhost:8000/course/resource/workSet', {
       params: {
         courseId:Number(courseId),
       }
@@ -160,6 +160,38 @@ export const getCourseOutLine = async (courseId) => {
     console.error("获取资源URL失败", error);
   }
 }
+//获取教学日历
+export const getCourseCalendar = async (courseId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/calendar', {
+      params: {
+        courseId: Number(courseId),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取资源URL失败", error);
+  }
+}
+
+export const sendNotification = async (title, content, teacherNum,courseId) => {
+  try {
+    const response = await axios.post("http://localhost:8000/teacher/sendNotification", null, {
+      params: {
+        title: title,
+        content: content,
+        teacherNum: teacherNum,
+        courseId: Number(courseId),
+      }
+    });
+
+    console.log("API 响应:", response.data);  // 输出响应数据调试
+    return response.data;  // 返回响应数据
+  } catch (error) {
+    console.error("发送通知失败", error);
+    throw error;  // 抛出错误，捕获异常
+  }
+};
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -171,5 +203,6 @@ export default {
   getCourseWareList,
   downLoadCourseResource,
   getCourseWorkSetList,
-  getCourseOutLine
+  getCourseOutLine,
+  getCourseCalendar
 };

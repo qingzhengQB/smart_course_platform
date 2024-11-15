@@ -16,7 +16,6 @@
           <p>加载中...</p>
         </div>
       </div>
-      <div v-else></div>
     </div>
     
     <div v-if="isTeacher" class="upload-file-container">
@@ -24,9 +23,11 @@
         <el-upload
           v-model:file-list="fileList"
           class="upload-files"
-          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          :action="uploadUrl"
           :limit="1"
-          ><el-button type="primary">上传文件</el-button>
+          :on-success="handleUploadSuccess"
+        >
+          <el-button type="primary">上传文件</el-button>
         </el-upload>
       </div>
     </div>
@@ -34,10 +35,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watchEffect } from "vue";
+import { ref, onMounted, watchEffect } from "vue";
 import * as pdfjsLib from "pdfjs-dist/webpack";
+import { getCourseCalendar } from "@/api/CoursePageApi";
+import { useRoute } from 'vue-router';
 
 const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
+const route = useRoute();
+const courseId = route.params.id;
 
 // 配置 PDF.js worker 文件
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js`;
@@ -47,11 +52,33 @@ const pageRefs = []; // 存储每个页的 canvas 引用
 const pdfLoaded = ref(false); // 表示 PDF 是否加载完成
 
 // 预设的 PDF 文件 URL
-const pdfUrl = "/2411.02310v1.pdf";
+const pdfUrl = ref(""); // 使用 ref 来存储 pdfUrl，以保证响应式更新
+// 动态生成上传文件的 URL
+const uploadUrl = ref(`http://localhost:8000/teacher/course/${courseId}/uploadCourseCalendar`);
+
+// 获取课程大纲 URL
+const fetchCourseCalendarUrl = async () => {
+  try {
+    const response = await getCourseCalendar(courseId);
+    pdfUrl.value = response.URL; // 更新为响应式变量
+  } catch (error) {
+    console.error("日历表url获取失败", error);
+  }
+};
+
+// 上传成功后的处理函数
+const handleUploadSuccess = async () => {
+  // 上传成功后，重新获取课程大纲并重新渲染 PDF
+  await fetchCourseCalendarUrl();
+  renderPDF(pdfUrl.value); // 重新渲染 PDF 文件
+};
 
 // 组件加载时自动渲染 PDF
 onMounted(async () => {
-  await renderPDF(pdfUrl);
+  await fetchCourseCalendarUrl();
+  if (pdfUrl.value) {
+    await renderPDF(pdfUrl.value); // 确保传入的 URL 是最新的
+  }
 });
 
 // 使用 watchEffect 监控 pages 数组的变化，确保 canvas 元素已挂载
@@ -86,7 +113,7 @@ const renderPDF = async (url) => {
 const renderAllPages = async () => {
   for (let pageNum = 1; pageNum <= pages.value.length; pageNum++) {
     const page = await pdfjsLib
-      .getDocument(pdfUrl)
+      .getDocument(pdfUrl.value) // 使用响应式的 pdfUrl
       .promise.then((pdf) => pdf.getPage(pageNum));
     const canvas = pageRefs[pageNum - 1];
     if (!canvas) {

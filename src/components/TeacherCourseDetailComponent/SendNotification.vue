@@ -17,18 +17,79 @@
         :rows="10"
       ></el-input>
       <div class="option-container">
-        <el-button type="primary" @click="sendNotification">发送</el-button>
+        <!-- 添加 @click 事件来触发发送通知函数 -->
+        <el-button type="primary" @click="getNotification">发送</el-button>
       </div>
+      <!-- 显示提示信息 -->
+      <el-alert
+        v-if="message"
+        :title="message"
+        :type="messageType"
+        show-icon
+        center
+      ></el-alert>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { ElMessage } from "element-plus";  // 确保已经导入 ElMessage
+import { sendNotification } from "@/api/CoursePageApi"; // 确保API路径正确
+import { useStore } from "vuex";
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const courseId = route.params.id;
+// 使用 Vuex 获取用户信息
+const store = useStore();
 const sendForm = ref({
   title: "",
   content: "",
 });
+
+const message = ref("");  // 提示信息
+const messageType = ref("");  // 提示类型
+const userNum = computed(() => store.state.userinfo.userNum); // 获取当前登录用户的编号
+
+// 发送通知函数
+const getNotification = async () => {
+  console.log("点击发送按钮"); // 调试信息
+
+  // 基本的表单验证
+  if (!sendForm.value.title || !sendForm.value.content) {
+    ElMessage.error("标题和内容不能为空！");
+    return;
+  }
+
+  try {
+    console.log(sendForm.value);
+    // 调用发送通知的 API
+    const response = await sendNotification(
+      sendForm.value.title,
+      sendForm.value.content,
+      userNum.value,
+      courseId
+    );
+    console.log("API 响应:", response); // 输出响应数据
+
+    // 处理响应
+    if (response.message) {
+      message.value = response.message;
+      messageType.value = "success";
+    } else if (response.error) {
+      message.value = response.error;
+      messageType.value = "error";
+    } else {
+      message.value = "未知错误";
+      messageType.value = "error";
+    }
+  } catch (error) {
+    console.error("发送通知失败:", error);
+    message.value = "服务器错误，请稍后重试";
+    messageType.value = "error";
+  }
+};
 </script>
 
 <style lang="scss" scoped>

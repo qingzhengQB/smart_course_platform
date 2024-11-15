@@ -10,60 +10,147 @@
       <tbody>
         <tr v-for="(file, index) in files" :key="index">
           <td style="padding-left: 30px">
-            <a @click.prevent="goToPreview(file.id)" href="#">{{
-              file.name
-            }}</a>
+            <a @click.prevent="goToPreview(file.id)" href="#">{{ file.fileName }}</a>
           </td>
-          <td
-            style="display: flex; justify-content: center; align-items: center"
-          >
+          <td style="display: flex; justify-content: center; align-items: center">
             <a href="#" @click.stop="downloadFile(file.id)">下载</a>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+
   <div class="upload-resource-container" v-if="isTeacher">
     <div class="upload-resource">
       <el-upload
         v-model:file-list="fileList"
         class="upload-files"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-        :limit="1"
-        ><el-button type="primary">上传文件</el-button>
+        :action="uploadUrl"
+        :data="uploadData"
+        :on-success="handleSuccess"
+        :on-error="handleError"
+        :on-change="handleChange"
+        :before-upload="beforeUpload"
+        method="post"
+        :limit="10"  
+        multiple 
+      >
+        <el-button type="primary">上传文件</el-button>
       </el-upload>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      isTeacher: window.location.pathname.startsWith("/teacher-course/"),
-      files: [{ id: "1", name: "习题1" }],
-    };
-  },
-  methods: {
-    goToPreview(fileId) {
-      this.$router.push({ name: "preview", params: { id: fileId } });
-    },
-    downloadFile(id) {
-      // 在这里实现文件下载逻辑
-      alert(`下载文件 ID: ${id}`);
+<script setup>
+import { getCourseWareList, downLoadCourseResource } from '@/api/CoursePageApi';
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-      const fileUrl = "/2411.02310v1.pdf";
+// 获取路由信息
+const route = useRoute();
+const router = useRouter();
+const courseId = route.params.id;
 
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      link.download = `文件${id}.pdf`;
-      link.style.display = "none";
+// 检查是否为教师
+const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
-  },
+// 文件列表
+const files = ref([]);
+const fileList = ref([]);
+
+// 上传数据配置
+const uploadUrl = "http://localhost:8000/teacher/course/" + courseId + "/uploadResource";  // 后端上传接口
+const uploadData = ref({
+  courseId: courseId // 传递课程 ID
+});
+
+// 预览文件
+const goToPreview = (fileId) => {
+  router.push({ name: "preview", params: { id: fileId } });
+};
+
+// 下载文件
+const downloadFile = async (id) => {
+  alert(`下载文件 ID: ${id}`);
+  
+  try {
+    // 获取文件 URL 和文件类型
+    const response = await downLoadCourseResource(id);
+    const fileUrl = response.URL;
+    const fileType = response.fileType;
+
+    let fileExtension = "unknown";
+    switch (fileType) {
+      case "application/pdf":
+        fileExtension = "pdf";
+        break;
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        fileExtension = "pptx";
+        break;
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        fileExtension = "docx";
+        break;
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        fileExtension = "xlsx";
+        break;
+      default:
+        fileExtension = "bin"; // 默认二进制文件
+    }
+
+    if (!fileUrl) {
+      throw new Error("文件 URL 无效。");
+    }
+
+    // 创建下载链接并触发下载
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.download = `文件${id}.${fileExtension}`; // 使用动态扩展名
+    link.style.display = "none";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("文件下载失败:", error);
+    alert("文件下载失败，请稍后再试。");
+  }
+};
+
+// 获取文件列表
+const fetchCourseWareList = async () => {
+  const response = await getCourseWareList(courseId);
+  files.value = response.resourceList;
+};
+
+// 初始化获取文件列表
+onMounted(() => {
+  fetchCourseWareList();
+});
+
+// 上传文件成功后的回调
+const handleSuccess = (response, file, fileList) => {
+  console.log('文件上传成功:', response);
+  fetchCourseWareList();  // 上传成功后重新加载文件列表
+};
+
+// 上传文件失败后的回调
+const handleError = (error, file, fileList) => {
+  console.error('文件上传失败:', error);
+  alert('文件上传失败，请稍后再试');
+};
+
+// 上传文件前的钩子函数，进行限制或验证
+const beforeUpload = (file) => {
+  const isPdf = file.type === 'application/pdf';
+  if (!isPdf) {
+    this.$message.error('只能上传 PDF 文件!');
+  }
+  return isPdf; // 返回 false 阻止上传，true 表示允许上传
+};
+
+// 文件列表更新的处理
+const handleChange = (file, fileList) => {
+  fileList.value = fileList;
 };
 </script>
 
@@ -108,6 +195,7 @@ export default {
 .file-table a:hover {
   text-decoration: underline;
 }
+
 .upload-resource-container {
   width: 100%;
   display: flex;

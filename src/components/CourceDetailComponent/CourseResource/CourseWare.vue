@@ -25,8 +25,15 @@
       <el-upload
         v-model:file-list="fileList"
         class="upload-files"
-        action="YOUR_UPLOAD_API_URL" 
-        :limit="1"
+        :action="uploadUrl"
+        :data="uploadData"
+        :on-success="handleSuccess"
+        :on-error="handleError"
+        :on-change="handleChange"
+        :before-upload="beforeUpload"
+        method="post"
+        :limit="10"  
+        multiple
       >
         <el-button type="primary">上传文件</el-button>
       </el-upload>
@@ -49,13 +56,20 @@ const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
 
 // 文件列表
 const files = ref([]);
+const fileList = ref([]);
+
+// 上传数据配置
+const uploadUrl = "http://localhost:8000/teacher/course/" + courseId + "/uploadResource";  // 后端上传接口
+const uploadData = ref({
+  courseId: courseId // 传递课程 ID
+});
 
 // 预览文件
 const goToPreview = (fileId) => {
   router.push({ name: "preview", params: { id: fileId } });
 };
 
-// // 下载文件
+// 下载文件
 const downloadFile = async (id) => {
   alert(`下载文件 ID: ${id}`);
   
@@ -64,10 +78,6 @@ const downloadFile = async (id) => {
     const response = await downLoadCourseResource(id);
     const fileUrl = response.URL;
     const fileType = response.fileType;
-
-    // 打印文件 URL 和文件类型
-    console.log(`文件 URL: ${fileUrl}`);
-    console.log(`文件类型: ${fileType}`);
 
     let fileExtension = "unknown";
     switch (fileType) {
@@ -87,7 +97,6 @@ const downloadFile = async (id) => {
         fileExtension = "bin"; // 默认二进制文件
     }
 
-    // 检查文件 URL 是否有效
     if (!fileUrl) {
       throw new Error("文件 URL 无效。");
     }
@@ -107,7 +116,6 @@ const downloadFile = async (id) => {
   }
 };
 
-
 // 获取文件列表
 const fetchCourseWareList = async () => {
   const response = await getCourseWareList(courseId);
@@ -118,6 +126,34 @@ const fetchCourseWareList = async () => {
 onMounted(() => {
   fetchCourseWareList();
 });
+
+// 上传文件成功后的回调
+const handleSuccess = (response, file, fileList) => {
+  console.log('文件上传成功:', response);
+  fetchCourseWareList();  // 上传成功后重新加载文件列表
+};
+
+// 上传文件失败后的回调
+const handleError = (error, file, fileList) => {
+  console.error('文件上传失败:', error);
+  alert('文件上传失败，请稍后再试');
+};
+
+// 上传文件前的钩子函数，进行限制或验证
+const beforeUpload = (file) => {
+  console.log('正在上传文件: ', file.name); // Debug log for file being uploaded
+  const isPdf = file.type === 'application/pdf';
+  if (!isPdf) {
+    alert('只能上传 PDF 文件!');
+  }
+  return isPdf; // 返回 false 阻止上传，true 表示允许上传
+};
+
+// 文件列表更新的处理
+const handleChange = (file, fileList) => {
+  console.log('文件列表更新:', file, fileList); // Debug log for file list changes
+  fileList.value = fileList;
+};
 </script>
 
 <style scoped>

@@ -19,8 +19,9 @@
         <el-upload
           v-model:file-list="fileList"
           class="upload-files"
-          action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+          :action="uploadUrl"
           :limit="1"
+          :on-success="handleUploadSuccess"
           ><el-button type="primary">上传文件</el-button>
         </el-upload>
       </div>
@@ -45,7 +46,8 @@ const pageRefs = []; // 存储每个页的 canvas 引用
 const pdfLoaded = ref(false); // 表示 PDF 是否加载完成
 
 const pdfUrl = ref(""); // 使用 ref 来存储 pdfUrl，以保证响应式更新
-
+// 动态生成上传文件的 URL
+const uploadUrl = ref(`http://localhost:8000/teacher/course/${courseId}/uploadCourseOutLine`);
 // 获取课程大纲 URL
 const fetchCourseOutLineUrl = async () => {
   try {
@@ -71,7 +73,13 @@ watchEffect(async () => {
     await renderAllPages();
   }
 });
-
+// 上传成功后的处理函数
+const handleUploadSuccess = () => {
+  // 上传成功后，重新获取课程大纲并重新渲染 PDF
+  fetchCourseOutLineUrl().then(() => {
+    renderPDF(pdfUrl.value); // 重新渲染 PDF 文件
+  });
+};
 // PDF 渲染函数：加载 PDF 并创建页面列表
 const renderPDF = async (url) => {
   if (!url) {

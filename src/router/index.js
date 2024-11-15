@@ -333,16 +333,6 @@ const routes = [
     name: "login",
     component: () => import("@/views/Login.vue"),
   },
-  {
-    path: "/notification",
-    name: "notification",
-    component: () => import("@/views/notification.vue"),
-  },
-  {
-    path: "/mul",
-    name: "mul",
-    component: () => import("@/views/mul.vue"),
-  },
 ];
 
 const router = createRouter({

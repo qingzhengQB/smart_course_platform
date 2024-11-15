@@ -22,8 +22,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { getCourses } from "../../api/HomePageApi";
+import { ref, onMounted, computed } from "vue";
+import { getCoursesOfStudent, getCoursesOfTeacher } from "../../api/HomePageApi";
 import { useStore } from "vuex";
 
 // 课程列表数据
@@ -31,12 +31,16 @@ const courseList = ref([]);
 // 引入课程封面图片
 const courseCover = require("@/assets/courseCover.png");
 const store = useStore();
+const userNum = computed(() => store.state.userinfo.userNum);
 
 // 获取课程列表
 const fetchCourses = async () => {
   try {
-    const response = await getCourses("852464");
-    courseList.value = response.courses;
+    if (store.getters.getIsTeacher) {
+      courseList.value = await getCoursesOfTeacher(userNum.value).courses;
+    } else {
+      courseList.value = await getCoursesOfStudent(userNum.value).courses;
+    }
   } catch (error) {
     console.error("获取课程失败:", error);
   }

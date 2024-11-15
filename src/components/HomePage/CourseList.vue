@@ -22,29 +22,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { getCoursesOfStudent, getCoursesOfTeacher } from "../../api/HomePageApi";
+import { defineProps } from "vue";
 import { useStore } from "vuex";
 
-// 课程列表数据
-const courseList = ref([]);
 // 引入课程封面图片
 const courseCover = require("@/assets/courseCover.png");
-const store = useStore();
-const userNum = computed(() => store.state.userinfo.userNum);
 
-// 获取课程列表
-const fetchCourses = async () => {
-  try {
-    if (store.getters.getIsTeacher) {
-      courseList.value = await getCoursesOfTeacher(userNum.value).courses;
-    } else {
-      courseList.value = await getCoursesOfStudent(userNum.value).courses;
-    }
-  } catch (error) {
-    console.error("获取课程失败:", error);
-  }
-};
+// 定义 props 接收父组件传递的数据
+const props = defineProps({
+  courseList: {
+    type: Array,
+    required: true,
+  },
+});
+
+const store = useStore();
 
 // 跳转到课程详情页
 const openCourseDetail = (courseId) => {
@@ -53,10 +45,6 @@ const openCourseDetail = (courseId) => {
   }/${courseId}`;
   window.open(url, "_blank"); // 新标签页打开
 };
-
-onMounted(() => {
-  fetchCourses();
-});
 </script>
 
 <style scoped>

@@ -1,17 +1,18 @@
 <template>
   <div class="homeview-container">
     <div class="main-content-container">
-      <div class = "left-panel">
-        <component :is="currentComponent" />
+      <div class="left-panel">
+        <component :is="currentComponent" :courseList="courseList" />
       </div>
     </div>
-    <div class = "right-panel">
+    <div class="right-panel">
       <UserInfo />
       <div class="notification-section">
         <button @click="toggleContent" class="notification-button">
           <i :class="iconClass"></i> {{ showNotifications ? "返回课程" : "查看通知" }}
         </button>
-        <NotificationSummary :notificationList="notificationList" />
+        <!-- Only render paginated notifications -->
+        <NotificationSummary :notificationList="paginatedData" />
       </div>
     </div>
   </div>
@@ -20,42 +21,47 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
-import { getNotifications, getCoursesOfStudent, getCoursesOfTeacher  } from "../api/HomePageApi";
+import { getNotifications, getCoursesOfStudent, getCoursesOfTeacher } from "../api/HomePageApi";
 import UserInfo from "@/components/HomePage/UserInfo.vue";
 import Notification from "@/components/HomePage/Notification.vue";
 import CourseList from "@/components/HomePage/CourseList.vue";
 import NotificationSummary from "@/components/HomePage/NotificationSummary.vue";
+
+// Vuex Store
 const store = useStore();
 const notificationDialogVisible = ref(false);
 const notificationList = ref([]);
-const courseList = ref([]); 
+const courseList = ref([]);
 const userNum = computed(() => store.state.userinfo.userNum);
 const showNotifications = ref(false);
 const iconClass = computed(() => showNotifications.value ? 'icon-return' : 'icon-notification');
-// 根据showNotifications的值来决定显示哪个组件
+
+// Dynamically switch component
 const currentComponent = computed(() => {
   return showNotifications.value ? Notification : CourseList;
 });
 
+// Toggle between notifications and courses
 const toggleContent = () => {
   showNotifications.value = !showNotifications.value;
 };
 
-// 获取课程列表
+// Fetch courses based on user type
 const fetchCourses = async () => {
   try {
     if (store.getters.getIsTeacher) {
-      courseList.value = await getCoursesOfTeacher(userNum.value).courses;
+      const response = await getCoursesOfTeacher(userNum.value);
+      courseList.value = response.courses || [];
     } else {
       const response = await getCoursesOfStudent(userNum.value);
-      courseList.value = response.courses;
-      console.log(courseList.value)
+      courseList.value = response.courses || [];
     }
   } catch (error) {
     console.error("获取课程失败:", error);
   }
 };
 
+// Fetch notifications
 const fetchNotifications = async () => {
   try {
     const response = await getNotifications(userNum.value);
@@ -75,10 +81,9 @@ const fetchNotifications = async () => {
 onMounted(() => {
   fetchNotifications();
   fetchCourses();
-
-  console.log("角色",store.state);
 });
 
+// Pagination for notifications
 const currentPage = ref(1);
 const pageSize = ref(5);
 
@@ -88,10 +93,12 @@ const paginatedData = computed(() => {
   return notificationList.value.slice(start, end);
 });
 
+// Change page
 const handleCurrentChange = (page) => {
   currentPage.value = page;
 };
 </script>
+
 
 <style scoped>
 .homeview-container {

@@ -106,6 +106,45 @@ export const getCourseIntro = async (courseId) => {
     console.error("获取课程介绍失败", error);
   }
 }
+
+export const getCourseWareList = async (courseId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/resource', {
+      params: {
+        courseId:Number(courseId),
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取课件列表失败", error);
+  }
+}
+
+export const downLoadCourseResource = async (resourceId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/course/downLoadResource', {
+      params: {
+        resourceId: Number(resourceId),
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取下载资源URL失败", error);
+  }
+}
+//获取试题集列表
+export const getCourseWorkSetList = async (courseId) => {
+  try {
+    const response = await axios.get('http://localhost:8000//course/resource/workSet', {
+      params: {
+        courseId:Number(courseId),
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("获取课件列表失败", error);
+  }
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -114,4 +153,7 @@ export default {
   getCourseDiscussion,
   getCoursePostDetial,
   getCourseIntro,
+  getCourseWareList,
+  downLoadCourseResource,
+  getCourseWorkSetList,
 };

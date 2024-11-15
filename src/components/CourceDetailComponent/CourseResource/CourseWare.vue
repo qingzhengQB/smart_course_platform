@@ -10,70 +10,114 @@
       <tbody>
         <tr v-for="(file, index) in files" :key="index">
           <td style="padding-left: 30px">
-            <a @click.prevent="goToPreview(file.id)" href="#">{{
-              file.name
-            }}</a>
+            <a @click.prevent="goToPreview(file.id)" href="#">{{ file.fileName }}</a>
           </td>
-          <td
-            style="display: flex; justify-content: center; align-items: center"
-          >
+          <td style="display: flex; justify-content: center; align-items: center">
             <a href="#" @click.stop="downloadFile(file.id)">下载</a>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
+
   <div class="upload-resource-container" v-if="isTeacher">
     <div class="upload-resource">
       <el-upload
         v-model:file-list="fileList"
         class="upload-files"
-        action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+        action="YOUR_UPLOAD_API_URL"  <!-- Replace with your actual file upload API -->
         :limit="1"
-        ><el-button type="primary">上传文件</el-button>
+      >
+        <el-button type="primary">上传文件</el-button>
       </el-upload>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      isTeacher: window.location.pathname.startsWith("/teacher-course/"),
+<script setup>
+import { getCourseWareList, downLoadCourseResource } from '@/api/CoursePageApi';
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-      files: [
-        { id: "1", name: "0-课程简介及要求" },
-        { id: "2", name: "第6章-科研论文-投稿" },
-        { id: "3", name: "第5-2章-毕设正文及答辩" },
-        { id: "4", name: "第5-1章-毕设摘要及目录" },
-        { id: "5", name: "第4章-开题报告及答辩" },
-        { id: "6", name: "第3章-学术伦理" },
-        { id: "7", name: "第1-2章-论文分类-检索" },
-      ],
-    };
-  },
-  methods: {
-    goToPreview(fileId) {
-      this.$router.push({ name: "preview", params: { id: fileId } });
-    },
-    downloadFile(id) {
-      // 在这里实现文件下载逻辑
-      alert(`下载文件 ID: ${id}`);
+// 获取路由信息
+const route = useRoute();
+const router = useRouter();
+const courseId = route.params.id;
 
-      const fileUrl = "/2411.02310v1.pdf";
+// 检查是否为教师
+const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
 
-      const link = document.createElement("a");
-      link.href = fileUrl;
-      link.download = `文件${id}.pdf`;
-      link.style.display = "none";
+// 文件列表
+const files = ref([]);
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    },
-  },
+// 预览文件
+const goToPreview = (fileId) => {
+  router.push({ name: "preview", params: { id: fileId } });
 };
+
+// // 下载文件
+const downloadFile = async (id) => {
+  alert(`下载文件 ID: ${id}`);
+  
+  try {
+    // 获取文件 URL 和文件类型
+    const response = await downLoadCourseResource(id);
+    const fileUrl = response.URL;
+    const fileType = response.fileType;
+
+    // 打印文件 URL 和文件类型
+    console.log(`文件 URL: ${fileUrl}`);
+    console.log(`文件类型: ${fileType}`);
+
+    let fileExtension = "unknown";
+    switch (fileType) {
+      case "application/pdf":
+        fileExtension = "pdf";
+        break;
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        fileExtension = "pptx";
+        break;
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        fileExtension = "docx";
+        break;
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        fileExtension = "xlsx";
+        break;
+      default:
+        fileExtension = "bin"; // 默认二进制文件
+    }
+
+    // 检查文件 URL 是否有效
+    if (!fileUrl) {
+      throw new Error("文件 URL 无效。");
+    }
+
+    // 创建下载链接并触发下载
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.download = `文件${id}.${fileExtension}`; // 使用动态扩展名
+    link.style.display = "none";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("文件下载失败:", error);
+    alert("文件下载失败，请稍后再试。");
+  }
+};
+
+
+// 获取文件列表
+const fetchCourseWareList = async () => {
+  const response = await getCourseWareList(courseId);
+  files.value = response.resourceList;
+};
+
+// 初始化获取文件列表
+onMounted(() => {
+  fetchCourseWareList();
+});
 </script>
 
 <style scoped>

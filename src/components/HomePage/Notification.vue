@@ -14,7 +14,7 @@ const notificationList = ref([]);
 const userNum = computed(() => store.state.userinfo.userNum);
 const fetchNotifications = async () => {
   try {
-    const response = await getNotifications(userNum);
+    const response = await getNotifications(userNum.value);
     notificationList.value = response.notifications.map(notification => {
       const [date, time] = notification.createTime.split('T');
       return {

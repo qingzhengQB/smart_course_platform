@@ -41,7 +41,76 @@ Mock.mock('http://localhost:8000/login', 'post', (options) => {
         userName: "金安琪",
     };
 });
+// 模拟获取课程列表的接口
+Mock.mock(/\/teacher\/courses/, 'get', (options) => {
+    console.log('请求课程接口'); // 调试信息
+    const courses = [
+        {
+            courseId: 1,
+            name: "数据结构",
+            intro: "2024学期课程",
+            outline: "无",
+            teacherInfo: "无",
+            calendar: "无",
+            resource: null,
+            teacher: {
+                id: 1,
+                name: "孙詩涵",
+                password: "346018",
+                teacherNum: "2592"
+            }
+        },
+        {
+            courseId: 2,
+            name: "计算机导论",
+            intro: "2024学期课程",
+            outline: "无",
+            teacherInfo: "无",
+            calendar: "无",
+            resource: null,
+            teacher: {
+                id: 2,
+                name: "廖岚",
+                password: "252797",
+                teacherNum: "6429"
+            }
+        },
+        {
+            courseId: 3,
+            name: "计算机导论",
+            intro: "2024学期课程",
+            outline: "无",
+            teacherInfo: "无",
+            calendar: "无",
+            resource: null,
+            teacher: {
+                id: 2,
+                name: "廖岚",
+                password: "252797",
+                teacherNum: "6429"
+            }
+        },
+        {
+            courseId: 4,
+            name: "计算机导论",
+            intro: "2024学期课程",
+            outline: "无",
+            teacherInfo: "无",
+            calendar: "无",
+            resource: null,
+            teacher: {
+                id: 2,
+                name: "廖岚",
+                password: "252797",
+                teacherNum: "6429"
+            }
+        }
+    ];
 
+    return {
+        courses, // 返回课程列表数据
+    };
+});
 // 模拟获取课程列表的接口
 Mock.mock(/\/student\/courses/, 'get', (options) => {
     console.log('请求课程接口'); // 调试信息

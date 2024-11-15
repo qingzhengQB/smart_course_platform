@@ -25,7 +25,7 @@
       <el-upload
         v-model:file-list="fileList"
         class="upload-files"
-        action="YOUR_UPLOAD_API_URL"  <!-- Replace with your actual file upload API -->
+        action="YOUR_UPLOAD_API_URL" 
         :limit="1"
       >
         <el-button type="primary">上传文件</el-button>

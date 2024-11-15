@@ -20,7 +20,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
-import { getCourses, getNotifications } from "../api/HomePageApi";
+import { getNotifications, getCoursesOfStudent, getCoursesOfTeacher  } from "../api/HomePageApi";
 import UserInfo from "@/components/HomePage/UserInfo.vue";
 import Notification from "@/components/HomePage/Notification.vue";
 import CourseList from "@/components/HomePage/CourseList.vue";
@@ -41,11 +41,16 @@ const toggleContent = () => {
   showNotifications.value = !showNotifications.value;
 };
 
+// 获取课程列表
 const fetchCourses = async () => {
   try {
-    const response = await getCourses(userNum.value);
-    courseList.value = response.courses; 
-    console.log("课程",courseList.value);
+    if (store.getters.getIsTeacher) {
+      courseList.value = await getCoursesOfTeacher(userNum.value).courses;
+    } else {
+      const response = await getCoursesOfStudent(userNum.value);
+      courseList.value = response.courses;
+      console.log(courseList.value)
+    }
   } catch (error) {
     console.error("获取课程失败:", error);
   }

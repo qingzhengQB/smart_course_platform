@@ -101,15 +101,27 @@ const downloadFile = async (id) => {
       throw new Error("文件 URL 无效。");
     }
 
-    // 创建下载链接并触发下载
+    // 通过 fetch 获取文件并创建 Blob 对象，避免浏览器跳转
+    const fileResponse = await fetch(fileUrl);
+    const blob = await fileResponse.blob();
+    
     const link = document.createElement("a");
-    link.href = fileUrl;
-    link.download = `文件${id}.${fileExtension}`; // 使用动态扩展名
-    link.style.display = "none";
+    const downloadUrl = window.URL.createObjectURL(blob);
+    link.href = downloadUrl;
+    link.download = `文件${id}.${fileExtension}`;  // 使用动态扩展名
 
-    document.body.appendChild(link);
+    link.style.display = "none"; // 隐藏链接元素
+    document.body.appendChild(link); // 将链接添加到页面中
+
+    // 模拟点击以触发下载
     link.click();
+
+    // 下载后移除链接元素
     document.body.removeChild(link);
+
+    // 释放 URL 对象
+    window.URL.revokeObjectURL(downloadUrl);
+
   } catch (error) {
     console.error("文件下载失败:", error);
     alert("文件下载失败，请稍后再试。");

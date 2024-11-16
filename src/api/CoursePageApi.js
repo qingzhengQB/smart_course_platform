@@ -120,7 +120,7 @@ export const getCourseWareList = async (courseId) => {
   }
 }
 
-//下载课程资源接口
+//下载课程资源接口 资源下载逻辑都相同，可以使用同一个接口
 export const downLoadCourseResource = async (resourceId) => {
   try {
     const response = await axios.get('http://localhost:8000/course/downLoadResource', {
@@ -146,6 +146,7 @@ export const getCourseWorkSetList = async (courseId) => {
     console.error("获取课件列表失败", error);
   }
 }
+
 
 //获取大纲接口
 export const getCourseOutLine = async (courseId) => {

@@ -13,7 +13,20 @@ export const getNotifications = async (userNum) => {
     throw error; // 抛出错误以便调用者处理
   }
 };
-
+// 获取通知列表的 API
+export const getNotificationsOfTeacher = async (userNum) => {
+  try {
+    const response = await axios.get('http://localhost:8000/teacher/getNotification', {
+        params:{
+          teacherNum: userNum
+        }
+    }); 
+    return response.data; // 返回通知列表数据
+  } catch (error) {
+    console.error("获取通知失败:", error);
+    throw error; // 抛出错误以便调用者处理
+  }
+};
 // 获取课程列表的 API
 export const getCoursesOfStudent = async (userNum) => {
   try {
@@ -48,5 +61,6 @@ export const getCoursesOfTeacher = async (userNum) => {
 export default {
     getNotifications,
   getCoursesOfStudent,
-  getCoursesOfTeacher
+  getCoursesOfTeacher,
+  getNotificationsOfTeacher
 };

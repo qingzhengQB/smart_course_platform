@@ -6,16 +6,29 @@
   
   <script setup>
   import { ref, computed, onMounted } from 'vue';
-  import { getNotifications } from "../../api/HomePageApi";
+  import { getNotifications,getNotificationsOfTeacher } from "../../api/HomePageApi";
   import NotificationList from './NotificationList.vue'; 
   import { useStore } from "vuex";
 const store = useStore();
 const notificationList = ref([]);
 const userNum = computed(() => store.state.userinfo.userNum);
+// Fetch notifications
 const fetchNotifications = async () => {
   try {
-    const response = await getNotifications(userNum.value);
-    notificationList.value = response.notifications.map(notification => {
+    getNotificationsOfTeacher
+    if (store.getters.getIsTeacher) {
+      const response = await getNotificationsOfTeacher(userNum.value);
+      notificationList.value = response.notifications.map(notification => {
+      const [date, time] = notification.createTime.split('T');
+      return {
+        ...notification,
+        date,
+        time
+      };
+    });;
+    } else {
+      const response = await getNotifications(userNum.value);
+      notificationList.value = response.notifications.map(notification => {
       const [date, time] = notification.createTime.split('T');
       return {
         ...notification,
@@ -23,6 +36,8 @@ const fetchNotifications = async () => {
         time
       };
     });
+    }
+    
   } catch (error) {
     console.error("获取通知失败", error);
   }

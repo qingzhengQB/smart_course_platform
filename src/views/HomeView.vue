@@ -21,7 +21,7 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
-import { getNotifications, getCoursesOfStudent, getCoursesOfTeacher } from "../api/HomePageApi";
+import { getNotifications, getNotificationsOfTeacher, getCoursesOfStudent, getCoursesOfTeacher } from "../api/HomePageApi";
 import UserInfo from "@/components/HomePage/UserInfo.vue";
 import Notification from "@/components/HomePage/Notification.vue";
 import CourseList from "@/components/HomePage/CourseList.vue";
@@ -64,8 +64,19 @@ const fetchCourses = async () => {
 // Fetch notifications
 const fetchNotifications = async () => {
   try {
-    const response = await getNotifications(userNum.value);
-    notificationList.value = response.notifications.map(notification => {
+    if (store.getters.getIsTeacher) {
+      const response = await getNotificationsOfTeacher(userNum.value);
+      notificationList.value = response.notifications.map(notification => {
+      const [date, time] = notification.createTime.split('T');
+      return {
+        ...notification,
+        date,
+        time
+      };
+    });;
+    } else {
+      const response = await getNotifications(userNum.value);
+      notificationList.value = response.notifications.map(notification => {
       const [date, time] = notification.createTime.split('T');
       return {
         ...notification,
@@ -73,6 +84,8 @@ const fetchNotifications = async () => {
         time
       };
     });
+    }
+    
   } catch (error) {
     console.error("获取通知失败", error);
   }

@@ -1,173 +1,232 @@
 <template>
-  <div class="homework-table">
-    <el-table :data="paginatedHomeworks" style="width: 100%">
-      <el-table-column prop="title" label="作业标题" width="180">
-        <template v-slot="{ row }">
-          <span>{{ row.title }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="startDate" label="作业开始" width="150" />
-      <el-table-column prop="endDate" label="作业截止" width="150" />
-      <el-table-column prop="submitted" label="提交人数" width="100" />
-      <el-table-column prop="submissionTime" label="提交时间" width="180" />
-      <el-table-column prop="score" label="得分" width="100" />
-      <el-table-column prop="reviewStatus" label="批改状态" width="100" />
-      <el-table-column label="操作" width="200">
-        <template v-slot="{ row }">
-          <el-button type="text" @click="viewFile(row.fileUrl)">查看</el-button>
-          <el-button type="text" @click="openSubmitDialog(row)">提交</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+  <el-container>
+    <el-header>
+      <h2>作业列表</h2>
+    </el-header>
 
-    <!-- 分页控件 -->
-    <!-- 分页控件 -->
-<div style="position: fixed; bottom: 0; width: 100%; text-align: center;  display: flex; justify-content: center;align-items: center;">
-  <el-pagination
-    background
-    layout="prev, pager, next"
-    :total="homeworks.length"
-    :page-size="pageSize"
-    :current-page.sync="currentPage"
-    @current-change="handlePageChange"
-  ></el-pagination>
-</div>
-
-    <!-- 提交作业的弹窗 -->
-    <el-dialog title="交作业" v-model="dialogVisible" width="600px">
-      <el-form>
-        <el-form-item label="作业内容：" label-width="80px">
-          <el-input
-            type="textarea"
-            v-model="homeworkContent"
-            placeholder="请输入3000字以内的作业内容"
-            rows="6"
-          ></el-input>
-        </el-form-item>
-
-        <el-form-item label="上传文件：" label-width="80px">
-          <el-upload
-            class="upload-demo"
-            action="/upload"
-            :limit="1"
-            :on-success="handleUploadSuccess"
-            :on-remove="handleFileRemove"
-            :file-list="fileList"
-            accept=".ppt, .pptx, .doc, .docx, .pdf, .txt, .xls, .xlsx, .jpg, .jpeg, .png, .bmp, .gif, .mp3, .mp4, .avi, .wmv, .mov, .rmvb, .flv, .f4v, .rar, .zip"
-          >
-            <el-button size="small" type="primary">上传文件</el-button>
-            <div slot="tip" class="el-upload__tip">
-              附件支持ppt, pptx, doc, docx, pdf, txt, xls, xlsx, jpg, jpeg, png, bmp, gif, mp3, mp4, avi, wmv, mov, rmvb, flv, f4v, rar, zip格式，其他格式附件请压缩后进行上传。
-            </div>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitHomework">确定</el-button>
+    <el-main>
+      <!-- 无作业时的提示 -->
+      <div v-if="homeworks.length === 0" class="no-homework">
+        暂无作业
       </div>
-    </el-dialog>
-  </div>
+
+      <!-- 作业列表展示 -->
+      <div v-else class="homework-list-container">
+        <div v-for="homework in paginatedHomeworks" :key="homework.homeworkId" class="homework-item">
+          <el-card>
+            <h3 @click="viewHomeworkDetails(homework)" class="homework-title">作业 {{ homework.homeworkNum }}</h3>
+            <p>{{ homework.content }}</p>
+            <p>提交时间: {{ homework.submissionDeadline }}</p>
+            <p v-if="homework.score">得分: {{ homework.score }}</p>
+            <p v-else>批改状态: 未批改</p>
+            <el-button type="primary" @click="openSubmitModal(homework)">提交作业</el-button>
+          </el-card>
+        </div>
+      </div>
+
+      <!-- 分页控件 -->
+      <div style="position: fixed; bottom: 0; width: 100%; text-align: center; display: flex; justify-content: center;align-items: center;">
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="homeworks.length"
+          :page-size="pageSize"
+          :current-page.sync="currentPage"
+          @current-change="handlePageChange"
+        ></el-pagination>
+      </div>
+
+      <!-- 提交作业对话框 -->
+      <el-dialog v-model="isModalOpen" title="提交作业" width="30%">
+        <template #header>
+          <h2>提交作业: {{ currentHomework.title }}</h2>
+        </template>
+
+        <el-form>
+          <el-form-item label="作业内容">
+            <el-input type="textarea" v-model="homeworkContent" placeholder="写下你的作业..." required></el-input>
+          </el-form-item>
+          <el-form-item label="上传附件">
+            <el-upload
+              class="upload-demo"
+              drag
+              multiple
+              :on-change="handleFileUpload"
+              :file-list="attachments"
+              :auto-upload="false"
+              :show-file-list="true"
+              :limit="5"
+              accept=".pdf,.doc,.docx,.jpg,.png"
+            >
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+            </el-upload>
+          </el-form-item>
+        </el-form>
+
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeModal">关闭</el-button>
+          <el-button type="primary" @click="submit">提交</el-button>
+        </span>
+      </el-dialog>
+
+      <!-- 作业详情对话框 -->
+      <el-dialog v-model="isDetailVisible" title="作业详情" width="60%">
+        <template #header>
+          <h2>作业 {{ detailHomework.homeworkNum }}</h2>
+        </template>
+        <div>
+          <p><strong>提交时间:</strong> {{ detailHomework.submissionDeadline }}</p>
+          <p><strong>作业内容:</strong></p>
+          <p>{{ detailHomework.content }}</p>
+          <p><strong>批改状态:</strong> 
+            <span v-if="detailHomework.score">{{ detailHomework.score }}</span>
+            <span v-else>未批改</span>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeDetailModal">关闭</el-button>
+        </span>
+      </el-dialog>
+    </el-main>
+  </el-container>
 </template>
 
-<script>
-import { ref, computed } from 'vue';
+<script setup>
+import { ref, onMounted, computed } from "vue";
+import { ElMessage } from 'element-plus';  // 引入 element-plus 的消息组件
+import {useStore} from 'vuex'
+import { fetchMyHomework } from "@/api/CoursePageApi";
+const homeworks = ref([]);
+const isModalOpen = ref(false);
+const isDetailVisible = ref(false);
+const currentHomework = ref({});
+const detailHomework = ref({});
+const homeworkContent = ref('');
+const attachments = ref([]);
+const currentPage = ref(1);
+const pageSize = 5;
+const store = useStore();
+  // 使用 computed 获取 userNum
+const userNum = computed(() => store.getters.getUserInfo.userNum);
+const courseId = "1"; //TODO router中传来的courseId
+// Simulated function to fetch homework
+const getMyHomework = async () => {
+    try {
+      const response = await fetchMyHomework("852464",courseId);
+      homeworks.value = response.homeworkList;
+      console.log("success")
+    } catch (error) {
+      console.error("获取作业失败", error);
+    }
+  } 
+onMounted(() => {
+  getMyHomework();
+});
 
-export default {
-  name: 'CourseHomework',
-  setup() {
-    const homeworks = ref([
-      {
-        title: '2024-2025-1 实验报告2',
-        startDate: '2024-10-01',
-        endDate: '2024-11-01',
-        submitted: '60/67',
-        submissionTime: '2024-11-06 21:50:46',
-        score: '未公布成绩',
-        reviewStatus: '未批改',
-        fileUrl: '/2411.02310v1.pdf',
-      },
-      {
-        title: '2024-2025-1 作业1',
-        startDate: '2024-10-01',
-        endDate: '2024-10-20',
-        submitted: '62/67',
-        submissionTime: '2024-10-22 23:51:14',
-        score: '未公布成绩',
-        reviewStatus: '未批改',
-        fileUrl: '/2411.02310v1.pdf',
-      },
-    ]);
+const paginatedHomeworks = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  return homeworks.value.slice(start, start + pageSize);
+});
 
-    const pageSize = 5;
-    const currentPage = ref(1);
+// View homework details
+const viewHomeworkDetails = (homework) => {
+  detailHomework.value = homework;
+  isDetailVisible.value = true;
+};
 
-    const dialogVisible = ref(false);
-    const homeworkContent = ref('');
-    const fileList = ref([]);
+// Close the homework detail dialog
+const closeDetailModal = () => {
+  isDetailVisible.value = false;
+};
 
-    const paginatedHomeworks = computed(() => {
-      const start = (currentPage.value - 1) * pageSize;
-      return homeworks.value.slice(start, start + pageSize);
-    });
+// Open the submit modal
+const openSubmitModal = (homework) => {
+  currentHomework.value = homework;
+  isModalOpen.value = true;
+};
 
-    const viewFile = (fileUrl) => {
-      window.open(fileUrl, '_blank');
-    };
+// Close the submit modal
+const closeModal = () => {
+  isModalOpen.value = false;
+  homeworkContent.value = '';
+  attachments.value = [];
+};
 
-    const openSubmitDialog = (row) => {
-      console.log('Attempting to open submit dialog');
-      dialogVisible.value = true;
-      
-      console.log('Dialog visible status:', dialogVisible.value); 
-      homeworkContent.value = ''; // 清空之前的内容
-      fileList.value = []; // 清空之前的上传文件
-    };
+// Handle file upload
+const handleFileUpload = (file) => {
+  attachments.value = [...attachments.value, file];
+};
 
-    const handleUploadSuccess = (response, file, fileList) => {
-      console.log('上传成功', response, file, fileList);
-    };
+const submit = async () => {
+    try {
+    // 获取作业 ID 和内容
+    const homeworkId = currentHomework.value.homeworkId;
+    const studentContent = homeworkContent.value;
 
-    const handleFileRemove = (file, fileList) => {
-      console.log('文件移除', file, fileList);
-    };
+    // 获取附件文件数组（确保 raw 是 File 对象）
+    const files = attachments.value.map(file => file.raw);
 
-    const submitHomework = () => {
-      if (!homeworkContent.value) {
-        alert('请填写作业内容');
-        return;
-      }
-      console.log('作业内容:', homeworkContent.value);
-      console.log('上传文件列表:', fileList.value);
-      dialogVisible.value = false; // 提交后关闭对话框
-    };
+    // 调用 submitHomework 函数，传递作业 ID、内容和附件（文件对象数组）
+    const response = await submitHomework(homeworkId, studentContent, files);
 
-    const handlePageChange = (page) => {
-      currentPage.value = page;
-    };
+    console.log("提交结果:", response);
+    closeModal();  // 提交后关闭模态框
+    // 提交成功后，显示成功的提示信息
+    ElMessage({
+        message: '作业提交成功！',
+        type: 'success',
+        duration: 1000  // 0.5秒后自动消失
+      });
 
-    return {
-      homeworks,
-      pageSize,
-      currentPage,
-      dialogVisible,
-      homeworkContent,
-      fileList,
-      paginatedHomeworks,
-      viewFile,
-      openSubmitDialog,
-      handleUploadSuccess,
-      handleFileRemove,
-      submitHomework,
-      handlePageChange,
-    };
-  },
+    } catch (error) {
+      console.error("提交失败", error);
+      // 提交失败时显示错误信息
+      ElMessage.error('提交失败，请重试！');
+    }
+};
+
+const handlePageChange = (page) => {
+  currentPage.value = page;
 };
 </script>
 
 <style scoped>
-.homework-table {
-  margin: 20px;
+.homework-item {
+  margin-bottom: 10px;
+  padding: 15px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.homework-title {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.upload-demo {
+  margin-top: 20px;
+}
+
+.dialog-footer {
+  text-align: right;
+}
+
+.homework-list-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.no-homework {
+  text-align: center;
+  font-size: 16px;
+  color: #909399;
+  padding: 50px 0;
 }
 </style>

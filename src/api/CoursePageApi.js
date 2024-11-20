@@ -7,12 +7,30 @@ export const fetchMyHomework = async (userNum,courseId) => {
               studentNum: userNum
             }
         });
+      // 对每个作业项进行处理，格式化submissionDeadline
+      response.data.homeworkList.forEach(homework => {
+        if (homework.submissionDeadline) {
+            homework.submissionDeadline = formatSubmissionDeadline(homework.submissionDeadline);
+        }
+        if (homework.submitcheck) {
+          homework.submitcheck = "已提交";
+        } else {
+          homework.submitcheck = "未提交";
+        }
+    });
+
         return response.data;
     } catch (error) {
         console.error("作业获取失败", error);
     } 
 }
-
+// 用于处理日期格式的函数
+const formatSubmissionDeadline = (dateString) => {
+  const date = new Date(dateString);
+  // 使用toISOString()获取标准格式，并去除T和.000+00:00
+  const formattedDate = date.toISOString().slice(0, 19).replace('T', ' '); // 保留年月日和时分秒，并将T替换为空格
+  return formattedDate;
+};
 
 export const submitHomework = async (homeworkId, homeworkContent, attachments) => {
   try {

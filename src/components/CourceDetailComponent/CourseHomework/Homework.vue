@@ -15,11 +15,13 @@
         <div v-for="homework in paginatedHomeworks" :key="homework.homeworkId" class="homework-item">
           <el-card>
             <h3 @click="viewHomeworkDetails(homework)" class="homework-title">作业 {{ homework.homeworkNum }}</h3>
-            <p>{{ homework.content }}</p>
-            <p>提交时间: {{ homework.submissionDeadline }}</p>
+            <p>作业内容：{{ homework.content }}</p>
+            <p>是否已提交：{{ homework.submitcheck }}</p>
+            <p>提交截至时间: {{ homework.submissionDeadline }}</p>
             <p v-if="homework.score">得分: {{ homework.score }}</p>
             <p v-else>批改状态: 未批改</p>
             <el-button type="primary" @click="openSubmitModal(homework)">提交作业</el-button>
+            <el-button type="primary">作业互评</el-button>
           </el-card>
         </div>
       </div>
@@ -76,7 +78,7 @@
           <h2>作业 {{ detailHomework.homeworkNum }}</h2>
         </template>
         <div>
-          <p><strong>提交时间:</strong> {{ detailHomework.submissionDeadline }}</p>
+          <p><strong>提交截至时间:</strong> {{ detailHomework.submissionDeadline }}</p>
           <p><strong>作业内容:</strong></p>
           <p>{{ detailHomework.content }}</p>
           <p><strong>批改状态:</strong> 
@@ -88,18 +90,34 @@
           <el-button @click="closeDetailModal">关闭</el-button>
         </span>
       </el-dialog>
+
+      <!-- 提交作业确认弹窗 -->
+      <el-dialog
+        v-model="isCheckModalOpen"
+        title="警告"
+        width="400px"
+        @close="handleDialogClose"
+      >
+        <p>作业已提交，再次提交会覆盖之前的作业内容</p>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="handleDialogClose">取消</el-button>
+          <el-button type="primary" @click="confirmSubmit">确认</el-button>
+        </span>
+      </el-dialog>
     </el-main>
   </el-container>
+  
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { ElMessage } from 'element-plus';  // 引入 element-plus 的消息组件
+import { ElMessage  } from 'element-plus';  // 引入 element-plus 的消息组件
 import {useStore} from 'vuex'
-import { fetchMyHomework } from "@/api/CoursePageApi";
+import { fetchMyHomework,submitHomework } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
+const isCheckModalOpen=ref(false);
 const isDetailVisible = ref(false);
 const currentHomework = ref({});
 const detailHomework = ref({});
@@ -117,7 +135,7 @@ console.log(courseId)
 // Simulated function to fetch homework
 const getMyHomework = async () => {
     try {
-      const response = await fetchMyHomework("852464",courseId);
+      const response = await fetchMyHomework(userNum.value,courseId);
       homeworks.value = response.homeworkList;
       console.log("success")
     } catch (error) {
@@ -147,9 +165,26 @@ const closeDetailModal = () => {
 // Open the submit modal
 const openSubmitModal = (homework) => {
   currentHomework.value = homework;
-  isModalOpen.value = true;
+   // 判断作业是否已提交
+  if (homework.submitcheck === "已提交") {
+    if (homework.submitcheck === "已提交") {
+      ElMessage.warning('作业已提交！');
+      isCheckModalOpen.value = true;
+      return; // 不再继续执行
+    }
+
+    // 否则，打开弹窗
+    isModalOpen.value = true;
+  }
 };
 
+const confirmSubmit = () => {
+  isModalOpen.value = true;
+}
+const handleDialogClose = () => {
+  isCheckModalOpen.value = false;
+  isModalOpen.value = false;
+}
 // Close the submit modal
 const closeModal = () => {
   isModalOpen.value = false;
@@ -175,7 +210,8 @@ const submit = async () => {
     const response = await submitHomework(homeworkId, studentContent, files);
 
     console.log("提交结果:", response);
-    closeModal();  // 提交后关闭模态框
+      closeModal();  // 提交后关闭模态框
+      isCheckModalOpen.value = false;
     // 提交成功后，显示成功的提示信息
     ElMessage({
         message: '作业提交成功！',

@@ -13,8 +13,12 @@
             <a @click.prevent="goToPreview(file.id)" href="#">{{ file.fileName }}</a>
           </td>
           <td style="display: flex; justify-content: center; align-items: center">
-            <a href="#" @click.stop="downloadFile(file.id)">下载</a>
+            <div style="display: flex; gap: 10px;"> <!-- 使用 Flexbox 布局 -->
+        <a href="#" @click.stop="downloadFile(file.id)">下载</a>
+        <a href="#" @click.stop="deleteFile(file.id)">删除</a>
+      </div>
           </td>
+          
         </tr>
       </tbody>
     </table>
@@ -42,7 +46,8 @@
 </template>
 
 <script setup>
-import { getCourseWareList, downLoadCourseResource } from '@/api/CoursePageApi';
+import { getCourseWareList, downLoadCourseResource,deleteCourseResource } from '@/api/CoursePageApi';
+import CourseList from '@/components/HomePage/CourseList.vue';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -57,8 +62,8 @@ const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
 // 文件列表
 const files = ref([]);
 const fileList = ref([]);
-
-// 上传数据配置
+const loading = ref(false);
+// 上传数据配置，通过接口"http://localhost:8000/teacher/course/" + courseId + "/uploadResource"
 const uploadUrl = "http://localhost:8000/teacher/course/" + courseId + "/uploadResource";  // 后端上传接口
 const uploadData = ref({
   courseId: courseId // 传递课程 ID
@@ -104,7 +109,6 @@ const downloadFile = async (id) => {
     // 通过 fetch 获取文件并创建 Blob 对象，避免浏览器跳转
     const fileResponse = await fetch(fileUrl);
     const blob = await fileResponse.blob();
-    
     const link = document.createElement("a");
     const downloadUrl = window.URL.createObjectURL(blob);
     link.href = downloadUrl;
@@ -127,11 +131,42 @@ const downloadFile = async (id) => {
     alert("文件下载失败，请稍后再试。");
   }
 };
-
+// 删除文件
+const deleteFile = async (resourceId) => {
+  if (confirm("确认删除此文件吗？")) {
+    try {
+      // 调用 API 删除文件
+      await deleteCourseResource(resourceId); // 使用 resourceId 进行删除
+      
+      // 文件删除后重新加载文件列表
+      fetchCourseWareList();
+      
+      alert("文件已删除。");
+    } catch (error) {
+      console.error("删除文件失败:", error);
+      alert("文件删除失败，请稍后再试。");
+    }
+  }
+};
 // 获取文件列表
 const fetchCourseWareList = async () => {
-  const response = await getCourseWareList(courseId);
-  files.value = response.resourceList;
+  try {
+    // 设置加载状态
+    loading.value = true; // 假设您有一个 loading 的 ref 变量来管理加载状态
+
+    const response = await getCourseWareList(courseId);
+    files.value = response.resourceList;
+
+    // 处理成功的逻辑
+    console.log('获取课件列表成功:', files.value);
+  } catch (error) {
+    // 处理错误
+    console.error('获取课件列表失败:', error);
+    alert('获取课件列表失败，请稍后再试。');
+  } finally {
+    // 清除加载状态
+    loading.value = false; // 结束加载状态
+  }
 };
 
 // 初始化获取文件列表

@@ -133,6 +133,12 @@ export const downLoadCourseResource = async (resourceId) => {
     console.error("获取下载资源URL失败", error);
   }
 }
+
+//删除课程资源接口
+export const deleteCourseResource = (resourceId) => {
+  return axios.delete(`/teacher/course/${courseId}/deleteResource/${resourceId}`);
+};
+
 //获取试题集列表
 export const getCourseWorkSetList = async (courseId) => {
   try {

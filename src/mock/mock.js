@@ -444,4 +444,38 @@ Mock.mock(/\/course\/discussionById/, 'get', (options) => {
           ]
     }
 })
+
+// 模拟课程资源列表接口
+Mock.mock(/\/course\/resource/, 'get', (options) => {
+  const courseId = new URLSearchParams(options.url.split('?')[1]).get('courseId'); // 获取 courseId 参数
+
+  // 生成模拟的课件列表
+  return {
+    resourceList: [
+      {
+        id: 1,
+        fileName: `课件文件1-${courseId}.pdf`,
+        fileType: 'application/pdf',
+        size: '@integer(1000, 10000)', // 随机文件大小
+        url: `http://localhost:8000/files/${courseId}/resource1.pdf`,
+      },
+      {
+        id: 2,
+        fileName: `课件文件2-${courseId}.pptx`,
+        fileType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        size: '@integer(1000, 10000)', // 随机文件大小
+        url: `http://localhost:8000/files/${courseId}/resource2.pptx`,
+      },
+      {
+        id: 3,
+        fileName: `课件文件3-${courseId}.docx`,
+        fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        size: '@integer(1000, 10000)', // 随机文件大小
+        url: `http://localhost:8000/files/${courseId}/resource3.docx`,
+      },
+    ],
+  }
+})
+
+
 export default Mock;

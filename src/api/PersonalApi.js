@@ -50,9 +50,13 @@ export const getMyComments = async (userNum) => {
         console.error("我的评论获取失败", error);
     }
 }
+export const deleteCollectionOfPostByPostId = async (favoriteId) => {
+    return (await axios.delete(`http://localhost:8000/student/deleteCollectionOfPost/${favoriteId}`)).data.message;
+  }
 export default {
     getPosts,  
     getMyComments,
     getMyFavourite,
     getMyNote,
+    deleteCollectionOfPostByPostId
 };

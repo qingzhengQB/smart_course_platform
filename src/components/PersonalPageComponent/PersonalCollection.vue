@@ -11,7 +11,7 @@
           <div v-if="!isOther" class="delete-icon-container">
             <i
               class="fa-solid fa-trash-alt fa-icon-style fa-delete-icon-style"
-            ></i>
+              @click="deleteCollection(item.favoriteId)"></i>
           </div>
           <div class="note-footer"></div>
         </div>
@@ -34,7 +34,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { getMyFavourite } from "@/api/PersonalApi";
+import { getMyFavourite,deleteCollectionOfPostByPostId } from "@/api/PersonalApi";
 import { useStore } from "vuex";
 const store = useStore();
 // 使用 computed 获取 userNum
@@ -42,6 +42,19 @@ const userNum = computed(() => store.getters.getUserInfo.userNum);
 const isOther = ref(window.location.pathname.startsWith("/other-personal")); // 是否是别人的主页
 const notes = ref([]);
 const otherFavo = ref([]);
+
+// 删除操作
+const deleteCollection = async (favoriteId) => {
+  try {
+    const response = await deleteCollectionOfPostByPostId(favoriteId);
+    console.log(response);
+    fetchMyFavourites();
+  } catch (error) {
+    
+  }
+  
+};
+
 const fetchMyFavourites = async () => {
   try {
     const response = await getMyFavourite(userNum.value);

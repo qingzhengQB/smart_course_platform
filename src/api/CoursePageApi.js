@@ -216,7 +216,8 @@ export const sendNotification = async (title, content, teacherNum,courseId) => {
     console.error("发送通知失败", error);
     throw error;  // 抛出错误，捕获异常
   }
-};
+}; 
+
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -230,5 +231,5 @@ export default {
   getCourseWorkSetList,
   getCourseOutLine,
   getCourseCalendar,
-  deleteCourseResource
+  deleteCourseResource,
 };

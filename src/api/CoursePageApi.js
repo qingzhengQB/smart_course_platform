@@ -135,8 +135,8 @@ export const downLoadCourseResource = async (resourceId) => {
 }
 
 //删除课程资源接口
-export const deleteCourseResource = (resourceId) => {
-  return axios.delete(`/teacher/course/${courseId}/deleteResource/${resourceId}`);
+export const deleteCourseResource = async (resourceId) => {
+  return await axios.delete(`http://localhost:8000/teacher/course/deleteResource/${resourceId}`).data;
 };
 
 //获取试题集列表
@@ -211,5 +211,6 @@ export default {
   downLoadCourseResource,
   getCourseWorkSetList,
   getCourseOutLine,
-  getCourseCalendar
+  getCourseCalendar,
+  deleteCourseResource
 };

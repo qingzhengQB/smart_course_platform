@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { getCourseWareList, downLoadCourseResource } from "@/api/CoursePageApi";
+import { getCourseWareList, downLoadCourseResource,deleteCourseResource } from "@/api/CoursePageApi";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -142,17 +142,16 @@ const deleteFile = async (resourceId) => {
     try {
       // 调用 API 删除文件
       await deleteCourseResource(resourceId); // 使用 resourceId 进行删除
-      
+      alert("文件已删除。");
       // 文件删除后重新加载文件列表
       fetchCourseWareList();
-      
-      alert("文件已删除。");
     } catch (error) {
       console.error("删除文件失败:", error);
       alert("文件删除失败，请稍后再试。");
     }
   }
 };
+
 // 获取文件列表
 const fetchCourseWareList = async () => {
   try {
@@ -173,9 +172,7 @@ const fetchCourseWareList = async () => {
     loading.value = false; // 结束加载状态
   }
 };
-function deleteFile(id) {
-  alert(`删除文件 ID: ${id}`);
-}
+
 // 初始化获取文件列表
 onMounted(() => {
   fetchCourseWareList();

@@ -54,6 +54,7 @@
 import {
   getCourseWorkSetList,
   downLoadCourseResource,
+  deleteCourseResource
 } from "@/api/CoursePageApi";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -78,9 +79,6 @@ const uploadUrl =
 const goToPreview = (fileId) => {
   router.push({ name: "preview", params: { id: fileId } });
 };
-function deleteFile(id) {
-  alert(`删除文件 ID: ${id}`);
-}
 
 // 下载文件
 const downloadFile = async (id) => {
@@ -139,7 +137,21 @@ const downloadFile = async (id) => {
     alert("文件下载失败，请稍后再试。");
   }
 };
-
+// 删除文件
+const deleteFile = async (resourceId) => {
+  if (confirm("确认删除此文件吗？")) {
+    try {
+      // 调用 API 删除文件
+      await deleteCourseResource(resourceId); // 使用 resourceId 进行删除
+      alert("文件已删除。");
+      // 文件删除后重新加载文件列表
+      fetchCourseWorkSetLis();
+    } catch (error) {
+      console.error("删除文件失败:", error);
+      alert("文件删除失败，请稍后再试。");
+    }
+  }
+};
 // 获取文件列表
 const fetchCourseWorkSetLis = async () => {
   const response = await getCourseWorkSetList(courseId);

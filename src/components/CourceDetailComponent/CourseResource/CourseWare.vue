@@ -10,13 +10,20 @@
       <tbody>
         <tr v-for="(file, index) in files" :key="index">
           <td style="padding-left: 30px">
-            <a @click.prevent="goToPreview(file.id)" href="#">{{ file.fileName }}</a>
+            <a @click.prevent="goToPreview(file.id)" href="#">{{
+              file.fileName
+            }}</a>
           </td>
-          <td style="display: flex; justify-content: center; align-items: center">
-            <div style="display: flex; gap: 10px;"> <!-- 使用 Flexbox 布局 -->
-        <a href="#" @click.stop="downloadFile(file.id)">下载</a>
-        <a href="#" @click.stop="deleteFile(file.id)">删除</a>
-      </div>
+          <td
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 20px;
+            "
+          >
+            <a href="#" @click.stop="downloadFile(file.id)">下载</a>
+            <a href="#" @click.stop="deleteFile(file.id)">删除</a>
           </td>
           
         </tr>
@@ -36,7 +43,7 @@
         :on-change="handleChange"
         :before-upload="beforeUpload"
         method="post"
-        :limit="10"  
+        :limit="10"
         multiple
       >
         <el-button type="primary">上传文件</el-button>
@@ -46,10 +53,9 @@
 </template>
 
 <script setup>
-import { getCourseWareList, downLoadCourseResource,deleteCourseResource } from '@/api/CoursePageApi';
-import CourseList from '@/components/HomePage/CourseList.vue';
-import { onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { getCourseWareList, downLoadCourseResource } from "@/api/CoursePageApi";
+import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 // 获取路由信息
 const route = useRoute();
@@ -66,7 +72,7 @@ const loading = ref(false);
 // 上传数据配置，通过接口"http://localhost:8000/teacher/course/" + courseId + "/uploadResource"
 const uploadUrl = "http://localhost:8000/teacher/course/" + courseId + "/uploadResource";  // 后端上传接口
 const uploadData = ref({
-  courseId: courseId // 传递课程 ID
+  courseId: courseId, // 传递课程 ID
 });
 
 // 预览文件
@@ -77,7 +83,7 @@ const goToPreview = (fileId) => {
 // 下载文件
 const downloadFile = async (id) => {
   alert(`下载文件 ID: ${id}`);
-  
+
   try {
     // 获取文件 URL 和文件类型
     const response = await downLoadCourseResource(id);
@@ -112,7 +118,7 @@ const downloadFile = async (id) => {
     const link = document.createElement("a");
     const downloadUrl = window.URL.createObjectURL(blob);
     link.href = downloadUrl;
-    link.download = `文件${id}.${fileExtension}`;  // 使用动态扩展名
+    link.download = `文件${id}.${fileExtension}`; // 使用动态扩展名
 
     link.style.display = "none"; // 隐藏链接元素
     document.body.appendChild(link); // 将链接添加到页面中
@@ -125,7 +131,6 @@ const downloadFile = async (id) => {
 
     // 释放 URL 对象
     window.URL.revokeObjectURL(downloadUrl);
-
   } catch (error) {
     console.error("文件下载失败:", error);
     alert("文件下载失败，请稍后再试。");
@@ -168,7 +173,9 @@ const fetchCourseWareList = async () => {
     loading.value = false; // 结束加载状态
   }
 };
-
+function deleteFile(id) {
+  alert(`删除文件 ID: ${id}`);
+}
 // 初始化获取文件列表
 onMounted(() => {
   fetchCourseWareList();
@@ -176,29 +183,29 @@ onMounted(() => {
 
 // 上传文件成功后的回调
 const handleSuccess = (response, file, fileList) => {
-  console.log('文件上传成功:', response);
-  fetchCourseWareList();  // 上传成功后重新加载文件列表
+  console.log("文件上传成功:", response);
+  fetchCourseWareList(); // 上传成功后重新加载文件列表
 };
 
 // 上传文件失败后的回调
 const handleError = (error, file, fileList) => {
-  console.error('文件上传失败:', error);
-  alert('文件上传失败，请稍后再试');
+  console.error("文件上传失败:", error);
+  alert("文件上传失败，请稍后再试");
 };
 
 // 上传文件前的钩子函数，进行限制或验证
 const beforeUpload = (file) => {
-  console.log('正在上传文件: ', file.name); // Debug log for file being uploaded
-  const isPdf = file.type === 'application/pdf';
+  console.log("正在上传文件: ", file.name); // Debug log for file being uploaded
+  const isPdf = file.type === "application/pdf";
   if (!isPdf) {
-    alert('只能上传 PDF 文件!');
+    alert("只能上传 PDF 文件!");
   }
   return isPdf; // 返回 false 阻止上传，true 表示允许上传
 };
 
 // 文件列表更新的处理
 const handleChange = (file, fileList) => {
-  console.log('文件列表更新:', file, fileList); // Debug log for file list changes
+  console.log("文件列表更新:", file, fileList); // Debug log for file list changes
   fileList.value = fileList;
 };
 </script>

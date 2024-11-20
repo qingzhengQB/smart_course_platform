@@ -256,6 +256,14 @@ const routes = [
                   ),
               },
               {
+                name: "correcting-homework-detail",
+                path: "correcting/:homeWorkId",
+                component: () =>
+                  import(
+                    "@/components/TeacherCourseDetailComponent/Homework/CorrectingHomeworkDetail.vue"
+                  ),
+              },
+              {
                 name: "statistics-homework",
                 path: "statistics",
                 component: () =>
@@ -297,6 +305,7 @@ const routes = [
         path: "personal",
         name: "personal",
         component: () => import("@/views/PersonalPage.vue"),
+        redirect: "/personal/question",
         children: [
           {
             path: "question",
@@ -325,6 +334,49 @@ const routes = [
               import("@/components/PersonalPageComponent/PersonalNote.vue"),
           },
         ],
+      },
+      {
+        path: "other-personal/:id",
+        name: "other-personal",
+        component: () => import("@/views/PersonalPage.vue"),
+        redirect: (to) => {
+          const { id } = to.params;
+          return `/other-personal/${id}/question`;
+        },
+        children: [
+          {
+            path: "question",
+            name: "other-question",
+            component: () =>
+              import("@/components/PersonalPageComponent/PersonalQuestion.vue"),
+          },
+          {
+            path: "answer",
+            name: "other-answer",
+            component: () =>
+              import("@/components/PersonalPageComponent/PersonalAnswer.vue"),
+          },
+          {
+            path: "collection",
+            name: "other-collection",
+            component: () =>
+              import(
+                "@/components/PersonalPageComponent/PersonalCollection.vue"
+              ),
+          },
+          {
+            path: "note",
+            name: "other-note",
+            component: () =>
+              import("@/components/PersonalPageComponent/PersonalNote.vue"),
+          },
+        ],
+      },
+      {
+        path: "note-preview/:id",
+        name: "note-preview",
+        component: () =>
+          import("@/components/PersonalPageComponent/NotePreview.vue"),
       },
     ],
   },

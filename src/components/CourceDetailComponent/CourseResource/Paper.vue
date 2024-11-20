@@ -15,9 +15,15 @@
             }}</a>
           </td>
           <td
-            style="display: flex; justify-content: center; align-items: center"
+            style="
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              gap: 20px;
+            "
           >
             <a href="#" @click.stop="downloadFile(file.id)">下载</a>
+            <a href="#" @click.stop="deleteFile(file.id)">删除</a>
           </td>
         </tr>
       </tbody>
@@ -47,6 +53,10 @@ export default {
   methods: {
     goToPreview(fileId) {
       this.$router.push({ name: "preview", params: { id: fileId } });
+    },
+    deleteFile(id) {
+      // 在这里实现文件删除逻辑
+      alert(`删除文件 ID: ${id}`);
     },
     downloadFile(id) {
       // 在这里实现文件下载逻辑

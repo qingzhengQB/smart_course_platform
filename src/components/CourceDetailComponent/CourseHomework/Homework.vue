@@ -97,6 +97,7 @@ import { ref, onMounted, computed } from "vue";
 import { ElMessage } from 'element-plus';  // 引入 element-plus 的消息组件
 import {useStore} from 'vuex'
 import { fetchMyHomework } from "@/api/CoursePageApi";
+import { useRoute } from "vue-router";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
 const isDetailVisible = ref(false);
@@ -107,9 +108,12 @@ const attachments = ref([]);
 const currentPage = ref(1);
 const pageSize = 5;
 const store = useStore();
+const route = useRoute()
   // 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
-const courseId = "1"; //TODO router中传来的courseId
+const courseId = route.params.id;
+
+console.log(courseId)
 // Simulated function to fetch homework
 const getMyHomework = async () => {
     try {

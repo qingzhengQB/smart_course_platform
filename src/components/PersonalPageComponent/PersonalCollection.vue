@@ -8,8 +8,12 @@
           <div class="course-name">来自课程{{ item.courseName }}</div>
           <div>点赞数 {{ item.likeNum }}</div>
           <div>收藏数 {{ item.favoNum }}</div>
-          <div class="note-footer">
+          <div v-if="!isOther" class="delete-icon-container">
+            <i
+              class="fa-solid fa-trash-alt fa-icon-style fa-delete-icon-style"
+            ></i>
           </div>
+          <div class="note-footer"></div>
         </div>
       </div>
       <div class="note-devide" v-if="index < notes.length - 1"></div>
@@ -20,8 +24,7 @@
           <div class="note-title">{{ item.otherFavoName }}</div>
           <div class="note-content">编号 {{ item.otherFavoNum }}</div>
           <div class="course-name">创建者{{ item.otherFavoCreaterName }}</div>
-          <div class="note-footer">
-          </div>
+          <div class="note-footer"></div>
         </div>
       </div>
       <div class="note-devide" v-if="index < notes.length - 1"></div>
@@ -32,10 +35,11 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { getMyFavourite } from "@/api/PersonalApi";
-import { useStore } from 'vuex';
+import { useStore } from "vuex";
 const store = useStore();
 // 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
+const isOther = ref(window.location.pathname.startsWith("/other-personal")); // 是否是别人的主页
 const notes = ref([]);
 const otherFavo = ref([]);
 const fetchMyFavourites = async () => {
@@ -46,10 +50,10 @@ const fetchMyFavourites = async () => {
   } catch (error) {
     console.error("获取收藏的帖子失败", error);
   }
-}
+};
 onMounted(() => {
   fetchMyFavourites();
-})
+});
 </script>
 
 <style scoped>
@@ -61,6 +65,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 .note-item {
   margin: 15px 0;
@@ -89,6 +94,11 @@ onMounted(() => {
   white-space: pre-wrap;
   word-break: break-word;
 }
+.delete-icon-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
 .note-footer {
   display: flex;
   align-items: center;
@@ -107,5 +117,15 @@ onMounted(() => {
   width: 100%;
   height: 2px;
   background-color: aliceblue;
+}
+.fa-icon-style {
+  cursor: pointer;
+  transition: 0.3s;
+}
+.fa-icon-style:hover {
+  color: var(--main-color);
+}
+.fa-delete-icon-style {
+  font-size: 1.2rem;
 }
 </style>

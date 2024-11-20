@@ -14,6 +14,11 @@
         <span class="read-more" @click="goToDiscussionDetail(postItem.postId)"
           >阅读全文</span
         >
+        <div v-if="isTeacher" class="post-delete-icon">
+          <i
+            class="fa-solid fa-trash-alt fa-icon-style fa-delete-icon-style"
+          ></i>
+        </div>
       </div>
     </div>
   </div>
@@ -30,6 +35,7 @@ const router = useRouter();
 const store = useStore();
 const courseID = route.params.id;
 const postList = ref([]);
+const isTeacher = store.getters.getIsTeacher;
 function goToDiscussionDetail(id) {
   console.log("go to discussion detail");
   router.push(
@@ -80,6 +86,7 @@ onMounted(() => {
   justify-content: space-around;
   gap: 10px;
   background-color: #fff;
+  position: relative;
 }
 .post-container:hover .post-title {
   color: var(--main-color);
@@ -109,5 +116,20 @@ onMounted(() => {
   color: var(--menu-color-hover);
   cursor: pointer;
   margin-left: auto;
+}
+.post-delete-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+.fa-icon-style {
+  cursor: pointer;
+  transition: 0.3s;
+}
+.fa-icon-style:hover {
+  color: var(--main-color);
+}
+.fa-delete-icon-style {
+  font-size: 1rem;
 }
 </style>

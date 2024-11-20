@@ -13,8 +13,10 @@
     "@vue-office/pdf": "^2.0.8",
     "axios": "^1.7.7",
     "docx-preview": "^0.3.3",
+    "echarts": "^5.5.1",
     "element-plus": "^2.8.6",
     "mammoth": "^1.8.0",
+    "md-editor-v3": "^5.0.2",
     "pdf.js": "^0.1.0",
     "pdfjs": "^2.5.3",
     "pdfjs-dist": "^2.16.105",
@@ -22,6 +24,7 @@
     "vanta": "^0.5.24",
     "vue": "^3.2.13",
     "vue-demi": "^0.14.10",
+    "vue-echarts": "^7.0.3",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"
   },

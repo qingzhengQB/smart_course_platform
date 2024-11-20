@@ -51,6 +51,8 @@
 import router from "@/router";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const store = useStore();
 const userNum = store.state.userinfo.userNum;
 const personalInfo = {
@@ -58,22 +60,25 @@ const personalInfo = {
   email:"",
 };
 
+const isOther = window.location.pathname.startsWith("/other-personal"); // 是否是别人的主页
+const otherId=isOther?route.params.id:"";
+const baseURL=isOther?`/other-personal/${otherId}`:"/personal",menuNameBase=isOther?"他的":"我的";
 const personalItem = [
   {
-    item: "我的帖子",
-    url: "/personal/question",
+    item: `${menuNameBase}帖子`,
+    url: `${baseURL}/question`,
   },
   {
-    item: "我的回答",
-    url: "/personal/answer",
+    item: `${menuNameBase}回答`,
+    url: `${baseURL}/answer`,
   },
   {
-    item: "我的收藏",
-    url: "/personal/collection",
+    item: `${menuNameBase}收藏`,
+    url: `${baseURL}/collection`,
   },
   {
-    item: "我的笔记",
-    url: "/personal/note",
+    item: `${menuNameBase}笔记`,
+    url: `${baseURL}/note`,
   },
 ];
 function returnHomePage(){

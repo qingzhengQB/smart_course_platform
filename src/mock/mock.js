@@ -30,6 +30,27 @@ Mock.mock(/\/student\/getNotification/, 'get', (options) => {
         notificationNum: 2
     };
 });
+// 修正正则表达式并模拟获取通知的接口
+Mock.mock(/\/teacher\/getNotification/, 'get', (options) => {
+    console.log('请求通知接口'); // 调试信息
+    return {
+        notifications: [
+            {
+                notificationId: 1,
+                teacherId: 1,
+                content: "作业1已布置",
+                createTime: "2024-10-31T22:15:58"
+            },
+            {
+                notificationId: 2,
+                teacherId: 1,
+                content: "周五补课",
+                createTime: "2024-10-31T22:55:05"
+            }
+        ],
+        notificationNum: 2
+    };
+});
 
 // 模拟登录接口
 Mock.mock('http://localhost:8000/login', 'post', (options) => {

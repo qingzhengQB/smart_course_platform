@@ -246,16 +246,17 @@ export const commentDisLike = async (commentId) => {
   })
 }
 export const submitNewDiscussionPost = async (courseID, newPost) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (courseID && newPost.title && newPost.content) {
-        console.log("New post submitted", { courseID, ...newPost });
-        resolve({ success: true });
-      } else {
-        reject("Invalid data");
-      }
-    }, 1000);
-  });
+  try {
+    const response = await axios.post('http://localhost:8000/course/discussion', {
+      courseId: courseID,
+      title: newPost.title,
+      content: newPost.content,
+    });
+    return response.data; // 返回后端的响应数据
+  } catch (error) {
+    console.error("提交讨论失败", error);
+    throw error; // 抛出错误以便调用者处理
+  }
 };
   // 导出所有 API 请求
 export default {

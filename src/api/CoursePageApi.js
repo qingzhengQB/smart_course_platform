@@ -245,6 +245,18 @@ export const commentDisLike = async (commentId) => {
     }
   })
 }
+export const submitNewDiscussionPost = async (courseID, newPost) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (courseID && newPost.title && newPost.content) {
+        console.log("New post submitted", { courseID, ...newPost });
+        resolve({ success: true });
+      } else {
+        reject("Invalid data");
+      }
+    }, 1000);
+  });
+};
   // 导出所有 API 请求
 export default {
   fetchMyHomework,

@@ -1,8 +1,19 @@
 <template>
   <div class="course-discussion-container">
+    <div class="discussion-header">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="搜索讨论..."
+        class="discussion-search"
+      />
+      <button @click="showPostForm = true" class="discussion-ask-button">
+        提问
+      </button>
+    </div>
     <div class="discussion-container">
       <div
-        v-for="(postItem, index) in postList"
+        v-for="(postItem, index) in filteredPostList"
         class="post-container"
         :id="`post-item-${index}`"
       >
@@ -10,7 +21,7 @@
         <div class="post-author" style="font-size: 0.8rem">
           {{ postItem.author }}
         </div>
-        <div class="post-content">{{ postItem.content }}</div>
+        <div class="post-content" v-html="formatPostContent(postItem.content)"></div>
         <span class="read-more" @click="goToDiscussionDetail(postItem.postId)"
           >阅读全文</span
         >
@@ -21,14 +32,44 @@
         </div>
       </div>
     </div>
+
+    <!-- 发布评论的表单 -->
+    <div v-if="showPostForm" class="post-form-overlay">
+      <div class="post-form">
+        <h3>发布评论</h3>
+        <input
+          v-model="newPost.title"
+          type="text"
+          placeholder="标题"
+          class="post-form-title"
+        />
+        <textarea
+          v-model="newPost.content"
+          placeholder="写下您的评论... "
+          class="post-form-content post-form-textarea"
+        ></textarea>
+        <input
+          type="file"
+          @change="handleFileUpload"
+          class="post-form-file-input"
+          accept="image/*"
+        />
+        <div class="post-form-buttons">
+          <button @click="submitPost" class="post-submit-button">提交</button>
+          <button @click="showPostForm = false" class="post-cancel-button">
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
-import { getCourseDiscussion } from "@/api/CoursePageApi";
+import { getCourseDiscussion, submitNewDiscussionPost } from "@/api/CoursePageApi";
 import { useStore } from "vuex";
 const route = useRoute();
 const router = useRouter();
@@ -36,14 +77,18 @@ const store = useStore();
 const courseID = route.params.id;
 const postList = ref([]);
 const isTeacher = store.getters.getIsTeacher;
+const searchQuery = ref("");
+const showPostForm = ref(false);
+const newPost = ref({ title: "", content: "" });
+
 function goToDiscussionDetail(id) {
-  console.log("go to discussion detail");
   router.push(
     `/${
       store.getters.getIsTeacher ? "teacher-course" : "course"
     }/${courseID}/discussion/${id}`
   );
 }
+
 const fetchDiscussion = async () => {
   try {
     const response = await getCourseDiscussion(courseID);
@@ -52,8 +97,49 @@ const fetchDiscussion = async () => {
     console.error("获取讨论失败", error);
   }
 };
+
+const submitPost = async () => {
+  if (newPost.value.title && newPost.value.content) {
+    try {
+      await submitNewDiscussionPost(courseID, newPost.value);
+      await fetchDiscussion();
+      showPostForm.value = false;
+      newPost.value = { title: "", content: "" };
+    } catch (error) {
+      console.error("发布评论失败", error);
+    }
+  } else {
+    alert("请填写完整的标题和内容！");
+  }
+};
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      newPost.value.content += `\n![图片](${e.target.result})`;
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
+const formatPostContent = (content) => {
+  return content
+    .replace(/@([\w-]+)/g, '<span class="mention">@$1</span>')
+    .replace(/#([\w-]+)/g, '<span class="hashtag">#$1</span>')
+    .replace(/!\[图片\]\((.*?)\)/g, '<img src="$1" alt="图片" class="inserted-image" />');
+};
+
 onMounted(() => {
   fetchDiscussion();
+});
+
+const filteredPostList = computed(() => {
+  return postList.value.filter(post =>
+    post.title.includes(searchQuery.value) ||
+    post.content.includes(searchQuery.value)
+  );
 });
 </script>
 
@@ -62,13 +148,47 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+}
+.discussion-header {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.discussion-search {
+  width: 70%;
+  padding: 12px;
+  border-radius: 25px;
+  border: 1px solid var(--main-border-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+}
+.discussion-search:focus {
+  outline: none;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+.discussion-ask-button {
+  padding: 12px 24px;
+  background-color: var(--main-color);
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.discussion-ask-button:hover {
+  background-color: var(--menu-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 .discussion-container {
   overflow-y: auto;
   overflow-x: hidden;
-  height: 88%;
+  height: 80%;
   width: 90%;
   border: var(--main-border);
   box-shadow: var(--main-box-shadow);
@@ -98,18 +218,12 @@ onMounted(() => {
 }
 .post-content {
   display: -webkit-box;
-  /* 使用 WebKit 盒模型 */
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  /* 限制最多显示两行 */
   -webkit-box-orient: vertical;
-  /* 垂直方向排列 */
   overflow: hidden;
-  /* 隐藏超出的内容 */
   text-overflow: ellipsis;
-  /* 使用省略号显示溢出内容 */
   white-space: pre-wrap;
-  /* 保留换行符，文本过长时会自动换行 */
   word-break: break-word;
 }
 .read-more {
@@ -131,5 +245,93 @@ onMounted(() => {
 }
 .fa-delete-icon-style {
   font-size: 1rem;
+}
+.post-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.post-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: var(--main-border-radius);
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.post-form-title,
+.post-form-content {
+  width: 100%;
+  padding: 12px;
+  border-radius: 15px;
+  border: 1px solid var(--main-border-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s;
+}
+.post-form-title:focus,
+.post-form-content:focus {
+  outline: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.post-form-file-input {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--main-border-color);
+}
+.post-form-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+.post-submit-button,
+.post-cancel-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.post-submit-button {
+  background-color: var(--main-color);
+  color: #fff;
+}
+.post-submit-button:hover {
+  background-color: var(--menu-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.post-cancel-button {
+  background-color: #ccc;
+}
+.post-cancel-button:hover {
+  background-color: #aaa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.post-form-textarea {
+  min-height: 100px;
+}
+.mention {
+  color: var(--main-color);
+  font-weight: bold;
+}
+.hashtag {
+  color: var(--menu-color-hover);
+  font-weight: bold;
+}
+.inserted-image {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 </style>

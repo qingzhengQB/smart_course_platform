@@ -358,6 +358,29 @@ Mock.mock(/\/student\/course\/homework/,'get',(options)=>{
 
     }
 })
+// 获取作业附件接口
+Mock.mock(/\/student\/course\/homework\/attachments/, 'get', (options) => {
+    const { courseId, homeworkId } = options.query; // 获取请求参数
+    let attachments = [];
+
+    // 根据 homeworkId 返回不同的附件
+    if (homeworkId === '1') {
+        attachments = [
+            { name: '作业说明.pdf', url: 'http://localhost:8000/files/homework1.pdf' },
+            { name: '参考资料.docx', url: 'http://localhost:8000/files/reference.docx' },
+        ];
+    } else if (homeworkId === '2') {
+        attachments = [
+            { name: '作业说明2.pdf', url: 'http://localhost:8000/files/homework2.pdf' },
+            { name: '参考资料2.docx', url: 'http://localhost:8000/files/reference2.docx' },
+        ];
+    }
+    // 继续添加其他作业 ID 的附件数据
+
+    return {
+        attachments, // 返回对应的附件数据
+    };
+});
 // 提交作业接口
 Mock.mock(/\/student\/course\/homework\/upload/, 'post', (options) => {
 

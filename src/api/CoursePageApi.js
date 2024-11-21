@@ -31,7 +31,21 @@ const formatSubmissionDeadline = (dateString) => {
   const formattedDate = date.toISOString().slice(0, 19).replace('T', ' '); // 保留年月日和时分秒，并将T替换为空格
   return formattedDate;
 };
-
+export const fetchHomeworkAttachments = async (courseId, homeworkId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/student/course/homework/attachments', {
+      params: {
+        courseId: Number(courseId),
+        homeworkId: Number(homeworkId),
+      }
+    });
+    console.log("获取mock数据", response.data); // 打印返回的数据
+    return response.data.Attachments; // 假设返回的数据结构中包含 Attachments 数组
+  } catch (error) {
+    console.error("获取作业附件失败", error);
+    throw error; // 抛出错误以便调用者处理
+  }
+}
 export const submitHomework = async (homeworkId, homeworkContent, attachments) => {
   try {
     // 创建 FormData 对象

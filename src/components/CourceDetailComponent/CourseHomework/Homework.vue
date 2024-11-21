@@ -85,6 +85,19 @@
             <span v-if="detailHomework.score">{{ detailHomework.score }}</span>
             <span v-else>未批改</span>
           </p>
+          <!-- 添加附件下载链接 -->
+          <p v-if="detailHomework.attachments && detailHomework.attachments.length > 0">
+            <strong>附件:</strong>
+            <span v-for="(attachment, index) in detailHomework.attachments" :key="index">
+              <a :href="attachment.url" target="_blank">{{ attachment.name }}</a>
+              <span v-if="index < detailHomework.attachments.length - 1">, </span>
+            </span>
+          </p>
+    <!-- 显示已提交的作业内容
+    <p v-if="detailHomework.submittedContent">
+      <strong>已提交的作业内容:</strong>
+      <p>{{ detailHomework.submittedContent }}</p>
+    </p> -->
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="closeDetailModal">关闭</el-button>
@@ -113,7 +126,7 @@
 import { ref, onMounted, computed } from "vue";
 import { ElMessage  } from 'element-plus';  // 引入 element-plus 的消息组件
 import {useStore} from 'vuex'
-import { fetchMyHomework,submitHomework } from "@/api/CoursePageApi";
+import { fetchMyHomework,submitHomework, fetchHomeworkAttachments } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
@@ -142,6 +155,20 @@ const getMyHomework = async () => {
       console.error("获取作业失败", error);
     }
   } 
+  // 在获取作业详情的函数中添加获取附件的逻辑
+const getHomeworkAttachment = async (homeworkId) => {
+  try {
+    console.log("获取附件")
+    // 获取作业附件
+    detailHomework.value.attachments = await fetchHomeworkAttachments(courseId, homeworkId);
+    console.log(detailHomework.value.attachments)
+  } catch (error) {
+    console.error("获取作业详情失败", error);
+  }
+};
+
+
+
 onMounted(() => {
   getMyHomework();
 });
@@ -153,6 +180,7 @@ const paginatedHomeworks = computed(() => {
 
 // View homework details
 const viewHomeworkDetails = (homework) => {
+  getHomeworkAttachment(homework.homeworkId); // 获取作业附件
   detailHomework.value = homework;
   isDetailVisible.value = true;
 };

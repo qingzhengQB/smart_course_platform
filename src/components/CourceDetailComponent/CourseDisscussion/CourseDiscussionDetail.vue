@@ -41,12 +41,12 @@
                     <i
                       v-if="commentItem.isLiked"
                       class="fa-solid fa-thumbs-up"
-                      @click="commentItem.isLiked = !commentItem.isLiked"
+                      @click="clickDisLike(commentItem)"
                     ></i>
                     <i
                       v-else
                       class="fa-regular fa-thumbs-up"
-                      @click="commentItem.isLiked = !commentItem.isLiked"
+                      @click="clickLike(commentItem)"
                     ></i>
                     <i class="fa-regular fa-comment"></i>
                   </div>
@@ -70,17 +70,28 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { getCoursePostDetial  } from "@/api/CoursePageApi";
+import { getCoursePostDetial,commentLike,commentDisLike  } from "@/api/CoursePageApi";
+
 const route = useRoute();
 const postId = route.params.id;
 const postDetail = ref({});
 
 const postComment = ref([]);
-const fetchPostDetails = async () => { 
+const fetchPostDetails = async () => {
   const response = await getCoursePostDetial(postId);
   postDetail.value = response.postDetial;
   postComment.value = response.postComments;
-  
+
+};
+const clickLike = async (commentItem)=> {
+  commentItem.isLiked = !commentItem.isLiked
+  await commentLike(commentItem.commentId);
+  commentItem.likeNum++;
+}
+const clickDisLike = async (commentItem) => {
+  commentItem.isLiked = !commentItem.isLiked
+  await commentDisLike(commentItem.commentId);
+  commentItem.likeNum--;
 }
 onMounted(() => {
   fetchPostDetails();

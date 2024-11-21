@@ -124,7 +124,7 @@ const detailHomework = ref({});
 const homeworkContent = ref('');
 const attachments = ref([]);
 const currentPage = ref(1);
-const pageSize = 5;
+const pageSize = 6;
 const store = useStore();
 const route = useRoute()
   // 使用 computed 获取 userNum
@@ -166,7 +166,6 @@ const closeDetailModal = () => {
 const openSubmitModal = (homework) => {
   currentHomework.value = homework;
    // 判断作业是否已提交
-  if (homework.submitcheck === "已提交") {
     if (homework.submitcheck === "已提交") {
       ElMessage.warning('作业已提交！');
       isCheckModalOpen.value = true;
@@ -175,7 +174,7 @@ const openSubmitModal = (homework) => {
 
     // 否则，打开弹窗
     isModalOpen.value = true;
-  }
+  
 };
 
 const confirmSubmit = () => {

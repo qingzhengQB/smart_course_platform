@@ -217,7 +217,20 @@ export const sendNotification = async (title, content, teacherNum,courseId) => {
     throw error;  // 抛出错误，捕获异常
   }
 }; 
-
+export const commentLike = async (commentId) => {
+  await axios.post("http://localhost:8000/comment/addLikeNum", null, {
+    params: {
+      commentId:Number(commentId),
+    }
+  })
+}
+export const commentDisLike = async (commentId) => {
+  await axios.post("http://localhost:8000/comment/decreaseLikeNum", null, {
+    params: {
+      commentId:Number(commentId),
+    }
+  })
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -232,4 +245,6 @@ export default {
   getCourseOutLine,
   getCourseCalendar,
   deleteCourseResource,
+  commentLike,
+  commentDisLike,
 };

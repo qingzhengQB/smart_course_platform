@@ -245,18 +245,20 @@ export const commentDisLike = async (commentId) => {
     }
   })
 }
-export const submitNewDiscussionPost = async (courseID, newPost) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (courseID && newPost.title && newPost.content) {
-        console.log("New post submitted", { courseID, ...newPost });
-        resolve({ success: true });
-      } else {
-        reject("Invalid data");
-      }
-    }, 1000);
+export const submitNewDiscussionPost = async (courseID, newPost, studentNum) => {
+  const encodedNoteTitle = encodeURIComponent(newPost.title); // 编码 title
+  const encodedContent = encodeURIComponent(newPost.content);     // 编码 content
+  const response = await axios.post("http://localhost:8000/student/setPost", null, {
+    params: {
+      courseId: Number(courseID),
+      title: encodedNoteTitle,
+      content: encodedContent,
+      studentNum: studentNum
+    }
   });
-};
+  return response.data;
+}
+
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -273,4 +275,5 @@ export default {
   deleteCourseResource,
   commentLike,
   commentDisLike,
+  submitNewDiscussionPost
 };

@@ -80,7 +80,8 @@ const isTeacher = store.getters.getIsTeacher;
 const searchQuery = ref("");
 const showPostForm = ref(false);
 const newPost = ref({ title: "", content: "" });
-
+  // 使用 computed 获取 userNum
+  const userNum = computed(() => store.getters.getUserInfo.userNum);
 function goToDiscussionDetail(id) {
   router.push(
     `/${
@@ -101,10 +102,13 @@ const fetchDiscussion = async () => {
 const submitPost = async () => {
   if (newPost.value.title && newPost.value.content) {
     try {
-      await submitNewDiscussionPost(courseID, newPost.value);
-      await fetchDiscussion();
-      showPostForm.value = false;
-      newPost.value = { title: "", content: "" };
+      const response = await submitNewDiscussionPost(courseID, newPost.value, userNum.value);
+      console.log(response)
+      if (response.message == "帖子发送成功") {
+        showPostForm.value = false;
+        newPost.value = { title: "", content: "" };
+      }
+      fetchDiscussion(); 
     } catch (error) {
       console.error("发布评论失败", error);
     }

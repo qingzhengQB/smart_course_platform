@@ -68,7 +68,9 @@ const notes = ref([]);
 const isOther = ref(window.location.pathname.startsWith("/other-personal")); // 是否是别人的主页
 const mdEditorVisible = ref(false);
 const mdEditTitle = ref(""), mdEditContent = ref(``);
- 
+const beforeClose = () => {
+  // 空实现，防止报错
+};
 const fetchMyNote = async () => {
   try {
     const response = await getMyNote(userNum.value);
@@ -80,13 +82,17 @@ const fetchMyNote = async () => {
 };
 const saveNote = async () => {
   try {
-    await saveNewNote(userNum.value, mdEditTitle.value, mdEditContent.value)
+    await saveNewNote(userNum.value, mdEditTitle.value, mdEditContent.value);
     ElMessage.success('笔记保存成功');
-    mdEditorVisible = false;
+    mdEditorVisible.value = false; // 使用 .value 关闭对话框
+    mdEditTitle.value = ""; // 清空标题
+    mdEditContent.value = ""; // 清空内容
+    fetchMyNote(); // 刷新笔记列表
   } catch (error) {
     ElMessage.warning("笔记保存失败");
   }
 };
+
 function toPreviewNote(noteId) {
   router.push({ name: "note-preview", params: { noteId } });
 };

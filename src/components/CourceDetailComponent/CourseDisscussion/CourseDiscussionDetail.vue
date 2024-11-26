@@ -53,7 +53,7 @@
                 <div v-if="replyFormIndex === index" class="reply-form-container">
                   <textarea v-model="replyComment.content" placeholder="回复评论..." class="comment-form-textarea"></textarea>
                   <div class="comment-form-buttons">
-                    <button @click="submitReply(commentItem.commentId)" class="comment-submit-button">提交回复</button>
+                    <button @click="submitReply()" class="comment-submit-button">提交回复</button>
                     <button @click="closeReplyForm" class="comment-cancel-button">取消</button>
                   </div>
                 </div>
@@ -68,10 +68,13 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from 'vuex';
 import { getCoursePostDetial, commentLike, commentDisLike, submitPostComment, submitCommentReply } from "@/api/CoursePageApi";
-
+const store = useStore();
+  // 使用 computed 获取 userNum
+const userNum = computed(() => store.getters.getUserInfo.userNum);
 const route = useRoute();
 const postId = route.params.id;
 const postDetail = ref({});
@@ -103,7 +106,8 @@ const clickDisLike = async (commentItem) => {
 const submitComment = async () => {
   if (newComment.value.content.trim() !== "") {
     try {
-      await submitPostComment(postId, newComment.value.content);
+      console.log(postId)
+      await submitPostComment(postId, newComment.value.content,userNum.value);
       await fetchPostDetails();
       showCommentForm.value = false;
       newComment.value = { content: "" };
@@ -124,10 +128,10 @@ const closeReplyForm = () => {
   replyComment.value = { content: "" };
 };
 
-const submitReply = async (commentId) => {
+const submitReply = async () => {
   if (replyComment.value.content.trim() !== "") {
     try {
-      await submitCommentReply(commentId, replyComment.value.content);
+      await submitPostComment(postId, replyComment.value.content,userNum.value);
       await fetchPostDetails();
       closeReplyForm();
     } catch (error) {

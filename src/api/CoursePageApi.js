@@ -120,87 +120,62 @@ export const getCoursePostDetial = async (postId) => {
         postId: Number(postId),
       }
     });
-    // mock接口正则表达式改不好，直接这里模拟一个返回数据了
-    const mockData = {
-      postDetial: [
-        {
-          title: "课程讨论标题", // Post title
-          studentName: "张三", // Student who created the post
-          content: "这是课程讨论的详细内容，关于课程中的某个重要问题。", // Post content
-          likeNum: 20, // Number of likes
-          favoNum: 10, // Number of favorites
-        },
-      ],
-      postComments: [
-        {
-          studentName: "李四",
-          teacherName: null,
-          commentedName: "张三",
-          content: "这是李四的评论内容。",
-          likeNum: 5,
-          isLiked: false,
-          commentId: 1,
-        },
-        {
-          studentName: null,
-          teacherName: "王老师",
-          commentedName: "张三",
-          content: "这是王老师的回复。",
-          likeNum: 3,
-          isLiked: false,
-          commentId: 2,
-        },
-      ],
-    };
+    // // mock接口正则表达式改不好，直接这里模拟一个返回数据了
+    // const mockData = {
+    //   postDetial: [
+    //     {
+    //       title: "课程讨论标题", // Post title
+    //       studentName: "张三", // Student who created the post
+    //       content: "这是课程讨论的详细内容，关于课程中的某个重要问题。", // Post content
+    //       likeNum: 20, // Number of likes
+    //       favoNum: 10, // Number of favorites
+    //     },
+    //   ],
+    //   postComments: [
+    //     {
+    //       studentName: "李四",
+    //       teacherName: null,
+    //       commentedName: "张三",
+    //       content: "这是李四的评论内容。",
+    //       likeNum: 5,
+    //       isLiked: false,
+    //       commentId: 1,
+    //     },
+    //     {
+    //       studentName: null,
+    //       teacherName: "王老师",
+    //       commentedName: "张三",
+    //       content: "这是王老师的回复。",
+    //       likeNum: 3,
+    //       isLiked: false,
+    //       commentId: 2,
+    //     },
+    //   ],
+    // };
   
-    return mockData;
+    // return mockData;
     return response.data;
   } catch (error) {
     console.error("获取帖子详情失败");
   }
 };
 // 发布评论
-export const submitPostComment = async (postId, content, studentNum = null, teacherNum = null) => {
+export const submitPostComment = async (postId, content,studentNum) => {
   try {
-    const response = await axios.post('http://localhost:8000/course/discussion/postComment', {
-      postId: postId,
-      content: content,
-      studentNum: studentNum,  // 学生ID
-      teacherNum: teacherNum   // 教师ID
+    const response = await axios.post('http://localhost:8000/student/post/setComment', null, {
+      params: {
+        postId: Number(postId),
+        studentNum:studentNum,
+        content: content,
+      }
     });
-
     return response.data;  // 返回评论提交的响应数据
   } catch (error) {
     console.error("提交评论失败", error);
     throw error;  // 抛出错误，供调用者处理
   }
 };
-//评论他人的评论
-export const submitComment = async () => {
-  if (newComment.value.content.trim() !== "") {
-    try {
-      const response = await axios.post('http://localhost:8000/course/discussion/submitComment', {
-        postId: postId, // 帖子 ID
-        content: newComment.value.content, // 评论内容
-        studentNum: studentNum,
-        teacherNum: teacherNum, 
-      });
 
-      // 如果请求成功，更新评论列表
-      if (response.status === 200) {
-        console.log("评论提交成功:", response.data);
-        await fetchPostDetails();  // 获取最新的帖子详情和评论
-        showCommentForm.value = false;  // 隐藏评论输入框
-        newComment.value = { content: "" };  // 清空评论内容
-      }
-    } catch (error) {
-      console.error("提交评论失败", error);
-      alert("提交评论失败，请稍后再试！");
-    }
-  } else {
-    alert("评论内容不能为空！");
-  }
-};
 export const getCourseIntro = async (courseId) => {
   try {
     const response = await axios.get('http://localhost:8000/course/intro', {

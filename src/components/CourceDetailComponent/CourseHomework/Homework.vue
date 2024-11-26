@@ -125,7 +125,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { ElMessage  } from 'element-plus';  // 引入 element-plus 的消息组件
-import {useStore} from 'vuex'
+import { useStore } from 'vuex';
 import { fetchMyHomework,submitHomework, fetchHomeworkAttachments } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 const homeworks = ref([]);

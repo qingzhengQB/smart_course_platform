@@ -8,13 +8,19 @@
             <div class="discussion-author-avatar">
               <img class="user-avatar" src="@/assets/avatar.png" alt="avatar" />
             </div>
-            <div class="discussion-author">{{ postDetail[0]?.studentName }}</div>
+            <div class="discussion-author">
+              {{ postDetail[0]?.studentName }}
+            </div>
           </div>
         </div>
         <div class="discussion-content-container">
           {{ postDetail[0]?.content }}
         </div>
-        <div>点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{ postDetail[0]?.favoNum }}</div>
+        <div>
+          点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{
+            postDetail[0]?.favoNum
+          }}
+        </div>
         <div class="discussion-comment-container">
           <div
             v-for="(commentItem, index) in postComment"
@@ -33,10 +39,15 @@
                       />
                     </div>
                     <div class="comment-author">
-                      {{ commentItem.studentName !== null ? commentItem.studentName : commentItem.teacherName }} 回复 {{ commentItem.commentedName  }}
+                      {{
+                        commentItem.studentName !== null
+                          ? commentItem.studentName
+                          : commentItem.teacherName
+                      }}
+                      回复 {{ commentItem.commentedName }}
                     </div>
                   </div>
-                  <div> 点赞数{{ commentItem.likeNum }}</div>
+                  <div>点赞数{{ commentItem.likeNum }}</div>
                   <div class="comment-options-container">
                     <i
                       v-if="commentItem.isLiked"
@@ -70,18 +81,18 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
-import { getCoursePostDetial  } from "@/api/CoursePageApi";
+import { getCoursePostDetial } from "@/api/CoursePageApi";
 const route = useRoute();
 const postId = route.params.id;
 const postDetail = ref({});
 
 const postComment = ref([]);
-const fetchPostDetails = async () => { 
+const fetchPostDetails = async () => {
   const response = await getCoursePostDetial(postId);
   postDetail.value = response.postDetial;
   postComment.value = response.postComments;
-  
-}
+  console.log(response);
+};
 onMounted(() => {
   fetchPostDetails();
 });

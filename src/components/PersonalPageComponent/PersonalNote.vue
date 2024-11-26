@@ -148,7 +148,7 @@ const fetchMyNote = async () => {
 };
 function saveNote() {}
 function toPreviewNote(noteId) {
-  router.push({ name: "note-preview", params: { noteId } });
+  router.push({ name: "note-preview", params: { id: noteId } });
 }
 onMounted(() => {
   fetchMyNote();

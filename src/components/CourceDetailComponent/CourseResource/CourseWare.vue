@@ -25,7 +25,6 @@
             <a href="#" @click.stop="downloadFile(file.id)">下载</a>
             <a href="#" @click.stop="deleteFile(file.id)">删除</a>
           </td>
-          
         </tr>
       </tbody>
     </table>
@@ -53,7 +52,11 @@
 </template>
 
 <script setup>
-import { getCourseWareList, downLoadCourseResource,deleteCourseResource } from "@/api/CoursePageApi";
+import {
+  getCourseWareList,
+  downLoadCourseResource,
+  deleteCourseResource,
+} from "@/api/CoursePageApi";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -70,14 +73,15 @@ const files = ref([]);
 const fileList = ref([]);
 const loading = ref(false);
 // 上传数据配置，通过接口"http://localhost:8000/teacher/course/" + courseId + "/uploadResource"
-const uploadUrl = "http://localhost:8000/teacher/course/" + courseId + "/uploadResource";  // 后端上传接口
+const uploadUrl =
+  "http://localhost:8000/teacher/course/" + courseId + "/uploadResource"; // 后端上传接口
 const uploadData = ref({
   courseId: courseId, // 传递课程 ID
 });
 
 // 预览文件
 const goToPreview = (fileId) => {
-  router.push({ name: "preview", params: { id: fileId } });
+  router.push({ name: "preview", params: { resourceId: fileId } });
 };
 
 // 下载文件
@@ -162,11 +166,11 @@ const fetchCourseWareList = async () => {
     files.value = response.resourceList;
 
     // 处理成功的逻辑
-    console.log('获取课件列表成功:', files.value);
+    console.log("获取课件列表成功:", files.value);
   } catch (error) {
     // 处理错误
-    console.error('获取课件列表失败:', error);
-    alert('获取课件列表失败，请稍后再试。');
+    console.error("获取课件列表失败:", error);
+    alert("获取课件列表失败，请稍后再试。");
   } finally {
     // 清除加载状态
     loading.value = false; // 结束加载状态

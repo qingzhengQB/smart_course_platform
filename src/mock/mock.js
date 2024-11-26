@@ -358,6 +358,29 @@ Mock.mock(/\/student\/course\/homework/,'get',(options)=>{
 
     }
 })
+// 获取作业附件接口
+Mock.mock(/\/student\/course\/homework\/attachments/, 'get', (options) => {
+    const { courseId, homeworkId } = options.query; // 获取请求参数
+    let attachments = [];
+
+    // 根据 homeworkId 返回不同的附件
+    if (homeworkId === '1') {
+        attachments = [
+            { name: '作业说明.pdf', url: 'http://localhost:8000/files/homework1.pdf' },
+            { name: '参考资料.docx', url: 'http://localhost:8000/files/reference.docx' },
+        ];
+    } else if (homeworkId === '2') {
+        attachments = [
+            { name: '作业说明2.pdf', url: 'http://localhost:8000/files/homework2.pdf' },
+            { name: '参考资料2.docx', url: 'http://localhost:8000/files/reference2.docx' },
+        ];
+    }
+    // 继续添加其他作业 ID 的附件数据
+
+    return {
+        attachments, // 返回对应的附件数据
+    };
+});
 // 提交作业接口
 Mock.mock(/\/student\/course\/homework\/upload/, 'post', (options) => {
 
@@ -498,5 +521,81 @@ Mock.mock(/\/course\/resource/, 'get', (options) => {
   }
 })
 
-
+// 获取帖子详情
+Mock.mock(/\/course\/discussionById/, "get", (options) => {
+    const { postId } = options.params;
+    const mockData = {
+      postDetial: [
+        {
+          title: "课程讨论标题", // Post title
+          studentName: "张三", // Student who created the post
+          content: "这是课程讨论的详细内容，关于课程中的某个重要问题。", // Post content
+          likeNum: 20, // Number of likes
+          favoNum: 10, // Number of favorites
+        },
+      ],
+      postComments: [
+        {
+          studentName: "李四",
+          teacherName: null,
+          commentedName: "张三",
+          content: "这是李四的评论内容。",
+          likeNum: 5,
+          isLiked: false,
+          commentId: 1,
+        },
+        {
+          studentName: null,
+          teacherName: "王老师",
+          commentedName: "张三",
+          content: "这是王老师的回复。",
+          likeNum: 3,
+          isLiked: false,
+          commentId: 2,
+        },
+      ],
+    };
+  
+    // Simulate a response with the provided postId
+    return mockData;
+  });
+  
+  Mock.mock(/\/course\/discussion\/postComment/, 'post', (options) => {
+    // 模拟请求的 body
+    const { postId, content, studentNum, teacherNum } = JSON.parse(options.body);
+  
+    // 检查参数
+    if (!postId || !content) {
+      return Mock.mock({
+        status: 400,
+        message: '缺少必要的参数',
+      });
+    }
+  
+    setTimeout(() => {
+      const randomCommentId = Mock.Random.guid();  // 模拟生成一个评论ID
+  
+      // 返回模拟的评论数据
+      return Mock.mock({
+        status: 200,
+        message: '评论提交成功',
+        data: {
+          commentId: randomCommentId,
+          postId: postId,
+          content: content,
+          studentNum: studentNum || null,
+          teacherNum: teacherNum || null,
+          createdAt: Mock.Random.date('yyyy-MM-dd HH:mm:ss'),  // 模拟创建时间
+        },
+      });
+    }, 1000);  // 模拟请求延迟
+  });
+  Mock.mock(/\/comment\/addLikeNum/, "post", (options) => {
+    return { success: true, message: "点赞成功" };
+  });
+  
+  Mock.mock(/\/comment\/decreaseLikeNum/, "post", (options) => {
+    return { success: true, message: "取消点赞成功" };
+  });
+  
 export default Mock;

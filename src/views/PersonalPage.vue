@@ -59,7 +59,7 @@ const personalInfo = {
   userName: "",
   email:"",
 };
-
+store.commit("setPagename", "个人主页");
 const isOther = window.location.pathname.startsWith("/other-personal"); // 是否是别人的主页
 const otherId=isOther?route.params.id:"";
 const baseURL=isOther?`/other-personal/${otherId}`:"/personal",menuNameBase=isOther?"他的":"我的";

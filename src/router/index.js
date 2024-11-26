@@ -81,7 +81,7 @@ const routes = [
                   ),
               },
               {
-                path: "preview/:id",
+                path: "preview/:resourceId",
                 name: "preview",
                 component: () =>
                   import(
@@ -209,7 +209,7 @@ const routes = [
                   ),
               },
               {
-                path: "preview/:id",
+                path: "preview/:resourceId",
                 name: "teacher-preview",
                 component: () =>
                   import(

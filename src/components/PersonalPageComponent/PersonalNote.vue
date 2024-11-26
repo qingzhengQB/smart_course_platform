@@ -2,9 +2,13 @@
   <div class="note-container">
     <template v-for="(item, index) in notes">
       <div class="note-item-container">
-        <div class="note-item" @click="toPreviewNote(item.noteId)">
-          <div class="note-title">{{ item.noteTitle }}</div>
-          <div class="note-content">{{ item.content }}</div>
+        <div class="note-item">
+          <div class="note-title" @click="toPreviewNote(item.noteId)">
+            {{ item.noteTitle }}
+          </div>
+          <div class="note-content" @click="toPreviewNote(item.noteId)">
+            {{ item.content }}
+          </div>
           <div class="note-collect-icon" v-if="isOther">
             <i
               v-if="!item.isCollectted"
@@ -15,6 +19,7 @@
           <div v-else class="note-collect-icon note-collect-delete-icon">
             <i
               class="fa-solid fa-trash-alt fa-icon-style fa-delete-icon-style"
+              @click="deleteNote(item.noteId)"
             ></i>
           </div>
         </div>
@@ -54,11 +59,12 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { getMyNote } from "@/api/PersonalApi";
+import { getMyNote, saveNewNote, deleteNoteByNoteId } from "@/api/PersonalApi";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { MdEditor } from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
+import { ElMessage } from "element-plus";
 const router = useRouter();
 const store = useStore();
 const userNum = computed(() => store.getters.getUserInfo.userNum);
@@ -66,77 +72,10 @@ const notes = ref([]);
 const isOther = ref(window.location.pathname.startsWith("/other-personal")); // 是否是别人的主页
 const mdEditorVisible = ref(false);
 const mdEditTitle = ref(""),
-  mdEditContent = ref(`
-### 基本使用
-
-**加粗**，<u>下划线</u>，_斜体_，~~删除线~~，上标^26^，下标~1~，\`inline code\`，[超链接](https://github.com/imzbf)
-
-> 引用：《I Have a Dream》
-
-1. So even though we face the difficulties of today and tomorrow, I still have a dream.
-2. It is a dream deeply rooted in the American dream.
-3. I have a dream that one day this nation will rise up.
-
-- [ ] 周五
-- [ ] 周六
-- [x] 周天
-
-![图片](https://imzbf.github.io/md-editor-rt/imgs/mark_emoji.gif)
-
-## 代码演示
-
-\`\`\`vue
-<template>
-  <MdEditor v-model="text" />
-</template>
-
-<style lang='scss' scoped>
-// style content
-</style>
-\`\`\`
-
-## 🖨 文本演示
-
-依照普朗克长度这项单位，目前可观测的宇宙的直径估计值（直径约 930 亿光年，即 8.8 × 10<sup>26</sup> 米）即为 5.4 × 10<sup>61</sup>倍普朗克长度。而可观测宇宙体积则为 8.4 × 10<sup>184</sup>立方普朗克长度（普朗克体积）。
-
-## 表格演示
-
-| 表头1  |  表头2   |  表头3 |
-| :----- | :------: | -----: |
-| 左对齐 | 中间对齐 | 右对齐 |
-
-## 📏 公式
-
-行内：$x+y^{2x}$
-
-$$
-\sqrt[3]{x}
-$$
-
-## 图表
-
-\`\`\`mermaid
-flowchart TD
-  Start --> Stop
-\`\`\`
-
-## 提示
-
-!!! note 支持的类型 note
-
-note、abstract、info、tip、success、question、warning、failure、danger、bug、example、quote、hint、caution、error、attention
-
-!!!
-
-!!! abstract 提示
-abstract 提示内容
-!!!
-!!! info 提示
-info 提示内容
-!!!
-
-## 占个坑@！
-  `);
+  mdEditContent = ref(``);
+const beforeClose = () => {
+  // 空实现，防止报错
+};
 const fetchMyNote = async () => {
   try {
     const response = await getMyNote(userNum.value);
@@ -146,10 +85,32 @@ const fetchMyNote = async () => {
     console.error("获取笔记失败", error);
   }
 };
-function saveNote() {}
+const saveNote = async () => {
+  try {
+    await saveNewNote(userNum.value, mdEditTitle.value, mdEditContent.value);
+    ElMessage.success("笔记保存成功");
+    mdEditorVisible.value = false; // 使用 .value 关闭对话框
+    mdEditTitle.value = ""; // 清空标题
+    mdEditContent.value = ""; // 清空内容
+    fetchMyNote(); // 刷新笔记列表
+  } catch (error) {
+    ElMessage.warning("笔记保存失败");
+  }
+};
+
 function toPreviewNote(noteId) {
   router.push({ name: "note-preview", params: { id: noteId } });
 }
+// 删除操作
+const deleteNote = async (noteId) => {
+  try {
+    const response = await deleteNoteByNoteId(noteId);
+    console.log(response);
+    fetchMyNote();
+  } catch (error) {
+    console.error("删除失败");
+  }
+};
 onMounted(() => {
   fetchMyNote();
 });

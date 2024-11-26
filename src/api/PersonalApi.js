@@ -52,11 +52,33 @@ export const getMyComments = async (userNum) => {
 }
 export const deleteCollectionOfPostByPostId = async (favoriteId) => {
     return (await axios.delete(`http://localhost:8000/student/deleteCollectionOfPost/${favoriteId}`)).data.message;
-  }
+}
+export const saveNewNote = async (userNum, mdEditTitle, mdEditContent) => {
+    try {
+        const encodedNoteTitle = encodeURIComponent(mdEditTitle); // 编码 note_title
+        const encodedContent = encodeURIComponent(mdEditContent);     // 编码 content
+        const response =  await axios.post("http://localhost:8000/student/saveNote", null, {
+            params: {
+                note_title: encodedNoteTitle,
+                content: encodedContent,
+                studentNum: userNum,
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log("保存笔记失败", error);
+        throw error;
+    }
+};
+export const deleteNoteByNoteId = async (noteId) => {
+    return (await axios.delete(`http://localhost:8000/student/deleteNote/${noteId}`)).data.message;
+}
 export default {
     getPosts,  
     getMyComments,
     getMyFavourite,
     getMyNote,
-    deleteCollectionOfPostByPostId
+    deleteCollectionOfPostByPostId,
+    saveNewNote,
+    deleteNoteByNoteId
 };

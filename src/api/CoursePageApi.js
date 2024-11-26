@@ -31,7 +31,21 @@ const formatSubmissionDeadline = (dateString) => {
   const formattedDate = date.toISOString().slice(0, 19).replace('T', ' '); // 保留年月日和时分秒，并将T替换为空格
   return formattedDate;
 };
-
+export const fetchHomeworkAttachments = async (courseId, homeworkId) => {
+  try {
+    const response = await axios.get('http://localhost:8000/student/course/homework/attachments', {
+      params: {
+        courseId: Number(courseId),
+        homeworkId: Number(homeworkId),
+      }
+    });
+    console.log("获取mock数据", response.data); // 打印返回的数据
+    return response.data.Attachments; // 假设返回的数据结构中包含 Attachments 数组
+  } catch (error) {
+    console.error("获取作业附件失败", error);
+    throw error; // 抛出错误以便调用者处理
+  }
+}
 export const submitHomework = async (homeworkId, homeworkContent, attachments) => {
   try {
     // 创建 FormData 对象
@@ -106,9 +120,59 @@ export const getCoursePostDetial = async (postId) => {
         postId: Number(postId),
       }
     });
+    // // mock接口正则表达式改不好，直接这里模拟一个返回数据了
+    // const mockData = {
+    //   postDetial: [
+    //     {
+    //       title: "课程讨论标题", // Post title
+    //       studentName: "张三", // Student who created the post
+    //       content: "这是课程讨论的详细内容，关于课程中的某个重要问题。", // Post content
+    //       likeNum: 20, // Number of likes
+    //       favoNum: 10, // Number of favorites
+    //     },
+    //   ],
+    //   postComments: [
+    //     {
+    //       studentName: "李四",
+    //       teacherName: null,
+    //       commentedName: "张三",
+    //       content: "这是李四的评论内容。",
+    //       likeNum: 5,
+    //       isLiked: false,
+    //       commentId: 1,
+    //     },
+    //     {
+    //       studentName: null,
+    //       teacherName: "王老师",
+    //       commentedName: "张三",
+    //       content: "这是王老师的回复。",
+    //       likeNum: 3,
+    //       isLiked: false,
+    //       commentId: 2,
+    //     },
+    //   ],
+    // };
+  
+    // return mockData;
     return response.data;
   } catch (error) {
     console.error("获取帖子详情失败");
+  }
+};
+// 发布评论
+export const submitPostComment = async (postId, content,studentNum) => {
+  try {
+    const response = await axios.post('http://localhost:8000/student/post/setComment', null, {
+      params: {
+        postId: Number(postId),
+        studentNum:studentNum,
+        content: content,
+      }
+    });
+    return response.data;  // 返回评论提交的响应数据
+  } catch (error) {
+    console.error("提交评论失败", error);
+    throw error;  // 抛出错误，供调用者处理
   }
 };
 
@@ -217,6 +281,33 @@ export const sendNotification = async (title, content, teacherNum,courseId) => {
     throw error;  // 抛出错误，捕获异常
   }
 }; 
+export const commentLike = async (commentId) => {
+  await axios.post("http://localhost:8000/comment/addLikeNum", null, {
+    params: {
+      commentId:Number(commentId),
+    }
+  })
+}
+export const commentDisLike = async (commentId) => {
+  await axios.post("http://localhost:8000/comment/decreaseLikeNum", null, {
+    params: {
+      commentId:Number(commentId),
+    }
+  })
+}
+export const submitNewDiscussionPost = async (courseID, newPost, studentNum) => {
+  const encodedNoteTitle = encodeURIComponent(newPost.title); // 编码 title
+  const encodedContent = encodeURIComponent(newPost.content);     // 编码 content
+  const response = await axios.post("http://localhost:8000/student/setPost", null, {
+    params: {
+      courseId: Number(courseID),
+      title: encodedNoteTitle,
+      content: encodedContent,
+      studentNum: studentNum
+    }
+  });
+  return response.data;
+}
 
   // 导出所有 API 请求
 export default {
@@ -232,4 +323,7 @@ export default {
   getCourseOutLine,
   getCourseCalendar,
   deleteCourseResource,
+  commentLike,
+  commentDisLike,
+  submitNewDiscussionPost
 };

@@ -1,6 +1,6 @@
 <template>
   <div class="head-container flex-row">
-    <div class="head flex-row">
+    <div class="head flex-row" @click="toHomePage">
       <span>{{ store.state.pagename }}</span>
     </div>
     <div class="head-user flex-row">
@@ -17,7 +17,9 @@
           />
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="toPersonalPage">个人信息</el-dropdown-item>
+              <el-dropdown-item @click="toPersonalPage"
+                >个人信息</el-dropdown-item
+              >
               <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -33,10 +35,13 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 const store = useStore();
 function toPersonalPage() {
-    router.push("/personal"); // 跳转到个人页面
+  router.push("/personal"); // 跳转到个人页面
 }
 function logout() {
   router.push("/login");
+}
+function toHomePage() {
+  router.push("/");
 }
 </script>
 
@@ -51,6 +56,7 @@ function logout() {
   justify-content: space-between;
   background-color: var(--main-color);
   user-select: none;
+  cursor: pointer;
 }
 
 .head {

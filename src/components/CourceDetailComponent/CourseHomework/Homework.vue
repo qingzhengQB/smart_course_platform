@@ -6,28 +6,48 @@
 
     <el-main>
       <!-- 无作业时的提示 -->
-      <div v-if="homeworks.length === 0" class="no-homework">
-        暂无作业
-      </div>
+      <div v-if="homeworks.length === 0" class="no-homework">暂无作业</div>
 
       <!-- 作业列表展示 -->
       <div v-else class="homework-list-container">
-        <div v-for="homework in paginatedHomeworks" :key="homework.homeworkId" class="homework-item">
+        <div
+          v-for="homework in paginatedHomeworks"
+          :key="homework.homeworkId"
+          class="homework-item"
+        >
           <el-card>
-            <h3 @click="viewHomeworkDetails(homework)" class="homework-title">作业 {{ homework.homeworkNum }}</h3>
+            <h3 @click="viewHomeworkDetails(homework)" class="homework-title">
+              作业 {{ homework.homeworkNum }}
+            </h3>
             <p>作业内容：{{ homework.content }}</p>
             <p>是否已提交：{{ homework.submitcheck }}</p>
             <p>提交截至时间: {{ homework.submissionDeadline }}</p>
             <p v-if="homework.score">得分: {{ homework.score }}</p>
             <p v-else>批改状态: 未批改</p>
-            <el-button type="primary" @click="openSubmitModal(homework)">提交作业</el-button>
-            <el-button type="primary">作业互评</el-button>
+            <el-button type="primary" @click="openSubmitModal(homework)"
+              >提交作业</el-button
+            >
+            <el-button
+              type="primary"
+              @click="homeworkMutualCorrecting(homework)"
+              >作业互评</el-button
+            >
           </el-card>
         </div>
       </div>
 
       <!-- 分页控件 -->
-      <div style="position: fixed; bottom: 0; width: 100%; text-align: center; display: flex; justify-content: center;align-items: center;">
+      <div
+        style="
+          position: fixed;
+          bottom: 0;
+          width: 100%;
+          text-align: center;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
+      >
         <el-pagination
           background
           layout="prev, pager, next"
@@ -46,7 +66,12 @@
 
         <el-form>
           <el-form-item label="作业内容">
-            <el-input type="textarea" v-model="homeworkContent" placeholder="写下你的作业..." required></el-input>
+            <el-input
+              type="textarea"
+              v-model="homeworkContent"
+              placeholder="写下你的作业..."
+              required
+            ></el-input>
           </el-form-item>
           <el-form-item label="上传附件">
             <el-upload
@@ -61,7 +86,9 @@
               accept=".pdf,.doc,.docx,.jpg,.png"
             >
               <i class="el-icon-upload"></i>
-              <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+              <div class="el-upload__text">
+                将文件拖到此处，或<em>点击上传</em>
+              </div>
             </el-upload>
           </el-form-item>
         </el-form>
@@ -78,13 +105,42 @@
           <h2>作业 {{ detailHomework.homeworkNum }}</h2>
         </template>
         <div>
-          <p><strong>提交截至时间:</strong> {{ detailHomework.submissionDeadline }}</p>
+          <p>
+            <strong>提交截至时间:</strong>
+            {{ detailHomework.submissionDeadline }}
+          </p>
           <p><strong>作业内容:</strong></p>
           <p>{{ detailHomework.content }}</p>
-          <p><strong>批改状态:</strong> 
+          <p>
+            <strong>批改状态:</strong>
             <span v-if="detailHomework.score">{{ detailHomework.score }}</span>
             <span v-else>未批改</span>
           </p>
+          <!-- 添加附件下载链接 -->
+          <p
+            v-if="
+              detailHomework.attachments &&
+              detailHomework.attachments.length > 0
+            "
+          >
+            <strong>附件:</strong>
+            <span
+              v-for="(attachment, index) in detailHomework.attachments"
+              :key="index"
+            >
+              <a :href="attachment.url" target="_blank">{{
+                attachment.name
+              }}</a>
+              <span v-if="index < detailHomework.attachments.length - 1"
+                >,
+              </span>
+            </span>
+          </p>
+          <!-- 显示已提交的作业内容
+    <p v-if="detailHomework.submittedContent">
+      <strong>已提交的作业内容:</strong>
+      <p>{{ detailHomework.submittedContent }}</p>
+    </p> -->
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="closeDetailModal">关闭</el-button>
@@ -106,42 +162,90 @@
       </el-dialog>
     </el-main>
   </el-container>
-  
+  <el-dialog
+    v-model="correctHomeworkDialogVisible"
+    class="homework-submit-detail"
+    width="90vw"
+  >
+    <div class="correct-dialog-body">
+      <div class="correct-homework-content">作业互评</div>
+      <el-input
+        type="textarea"
+        v-model="correctHomeworkContent"
+        placeholder="作业内容"
+        rows="10"
+        readonly
+      ></el-input>
+      <el-button type="primary" class="correct-homework-content"
+        >提交文件下载</el-button
+      >
+      <div class="correct-homework-score">
+        <el-input
+          class="correct-homework-score-input"
+          v-model="homeworkScore"
+          placeholder="请输入互评分数"
+        ></el-input>
+        <el-button type="primary" class="submit-score">提交</el-button>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from "vue";
-import { ElMessage  } from 'element-plus';  // 引入 element-plus 的消息组件
-import {useStore} from 'vuex'
-import { fetchMyHomework,submitHomework } from "@/api/CoursePageApi";
+import { ElMessage } from "element-plus"; // 引入 element-plus 的消息组件
+import { useStore } from "vuex";
+import {
+  fetchMyHomework,
+  submitHomework,
+  fetchHomeworkAttachments,
+} from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
-const isCheckModalOpen=ref(false);
+const isCheckModalOpen = ref(false);
 const isDetailVisible = ref(false);
+const correctHomeworkDialogVisible = ref(false);
 const currentHomework = ref({});
 const detailHomework = ref({});
-const homeworkContent = ref('');
+const homeworkContent = ref("");
+const correctHomeworkContent = ref("这是随机到的互评学生的作业内容");
+const homeworkScore = ref(0);
 const attachments = ref([]);
 const currentPage = ref(1);
-const pageSize = 5;
+const pageSize = 6;
 const store = useStore();
-const route = useRoute()
-  // 使用 computed 获取 userNum
+const route = useRoute();
+// 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const courseId = route.params.id;
 
-console.log(courseId)
+console.log(courseId);
 // Simulated function to fetch homework
 const getMyHomework = async () => {
-    try {
-      const response = await fetchMyHomework(userNum.value,courseId);
-      homeworks.value = response.homeworkList;
-      console.log("success")
-    } catch (error) {
-      console.error("获取作业失败", error);
-    }
-  } 
+  try {
+    const response = await fetchMyHomework(userNum.value, courseId);
+    homeworks.value = response.homeworkList;
+    console.log("success");
+  } catch (error) {
+    console.error("获取作业失败", error);
+  }
+};
+// 在获取作业详情的函数中添加获取附件的逻辑
+const getHomeworkAttachment = async (homeworkId) => {
+  try {
+    console.log("获取附件");
+    // 获取作业附件
+    detailHomework.value.attachments = await fetchHomeworkAttachments(
+      courseId,
+      homeworkId
+    );
+    console.log(detailHomework.value.attachments);
+  } catch (error) {
+    console.error("获取作业详情失败", error);
+  }
+};
+
 onMounted(() => {
   getMyHomework();
 });
@@ -153,6 +257,7 @@ const paginatedHomeworks = computed(() => {
 
 // View homework details
 const viewHomeworkDetails = (homework) => {
+  getHomeworkAttachment(homework.homeworkId); // 获取作业附件
   detailHomework.value = homework;
   isDetailVisible.value = true;
 };
@@ -165,30 +270,33 @@ const closeDetailModal = () => {
 // Open the submit modal
 const openSubmitModal = (homework) => {
   currentHomework.value = homework;
-   // 判断作业是否已提交
+  // 判断作业是否已提交
   if (homework.submitcheck === "已提交") {
-    if (homework.submitcheck === "已提交") {
-      ElMessage.warning('作业已提交！');
-      isCheckModalOpen.value = true;
-      return; // 不再继续执行
-    }
-
-    // 否则，打开弹窗
-    isModalOpen.value = true;
+    ElMessage.warning("作业已提交！");
+    isCheckModalOpen.value = true;
+    return; // 不再继续执行
   }
+
+  // 否则，打开弹窗
+  isModalOpen.value = true;
 };
+
+function homeworkMutualCorrecting(homework) {
+  console.log("作业互评", homework);
+  correctHomeworkDialogVisible.value = true;
+}
 
 const confirmSubmit = () => {
   isModalOpen.value = true;
-}
+};
 const handleDialogClose = () => {
   isCheckModalOpen.value = false;
   isModalOpen.value = false;
-}
+};
 // Close the submit modal
 const closeModal = () => {
   isModalOpen.value = false;
-  homeworkContent.value = '';
+  homeworkContent.value = "";
   attachments.value = [];
 };
 
@@ -198,32 +306,31 @@ const handleFileUpload = (file) => {
 };
 
 const submit = async () => {
-    try {
+  try {
     // 获取作业 ID 和内容
     const homeworkId = currentHomework.value.homeworkId;
     const studentContent = homeworkContent.value;
 
     // 获取附件文件数组（确保 raw 是 File 对象）
-    const files = attachments.value.map(file => file.raw);
+    const files = attachments.value.map((file) => file.raw);
 
     // 调用 submitHomework 函数，传递作业 ID、内容和附件（文件对象数组）
     const response = await submitHomework(homeworkId, studentContent, files);
 
     console.log("提交结果:", response);
-      closeModal();  // 提交后关闭模态框
-      isCheckModalOpen.value = false;
+    closeModal(); // 提交后关闭模态框
+    isCheckModalOpen.value = false;
     // 提交成功后，显示成功的提示信息
     ElMessage({
-        message: '作业提交成功！',
-        type: 'success',
-        duration: 1000  // 0.5秒后自动消失
-      });
-
-    } catch (error) {
-      console.error("提交失败", error);
-      // 提交失败时显示错误信息
-      ElMessage.error('提交失败，请重试！');
-    }
+      message: "作业提交成功！",
+      type: "success",
+      duration: 1000, // 0.5秒后自动消失
+    });
+  } catch (error) {
+    console.error("提交失败", error);
+    // 提交失败时显示错误信息
+    ElMessage.error("提交失败，请重试！");
+  }
 };
 
 const handlePageChange = (page) => {
@@ -268,5 +375,33 @@ const handlePageChange = (page) => {
   font-size: 16px;
   color: #909399;
   padding: 50px 0;
+}
+
+.correct-dialog-body {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: auto;
+}
+.correct-homework-content {
+  font-size: 1.2rem;
+  font-weight: bolder;
+  margin: 10px 0;
+  width: 100%;
+  height: 35px;
+  /* margin: 10px 0; */
+}
+.correct-homework-score {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+.correct-homework-score-input {
+  width: 80%;
+}
+.submit-score {
+  width: 15%;
 }
 </style>

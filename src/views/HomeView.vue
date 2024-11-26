@@ -9,7 +9,8 @@
       <UserInfo />
       <div class="notification-section">
         <button @click="toggleContent" class="notification-button">
-          <i :class="iconClass"></i> {{ showNotifications ? "返回课程" : "查看通知" }}
+          <i :class="iconClass"></i>
+          {{ showNotifications ? "返回课程" : "查看通知" }}
         </button>
         <!-- Only render paginated notifications -->
         <NotificationSummary :notificationList="paginatedData" />
@@ -21,7 +22,12 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useStore } from "vuex";
-import { getNotifications, getNotificationsOfTeacher, getCoursesOfStudent, getCoursesOfTeacher } from "../api/HomePageApi";
+import {
+  getNotifications,
+  getNotificationsOfTeacher,
+  getCoursesOfStudent,
+  getCoursesOfTeacher,
+} from "../api/HomePageApi";
 import UserInfo from "@/components/HomePage/UserInfo.vue";
 import Notification from "@/components/HomePage/Notification.vue";
 import CourseList from "@/components/HomePage/CourseList.vue";
@@ -34,7 +40,9 @@ const notificationList = ref([]);
 const courseList = ref([]);
 const userNum = computed(() => store.state.userinfo.userNum);
 const showNotifications = ref(false);
-const iconClass = computed(() => showNotifications.value ? 'icon-return' : 'icon-notification');
+const iconClass = computed(() =>
+  showNotifications.value ? "icon-return" : "icon-notification"
+);
 
 // Dynamically switch component
 const currentComponent = computed(() => {
@@ -66,31 +74,30 @@ const fetchNotifications = async () => {
   try {
     if (store.getters.getIsTeacher) {
       const response = await getNotificationsOfTeacher(userNum.value);
-      notificationList.value = response.notifications.map(notification => {
-      const [date, time] = notification.createTime.split('T');
-      return {
-        ...notification,
-        date,
-        time
-      };
-    });;
+      notificationList.value = response.notifications.map((notification) => {
+        const [date, time] = notification.createTime.split("T");
+        return {
+          ...notification,
+          date,
+          time,
+        };
+      });
     } else {
       const response = await getNotifications(userNum.value);
-      notificationList.value = response.notifications.map(notification => {
-      const [date, time] = notification.createTime.split('T');
-      return {
-        ...notification,
-        date,
-        time
-      };
-    });
+      notificationList.value = response.notifications.map((notification) => {
+        const [date, time] = notification.createTime.split("T");
+        return {
+          ...notification,
+          date,
+          time,
+        };
+      });
     }
-    
   } catch (error) {
     console.error("获取通知失败", error);
   }
 };
-
+store.commit("setPagename", "智慧课程平台");
 onMounted(() => {
   fetchNotifications();
   fetchCourses();
@@ -111,7 +118,6 @@ const handleCurrentChange = (page) => {
   currentPage.value = page;
 };
 </script>
-
 
 <style scoped>
 .homeview-container {
@@ -247,22 +253,23 @@ const handleCurrentChange = (page) => {
 }
 /* 按钮样式 */
 .notification-button {
-  padding: 10px 20px; 
-  border-radius: 20px; 
+  padding: 10px 20px;
+  border-radius: 20px;
   border: 0;
   color: black;
   font-size: 16px;
   display: flex;
-  align-items: center; 
+  align-items: center;
   cursor: pointer; /* 鼠标悬停时显示指针 */
-  transition: background-color 0.2s; 
+  transition: background-color 0.2s;
 }
 .notification-button:hover {
-  background-color: #d1cece; 
+  background-color: #d1cece;
 }
 
 /* 图标样式 */
-.icon-return, .icon-notification {
+.icon-return,
+.icon-notification {
   width: 20px;
   height: 20px;
   display: inline-block;
@@ -270,11 +277,11 @@ const handleCurrentChange = (page) => {
 }
 
 .icon-return {
-  background-image: url('../assets/return.svg'); 
+  background-image: url("../assets/return.svg");
 }
 
 .icon-notification {
-  background-image: url('../assets/notification.svg'); 
+  background-image: url("../assets/notification.svg");
 }
 /* 左侧和右侧面板的样式 */
 .left-panel {

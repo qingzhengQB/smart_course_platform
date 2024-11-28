@@ -4,7 +4,7 @@
       class="course-item"
       v-for="(item, index) in courseList"
       :key="index"
-      @click="openCourseDetail(item.courseId)"
+      @click="openCourseDetail(item)"
     >
       <div class="course-item-img">
         <img :src="courseCover" alt="Course Cover" />
@@ -44,10 +44,10 @@ const store = useStore();
 const router = useRouter();
 
 // 跳转到相应的页面
-const openCourseDetail = (courseId) => {
+const openCourseDetail = (item) => {
   const path = `/${
     store.getters.getIsTeacher ? "teacher-course" : "course"
-  }/${courseId}`;
+  }/${item.courseId}?coursename=${item.name}`;
   
   // 使用 router.push 进行跳转
   router.push(path);

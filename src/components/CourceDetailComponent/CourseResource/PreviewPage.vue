@@ -31,10 +31,10 @@ const resourceId = route.params.resourceId; // URL中的资源ID
 const fileUrl = ref("");
 
 // 异步获取资源的函数
-const fetchResourceURL = async (id) => {
+const fetchResourceURL = async (resourceId) => {
   try {
     // 调用 API 获取资源 URL
-    const response = await downLoadCourseResource(id);
+    const response = await downLoadCourseResource(resourceId);
     fileUrl.value = response.URL;
   } catch (error) {
     console.error("获取预览资源失败:", error);
@@ -43,7 +43,7 @@ const fetchResourceURL = async (id) => {
 
 // 在组件挂载时调用 fetchResourceURL 获取资源 URL
 onMounted(() => {
-  fetchResourceURL(props.id); // 确保传递 id
+  fetchResourceURL(resourceId); // 确保传递 id
 });
 </script>
 

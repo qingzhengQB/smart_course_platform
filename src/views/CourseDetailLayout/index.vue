@@ -12,14 +12,18 @@
 <script setup>
 import { ref } from "vue";
 import { useStore } from "vuex";
+import {useRoute} from "vue-router"
 import Menu from "@/components/Menu.vue";
 const store = useStore();
+const route = useRoute();
 const courseinfo = {
   name: "Course 1",
   description: "This is a course about something",
   no: 10001,
 };
-
+if (route.query.coursename) {
+  courseinfo.name = route.query.coursename;
+}
 store.commit("setPagename", courseinfo.name);
 </script>
 

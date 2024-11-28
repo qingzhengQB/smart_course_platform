@@ -58,6 +58,8 @@ import {
 } from "@/api/CoursePageApi";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useStore } from "vuex";
+const store = useStore();
 
 // 获取路由信息
 const route = useRoute();
@@ -77,7 +79,10 @@ const uploadUrl =
 
 // 预览文件
 const goToPreview = (fileId) => {
-  router.push({ name: "preview", params: { resourceId: fileId } });
+  router.push({
+    name: store.getters.getIsTeacher ? "teacher-preview" : "preview",
+    params: { resourceId: fileId },
+  });
 };
 
 // 下载文件

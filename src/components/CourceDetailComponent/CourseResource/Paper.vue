@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     goToPreview(fileId) {
-      this.$router.push({ name: "preview", params: { id: fileId } });
+      this.$router.push({ name: "preview", params: { resourceId: fileId } });
     },
     deleteFile(id) {
       // 在这里实现文件删除逻辑

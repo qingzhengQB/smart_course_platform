@@ -54,7 +54,7 @@
 import {
   getCourseWorkSetList,
   downLoadCourseResource,
-  deleteCourseResource
+  deleteCourseResource,
 } from "@/api/CoursePageApi";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -77,7 +77,7 @@ const uploadUrl =
 
 // 预览文件
 const goToPreview = (fileId) => {
-  router.push({ name: "preview", params: { id: fileId } });
+  router.push({ name: "preview", params: { resourceId: fileId } });
 };
 
 // 下载文件

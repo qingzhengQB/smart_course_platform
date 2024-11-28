@@ -10,17 +10,17 @@
             type="text"
             id="name"
             v-model="teacher.name"
-            :readonly="!isTeacher"
+            readonly
             class="readonly"
           />
         </div>
         <div class="form-group">
-          <label for="unit">教学单位：</label>
+          <label for="unit">教学单位</label>
           <input
             type="text"
             id="unit"
             v-model="teacher.unit"
-            :readonly="!isTeacher"
+            readonly
             class="readonly"
           />
         </div>
@@ -32,17 +32,9 @@
             type="text"
             id="jobNumber"
             v-model="teacher.jobNumber"
-            :readonly="!isTeacher"
+            readonly
             class="readonly"
           />
-        </div>
-        <div class="form-group">
-          <label for="title">职称：</label>
-          <select id="title" v-model="teacher.title" disabled class="readonly">
-            <option value="教授">教授</option>
-            <option value="副教授">副教授</option>
-            <!-- 其他职称选项 -->
-          </select>
         </div>
       </div>
       <div class="form-row">
@@ -57,17 +49,6 @@
             class="readonly"
           />
         </div>
-        <div class="form-group">
-          <label for="mobile">移动电话：</label>
-          <input
-            type="text"
-            id="mobile"
-            v-model="teacher.mobile"
-            placeholder="11位有效数字"
-            :readonly="!isTeacher"
-            class="readonly"
-          />
-        </div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -77,17 +58,7 @@
             id="email"
             v-model="teacher.email"
             placeholder="如：123@qq.com"
-            :readonly="!isTeacher"
-            class="readonly"
-          />
-        </div>
-        <div class="form-group">
-          <label for="website">个人网址：</label>
-          <input
-            type="url"
-            id="website"
-            v-model="teacher.website"
-            :readonly="!isTeacher"
+            readonly
             class="readonly"
           />
         </div>
@@ -112,47 +83,50 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import { getCourseTeacherInfo,setTeacherInfo } from "@/api/CoursePageApi";
+import { useRoute } from "vue-router";
 const isTeacher = ref(window.location.pathname.startsWith("/teacher-course/"));
-
+const route = useRoute();
+const courseId = route.params.id;
 const teacher = ref({
   name: "",
-  unit: "",
+  unit: "北京交通大学",
   jobNumber: "",
-  title: "",
-  phone: "",
-  mobile: "",
   email: "",
+  phone:"",
   bio: "",
-  website: "",
 });
-function saveInfo() {
-  console.log("save");
-}
-// // API 部分
-// const fetchTeacherInfo = async () => {
-//     try {
-//         const response = await axios.get('/api/teacher/info');
-//         const data = response.data;
-//         teacher.value = {
-//             name: data.name || 'N/A',
-//             unit: data.unit || 'N/A',
-//             jobNumber: data.jobNumber || 'N/A',
-//             title: data.title || 'N/A',
-//             phone: data.phone || 'N/A',
-//             mobile: data.mobile || 'N/A',
-//             email: data.email || 'N/A',
-//             bio: data.bio || 'N/A',
-//             website: data.website || 'N/A'
-//         };
-//     } catch (error) {
-//         console.error("Failed to fetch teacher information:", error);
-//     }
-// };
+async function saveInfo() {
+  try {
+    // 调用 setTeacherInfo 提交教师信息
+    await setTeacherInfo(courseId, teacher.value.phone, teacher.value.bio);
+    
+    // 打印教师信息到控制台
+    console.log(teacher.value);
 
-// onMounted(() => {
-//     fetchTeacherInfo();
-// });
+    // 获取并更新教师信息
+    await fetchTeacherInfo();
+  } catch (error) {
+    console.error("保存教师信息失败：", error);
+  }
+}
+// API 部分
+const fetchTeacherInfo = async () => {
+  try {
+    const response = await getCourseTeacherInfo(courseId);
+    teacher.value.name = response.teacher.name;          
+    teacher.value.jobNumber = response.teacher.teacherNum;
+    teacher.value.phone = response.teacher.phoneNum;
+    teacher.value.bio = response.teacher_Info;
+    teacher.value.email = teacher.value.jobNumber + "@bjtu.edu.cn";  
+  } catch (error) {
+    console.error("获取教师信息失败");
+  }
+};
+
+onMounted(() => {
+    fetchTeacherInfo();
+});
 </script>
 
 <style scoped>

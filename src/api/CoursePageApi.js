@@ -1,4 +1,5 @@
 import axios from "axios";
+import { number } from "echarts";
 export const fetchMyHomework = async (userNum,courseId) => {
     try {
         const response = await axios.get('http://localhost:8000/student/course/homework', {
@@ -309,6 +310,30 @@ export const submitNewDiscussionPost = async (courseID, newPost, studentNum) => 
   return response.data;
 }
 
+export const getCourseTeacherInfo = async (courseId) => {
+  const response = await axios.get("http://localhost:8000/course/teacherInfo", {
+    params: {
+      courseId: Number(courseId)
+    }
+  });
+  return response.data;
+}
+export const setTeacherInfo = async (courseId, phoneNum, content) => {
+  try {
+    const response = await axios.post("http://localhost:8000/course/setTeacherInfo", null, {
+      params: {
+        courseId: Number(courseId),  // 通过请求体传递参数
+        phoneNum: phoneNum,
+        content: content,
+      }
+    });
+    return response;
+  } catch (error) {
+    console.error("Error setting teacher info:", error);
+    throw error;  // 抛出错误以便调用者处理
+  }
+}
+
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -325,5 +350,7 @@ export default {
   deleteCourseResource,
   commentLike,
   commentDisLike,
-  submitNewDiscussionPost
+  submitNewDiscussionPost,
+  getCourseTeacherInfo,
+  setTeacherInfo,
 };

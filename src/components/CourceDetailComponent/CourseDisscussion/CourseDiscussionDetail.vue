@@ -120,6 +120,18 @@
             ></div>
           </div>
         </div>
+        <div class="post-options-container-row">
+          <div class="post-options-container">
+            <div class="single-option-container">
+              <i v-if="isLikePost" class="fa-solid fa-thumbs-up post-like"></i>
+              <i v-else class="fa-regular fa-thumbs-up"></i>
+            </div>
+            <div class="single-option-container">
+              <i v-if="isCollectPost" class="fa-solid fa-star"></i>
+              <i v-else class="fa-regular fa-star"></i>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -216,7 +228,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .discussion-detail-container {
   display: flex;
   justify-content: center;
@@ -296,6 +308,9 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
 }
+.discussion-comment-container {
+  max-height: 60%;
+}
 .comment-content-container {
   padding: 15px;
   border-radius: 10px;
@@ -339,6 +354,34 @@ onMounted(() => {
   height: 1px;
   background-color: #e0e0e0;
   margin: 10px 0;
+}
+.post-options-container-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 20px;
+}
+.post-options-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 15px;
+}
+.single-option-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  border: #fff 1px solid;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+.single-option-container:hover {
+  border: var(--main-color) 1px solid;
+  color: var(--main-color);
 }
 .comment-button {
   padding: 8px 16px;

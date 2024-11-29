@@ -2,22 +2,22 @@
   <div class="discussion-detail-container">
     <div class="discussion-detail">
       <div class="discussion-detail-inner-container">
-        <div class="discussion-title">{{ postDetail?.title }}</div>
+        <div class="discussion-title">{{ postDetail[0]?.title }}</div>
         <div class="discussion-info-container">
           <div class="discussion-author-container">
             <div class="discussion-author-avatar">
               <img class="user-avatar" src="@/assets/avatar.png" alt="avatar" />
             </div>
             <div class="discussion-author">
-              {{ postDetail?.studentName }}
+              {{ postDetail[0]?.studentName }}
             </div>
           </div>
         </div>
         <div class="discussion-content-container">
-          {{ postDetail?.content }}
+          {{ postDetail[0]?.content }}
         </div>
         <div class="discussion-stats-container">
-          点赞数： {{ postDetail?.likeNum }} 收藏数：{{ postDetail?.favoNum }}
+          点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{ postDetail[0]?.favoNum }}
           <button class="comment-button" @click="showCommentForm = true">
             评论
           </button>

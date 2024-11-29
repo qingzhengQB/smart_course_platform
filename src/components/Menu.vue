@@ -65,7 +65,7 @@ const menuList = location.pathname.startsWith("/course/")
         children: [
           { name: "电子课件", url: "/courseware" },
           { name: "习题库", url: "/exercisebank" },
-          { name: "历年试卷库", url: "/paper" },
+          // { name: "历年试卷库", url: "/paper" },
         ],
       },
       {
@@ -93,7 +93,7 @@ const menuList = location.pathname.startsWith("/course/")
         children: [
           { name: "上传电子课件", url: "/courseware" },
           { name: "上传习题库", url: "/exercisebank" },
-          { name: "上传历年试卷库", url: "/paper" },
+          // { name: "上传历年试卷库", url: "/paper" },
         ],
       },
       {

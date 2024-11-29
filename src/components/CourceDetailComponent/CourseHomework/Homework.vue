@@ -166,9 +166,23 @@
     v-model="correctHomeworkDialogVisible"
     class="homework-submit-detail"
     width="90vw"
+    top="10vh"
   >
-    <div class="correct-dialog-body">
+    <div class="correct-dialog-options-container">
+      <el-button @click="isShowCorrectScoreView = false">互评作业</el-button>
+      <el-button @click="isShowCorrectScoreView = true">查看互评得分</el-button>
+    </div>
+    <div v-if="!isShowCorrectScoreView" class="correct-dialog-body">
       <div class="correct-homework-content">作业互评</div>
+      <div class="pdf-container">
+        <iframe
+          :src="previewFileUrl"
+          width="100%"
+          height="100%"
+          type="application/pdf"
+          class="pdf-iframe"
+        ></iframe>
+      </div>
       <el-input
         type="textarea"
         v-model="correctHomeworkContent"
@@ -176,9 +190,6 @@
         rows="10"
         readonly
       ></el-input>
-      <el-button type="primary" class="correct-homework-content"
-        >提交文件下载</el-button
-      >
       <div class="correct-homework-score">
         <el-input
           class="correct-homework-score-input"
@@ -187,6 +198,21 @@
         ></el-input>
         <el-button type="primary" class="submit-score">提交</el-button>
       </div>
+    </div>
+    <div class="correct-dialog-body" v-else>
+      <div class="correct-homework-content">本次作业互评得分</div>
+      <el-form>
+        <el-form-item label="互评得分: ">
+          <span class="self-correct-homework-score"
+            >{{ correctHomeworkScore }} 分</span
+          >
+        </el-form-item>
+        <el-form-item label="互评人: ">
+          <span class="self-homework-score-correcter">{{
+            selfHomeworkCorrecter
+          }}</span>
+        </el-form-item>
+      </el-form>
     </div>
   </el-dialog>
 </template>
@@ -206,10 +232,14 @@ const isModalOpen = ref(false);
 const isCheckModalOpen = ref(false);
 const isDetailVisible = ref(false);
 const correctHomeworkDialogVisible = ref(false);
+const isShowCorrectScoreView = ref(false);
 const currentHomework = ref({});
 const detailHomework = ref({});
 const homeworkContent = ref("");
 const correctHomeworkContent = ref("这是随机到的互评学生的作业内容");
+const correctHomeworkScore = ref("未被互评");
+const selfHomeworkCorrecter = ref("张三");
+const previewFileUrl = ref("/2411.02310v1.pdf");
 const homeworkScore = ref(0);
 const attachments = ref([]);
 const currentPage = ref(1);
@@ -376,13 +406,22 @@ const handlePageChange = (page) => {
   color: #909399;
   padding: 50px 0;
 }
-
+.correct-dialog-options-container {
+  display: flex;
+  gap: 10px;
+  /* justify-content: center; */
+  align-items: center;
+  margin: 10px 80px;
+}
 .correct-dialog-body {
   width: 80%;
+  height: 70vh;
   display: flex;
   flex-direction: column;
   gap: 15px;
   margin: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .correct-homework-content {
   font-size: 1.2rem;
@@ -391,6 +430,9 @@ const handlePageChange = (page) => {
   width: 100%;
   height: 35px;
   /* margin: 10px 0; */
+}
+.pdf-iframe {
+  height: 50vh;
 }
 .correct-homework-score {
   display: flex;

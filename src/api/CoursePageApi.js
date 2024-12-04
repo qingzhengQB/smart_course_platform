@@ -177,6 +177,22 @@ export const submitPostComment = async (postId, content,studentNum) => {
   }
 };
 
+// 发布评论
+export const submitPostCommentByTeacher = async (postId, content,studentNum) => {
+  try {
+    const response = await axios.post('http://localhost:8000/teacher/post/setComment', null, {
+      params: {
+        postId: Number(postId),
+        teacherNum:studentNum,
+        content: content,
+      }
+    });
+    return response.data;  // 返回评论提交的响应数据
+  } catch (error) {
+    console.error("提交评论失败", error);
+    throw error;  // 抛出错误，供调用者处理
+  }
+};
 export const getCourseIntro = async (courseId) => {
   try {
     const response = await axios.get('http://localhost:8000/course/intro', {
@@ -309,7 +325,19 @@ export const submitNewDiscussionPost = async (courseID, newPost, studentNum) => 
   });
   return response.data;
 }
-
+export const submitNewDiscussionPostByTeacher= async (courseID, newPost, teacherNum) => {
+  const encodedNoteTitle = encodeURIComponent(newPost.title); // 编码 title
+  const encodedContent = encodeURIComponent(newPost.content);     // 编码 content
+  const response = await axios.post("http://localhost:8000/teacher/setPost", null, {
+    params: {
+      courseId: Number(courseID),
+      title: encodedNoteTitle,
+      content: encodedContent,
+      teacherNum: teacherNum
+    }
+  });
+  return response.data;
+}
 export const getCourseTeacherInfo = async (courseId) => {
   const response = await axios.get("http://localhost:8000/course/teacherInfo", {
     params: {
@@ -333,7 +361,10 @@ export const setTeacherInfo = async (courseId, phoneNum, content) => {
     throw error;  // 抛出错误以便调用者处理
   }
 }
-
+//删除课程资源接口
+export const deletePostByTeacher = async (postId) => {
+  return await axios.delete(`http://localhost:8000/teacher/course/deletePost/${postId}`).data;
+};
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -351,6 +382,8 @@ export default {
   commentLike,
   commentDisLike,
   submitNewDiscussionPost,
+  submitNewDiscussionPostByTeacher,
   getCourseTeacherInfo,
   setTeacherInfo,
+  deletePostByTeacher,
 };

@@ -146,7 +146,7 @@ import {
   commentLike,
   commentDisLike,
   submitPostComment,
-  submitCommentReply,
+  submitPostCommentByTeacher
 } from "@/api/CoursePageApi";
 const store = useStore();
 // 使用 computed 获取 userNum
@@ -182,7 +182,19 @@ const clickDisLike = async (commentItem) => {
 
 const submitComment = async () => {
   if (newComment.value.content.trim() !== "") {
-    try {
+    if (store.getters.getIsTeacher) 
+    {
+      try {
+      console.log(postId);
+      await submitPostCommentByTeacher(postId, newComment.value.content, userNum.value);
+      await fetchPostDetails();
+      showCommentForm.value = false;
+      newComment.value = { content: "" };
+    } catch (error) {
+      console.error("提交评论失败", error);
+    }
+    } else {
+      try {
       console.log(postId);
       await submitPostComment(postId, newComment.value.content, userNum.value);
       await fetchPostDetails();
@@ -191,6 +203,8 @@ const submitComment = async () => {
     } catch (error) {
       console.error("提交评论失败", error);
     }
+    }
+   
   } else {
     alert("评论内容不能为空！");
   }
@@ -207,17 +221,33 @@ const closeReplyForm = () => {
 
 const submitReply = async () => {
   if (replyComment.value.content.trim() !== "") {
-    try {
-      await submitPostComment(
-        postId,
-        replyComment.value.content,
-        userNum.value
-      );
-      await fetchPostDetails();
-      closeReplyForm();
-    } catch (error) {
-      console.error("提交回复失败", error);
+    if (store.getters.getIsTeacher) {
+        try {
+          await submitPostCommentByTeacher(
+            postId,
+            replyComment.value.content,
+            userNum.value
+          );
+          await fetchPostDetails();
+          closeReplyForm();
+        } catch (error) {
+          console.error("提交回复失败", error);
+      }
+    } else {
+        try {
+          await submitPostComment(
+            postId,
+            replyComment.value.content,
+            userNum.value
+          );
+          await fetchPostDetails();
+          closeReplyForm();
+        } catch (error) {
+          console.error("提交回复失败", error);
+      }
     }
+
+   
   } else {
     alert("回复内容不能为空！");
   }

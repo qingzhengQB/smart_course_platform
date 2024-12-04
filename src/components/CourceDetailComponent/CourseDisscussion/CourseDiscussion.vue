@@ -28,49 +28,22 @@
         <span class="read-more" @click="goToDiscussionDetail(postItem.postId)"
           >阅读全文</span
         >
-        <div v-if="isTeacher" class="post-delete-icon">
+        <div v-if="isTeacher" 
+        class="post-delete-icon"
+        >
           <i
             class="fa-solid fa-trash-alt fa-icon-style fa-delete-icon-style"
+            @click="deletePost(postItem.postId)"
           ></i>
         </div>
       </div>
       <div
         class="send-post-icon"
         @mousedown="startDrag"
-        @click="handleSendPost"
+        @click="showPostForm=true"
         :style="iconStyle"
       >
         <i class="fa-solid fa-plus send-post-icon-content"></i>
-      </div>
-    </div>
-
-    <!-- 发布评论的表单 -->
-    <div v-if="showPostForm" class="post-form-overlay">
-      <div class="post-form">
-        <h3>发布评论</h3>
-        <input
-          v-model="newPost.title"
-          type="text"
-          placeholder="标题"
-          class="post-form-title"
-        />
-        <textarea
-          v-model="newPost.content"
-          placeholder="写下您的评论... "
-          class="post-form-content post-form-textarea"
-        ></textarea>
-        <input
-          type="file"
-          @change="handleFileUpload"
-          class="post-form-file-input"
-          accept="image/*"
-        />
-        <div class="post-form-buttons">
-          <button @click="submitPost" class="post-submit-button">提交</button>
-          <button @click="showPostForm = false" class="post-cancel-button">
-            取消
-          </button>
-        </div>
       </div>
     </div>
 
@@ -128,6 +101,8 @@ import { useRouter } from "vue-router";
 import {
   getCourseDiscussion,
   submitNewDiscussionPost,
+  submitNewDiscussionPostByTeacher,
+  deletePostByTeacher,
 } from "@/api/CoursePageApi";
 import { useStore } from "vuex";
 const route = useRoute();
@@ -148,7 +123,17 @@ function goToDiscussionDetail(id) {
     }/${courseID}/discussion/${id}`
   );
 }
-
+async function deletePost(id) {
+  try {
+    await deletePostByTeacher(id);
+     // 延迟 0.5 秒后刷新页面
+     setTimeout(() => {
+      fetchDiscussion();
+    }, 500);
+  } catch (error) {
+    console.error("帖子删除失败");
+  }
+}
 const fetchDiscussion = async () => {
   try {
     const response = await getCourseDiscussion(courseID);
@@ -160,7 +145,24 @@ const fetchDiscussion = async () => {
 
 const submitPost = async () => {
   if (newPost.value.title && newPost.value.content) {
-    try {
+    if (store.getters.getIsTeacher) {
+      try {
+      const response = await submitNewDiscussionPostByTeacher(
+        courseID,
+        newPost.value,
+        userNum.value
+      );
+      console.log(response);
+      if (response.message == "帖子发送成功") {
+        showPostForm.value = false;
+        newPost.value = { title: "", content: "" };
+      }
+      fetchDiscussion();
+    } catch (error) {
+      console.error("发布评论失败", error);
+    }
+    } else {
+      try {
       const response = await submitNewDiscussionPost(
         courseID,
         newPost.value,
@@ -174,6 +176,7 @@ const submitPost = async () => {
       fetchDiscussion();
     } catch (error) {
       console.error("发布评论失败", error);
+    }
     }
   } else {
     alert("请填写完整的标题和内容！");

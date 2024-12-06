@@ -288,6 +288,7 @@ onMounted(() => {
   width: 95%;
   overflow-y: auto;
   overflow-x: hidden;
+  position: relative;
 }
 .discussion-title {
   font-size: 2rem;
@@ -389,7 +390,13 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  margin: 0 20px;
+  // padding: 30px 0;
+  padding-right: 20px;
+  position: absolute;
+  right: 1rem;
+  top: 2rem;
+  background-color: #fff;
+  width: 30%;
 }
 .post-options-container {
   display: flex;
@@ -407,7 +414,7 @@ onMounted(() => {
   width: 30px;
   height: 30px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.6rem;
 }
 .single-option-container:hover {
   border: var(--main-color) 1px solid;

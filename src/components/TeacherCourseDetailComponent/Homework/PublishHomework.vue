@@ -30,7 +30,8 @@
       <el-form-item label="作业内容" prop="content">
         <el-input
           v-model.trim.lazy="content"
-          type="textarea"
+          typ
+          e="textarea"
           placeholder="请输入作业内容"
           rows="4"
         ></el-input>

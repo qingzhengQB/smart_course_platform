@@ -365,6 +365,17 @@ export const setTeacherInfo = async (courseId, phoneNum, content) => {
 export const deletePostByTeacher = async (postId) => {
   return await axios.delete(`http://localhost:8000/teacher/course/deletePost/${postId}`).data;
 };
+
+export const postLike = async (postId) => {
+  await axios.post("http://localhost:8000/post/addLikeNum", null, {
+    params: {
+      postId:Number(postId),
+    }
+  })
+};
+export const postFavor = async (postId) => {
+  
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -386,4 +397,6 @@ export default {
   getCourseTeacherInfo,
   setTeacherInfo,
   deletePostByTeacher,
+  postLike,
+  postFavor
 };

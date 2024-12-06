@@ -123,7 +123,7 @@
         <div class="post-options-container-row">
           <div class="post-options-container">
             <div class="single-option-container">
-              <i v-if="isLikePost" class="fa-solid fa-thumbs-up post-like"></i>
+              <i v-if="isLikePost" class="fa-solid fa-thumbs-up post-like" @click="LikePost"></i>
               <i v-else class="fa-regular fa-thumbs-up"></i>
             </div>
             <div class="single-option-container">
@@ -146,7 +146,9 @@ import {
   commentLike,
   commentDisLike,
   submitPostComment,
-  submitPostCommentByTeacher
+  submitPostCommentByTeacher,
+  postLike,
+  postFavor,
 } from "@/api/CoursePageApi";
 const store = useStore();
 // 使用 computed 获取 userNum
@@ -179,7 +181,13 @@ const clickDisLike = async (commentItem) => {
   await commentDisLike(commentItem.commentId);
   commentItem.likeNum--;
 };
-
+const LikePost = async () => {
+  await postLike(postId);
+};
+const FavorPost = async () => {
+  await postFavor(postId);
+  
+}
 const submitComment = async () => {
   if (newComment.value.content.trim() !== "") {
     if (store.getters.getIsTeacher) 

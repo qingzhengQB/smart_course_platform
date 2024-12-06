@@ -52,6 +52,7 @@
           style="height: 400px; width: 700px"
         ></v-chart>
       </div>
+      <div class="avarage-score-container">作业均分：{{ avarageScore }}</div>
     </div>
   </el-dialog>
 </template>
@@ -60,6 +61,7 @@
 import { ref } from "vue";
 
 const statisticsHomeworkDialogVisible = ref(false);
+const avarageScore = ref(90);
 const homeworkList = ref([
   {
     homeworkNum: "1",
@@ -178,6 +180,9 @@ function handleStatistics(row) {
   align-items: center;
   gap: 20px;
   margin-top: 20px;
+}
+.avarage-score-container {
+  font-size: 1.8rem;
 }
 </style>
 

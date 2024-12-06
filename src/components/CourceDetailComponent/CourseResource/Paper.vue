@@ -23,7 +23,7 @@
             "
           >
             <a href="#" @click.stop="downloadFile(file.id)">下载</a>
-            <a href="#" @click.stop="deleteFile(file.id)">删除</a>
+            <a v-if="isTeacher" href="#" @click.stop="deleteFile(file.id)">删除</a>
           </td>
         </tr>
       </tbody>

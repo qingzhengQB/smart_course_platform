@@ -27,6 +27,12 @@
             <div class="note-title" @click="goToOther(item.otherFavoNum,item.otherFavoName)">{{ item.otherFavoName }}</div>
             <div class="note-content">编号 {{ item.otherFavoNum }}</div>
             <div class="course-name">创建者{{ item.otherFavoCreaterName }}</div>
+            <div v-if="!isOther" class="delete-icon-container">
+              <i
+                class="fa-solid fa-trash-alt fa-icon-style fa-delete-icon-style"
+                @click="deleteCollection(item.favoriteId)"
+              ></i>
+            </div>
             <div class="note-footer"></div>
           </div>
         </div>

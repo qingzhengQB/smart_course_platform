@@ -5,20 +5,29 @@
         <el-table-column label="学生ID" prop="studentID"></el-table-column>
         <el-table-column label="学生姓名" prop="studentName"></el-table-column>
         <el-table-column label="提交时间" prop="submitTime"></el-table-column>
-        <el-table-column label="状态" prop="status"></el-table-column>
+        <el-table-column
+          label="提交状态"
+          prop="isSubmit"
+          :formatter="formatSubmitState"
+        ></el-table-column>
+        <el-table-column
+          label="批改状态"
+          prop="isBeingCorrected"
+          :formatter="formatCorrectedState"
+        ></el-table-column>
         <el-table-column label="操作">
           <template #default="{ row }">
             <el-button
-              v-if="row.status == '未批改'"
+              v-if="row.isBeingCorrected"
               type="primary"
               @click="handleCorrect(row)"
-              >批改</el-button
+              >查看成绩</el-button
             >
             <el-button
-              v-else-if="row.status == '已批改'"
+              v-else-if="row.isSubmit"
               type="primary"
               @click="handleScore(row)"
-              >查看成绩</el-button
+              >批改</el-button
             >
           </template>
         </el-table-column>
@@ -89,19 +98,22 @@ const submitList = ref([
     studentID: "1",
     studentName: "学生1",
     submitTime: "-",
-    status: "未提交",
+    isSubmit: false,
+    isBeingCorrected: false,
   },
   {
     studentID: "2",
     studentName: "学生2",
     submitTime: "2021-07-01 12:00:00",
-    status: "已批改",
+    isSubmit: true,
+    isBeingCorrected: false,
   },
   {
     studentID: "3",
     studentName: "学生3",
     submitTime: "2021-07-01 12:00:00",
-    status: "未批改",
+    isSubmit: true,
+    isBeingCorrected: true,
   },
 ]);
 function handleCorrect(row) {
@@ -109,6 +121,12 @@ function handleCorrect(row) {
 }
 function handleScore(row) {
   homeworkScoreDialogVisible.value = true;
+}
+function formatSubmitState(row) {
+  return row.isSubmit ? "已提交" : "未提交";
+}
+function formatCorrectedState(row) {
+  return row.isBeingCorrected ? "已批改" : "未批改";
 }
 </script>
 

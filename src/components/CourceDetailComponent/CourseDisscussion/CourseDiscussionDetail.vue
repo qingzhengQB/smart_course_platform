@@ -17,7 +17,9 @@
           {{ postDetail[0]?.content }}
         </div>
         <div class="discussion-stats-container">
-          点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{ postDetail[0]?.favoNum }}
+          点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{
+            postDetail[0]?.favoNum
+          }}
           <button class="comment-button" @click="showCommentForm = true">
             评论
           </button>
@@ -161,6 +163,8 @@ const showCommentForm = ref(false);
 const newComment = ref({ content: "" });
 const replyComment = ref({ content: "" });
 const replyFormIndex = ref(null);
+const isLikePost = ref(false);
+const isCollectPost = ref(false);
 
 const fetchPostDetails = async () => {
   console.log("尝试获取帖子详情");
@@ -190,29 +194,35 @@ const FavorPost = async () => {
 }
 const submitComment = async () => {
   if (newComment.value.content.trim() !== "") {
-    if (store.getters.getIsTeacher) 
-    {
+    if (store.getters.getIsTeacher) {
       try {
-      console.log(postId);
-      await submitPostCommentByTeacher(postId, newComment.value.content, userNum.value);
-      await fetchPostDetails();
-      showCommentForm.value = false;
-      newComment.value = { content: "" };
-    } catch (error) {
-      console.error("提交评论失败", error);
-    }
+        console.log(postId);
+        await submitPostCommentByTeacher(
+          postId,
+          newComment.value.content,
+          userNum.value
+        );
+        await fetchPostDetails();
+        showCommentForm.value = false;
+        newComment.value = { content: "" };
+      } catch (error) {
+        console.error("提交评论失败", error);
+      }
     } else {
       try {
-      console.log(postId);
-      await submitPostComment(postId, newComment.value.content, userNum.value);
-      await fetchPostDetails();
-      showCommentForm.value = false;
-      newComment.value = { content: "" };
-    } catch (error) {
-      console.error("提交评论失败", error);
+        console.log(postId);
+        await submitPostComment(
+          postId,
+          newComment.value.content,
+          userNum.value
+        );
+        await fetchPostDetails();
+        showCommentForm.value = false;
+        newComment.value = { content: "" };
+      } catch (error) {
+        console.error("提交评论失败", error);
+      }
     }
-    }
-   
   } else {
     alert("评论内容不能为空！");
   }
@@ -230,32 +240,30 @@ const closeReplyForm = () => {
 const submitReply = async () => {
   if (replyComment.value.content.trim() !== "") {
     if (store.getters.getIsTeacher) {
-        try {
-          await submitPostCommentByTeacher(
-            postId,
-            replyComment.value.content,
-            userNum.value
-          );
-          await fetchPostDetails();
-          closeReplyForm();
-        } catch (error) {
-          console.error("提交回复失败", error);
+      try {
+        await submitPostCommentByTeacher(
+          postId,
+          replyComment.value.content,
+          userNum.value
+        );
+        await fetchPostDetails();
+        closeReplyForm();
+      } catch (error) {
+        console.error("提交回复失败", error);
       }
     } else {
-        try {
-          await submitPostComment(
-            postId,
-            replyComment.value.content,
-            userNum.value
-          );
-          await fetchPostDetails();
-          closeReplyForm();
-        } catch (error) {
-          console.error("提交回复失败", error);
+      try {
+        await submitPostComment(
+          postId,
+          replyComment.value.content,
+          userNum.value
+        );
+        await fetchPostDetails();
+        closeReplyForm();
+      } catch (error) {
+        console.error("提交回复失败", error);
       }
     }
-
-   
   } else {
     alert("回复内容不能为空！");
   }

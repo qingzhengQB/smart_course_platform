@@ -17,17 +17,8 @@
         ></el-table-column>
         <el-table-column label="操作">
           <template #default="{ row }">
-            <el-button
-              v-if="row.isBeingCorrected"
-              type="primary"
-              @click="handleCorrect(row)"
-              >查看成绩</el-button
-            >
-            <el-button
-              v-else-if="row.isSubmit"
-              type="primary"
-              @click="handleScore(row)"
-              >批改</el-button
+            <el-button type="primary" @click="handleCorrect(row)"
+              >批改/查看成绩</el-button
             >
           </template>
         </el-table-column>
@@ -45,13 +36,22 @@
         type="textarea"
         v-model="homeworkContent"
         placeholder="作业内容"
-        rows="10"
+        rows="6"
         readonly
       ></el-input>
       <el-button type="primary" class="correct-homework-content"
         >提交文件下载</el-button
       >
+      <div class="correct-homework-preview">
+        <iframe
+          :src="previewFileUrl"
+          width="100%"
+          height="250px"
+          type="application/pdf"
+        ></iframe>
+      </div>
       <div class="correct-homework-score">
+        <div class="correct-homework-score-tip">批改成绩：</div>
         <el-input
           class="correct-homework-score-input"
           v-model="homeworkScore"
@@ -61,7 +61,7 @@
       </div>
     </div>
   </el-dialog>
-  <el-dialog
+  <!-- <el-dialog
     v-model="homeworkScoreDialogVisible"
     class="homework-submit-detail"
     width="90vw"
@@ -80,7 +80,7 @@
       >
       <div class="correct-homework-score">批改成绩：{{ homeworkScore }}</div>
     </div>
-  </el-dialog>
+  </el-dialog> -->
 </template>
 
 <script setup>
@@ -91,7 +91,9 @@ const homeworkID = route.params.homeWorkId;
 const correctHomeworkDialogVisible = ref(false),
   homeworkScoreDialogVisible = ref(false);
 // 定义响应式变量 fileUrl
-const fileUrl = ref("/2411.02310v1.pdf");
+const previewFileUrl = ref("/2411.02310v1.pdf");
+const homeworkScore = ref("");
+const homeworkContent = ref("作业内容");
 
 const submitList = ref([
   {
@@ -154,10 +156,13 @@ function formatCorrectedState(row) {
 .correct-homework-content {
   font-size: 1.2rem;
   font-weight: bolder;
-  margin: 10px 0;
   width: 100%;
-  height: 35px;
+  height: 25px;
   /* margin: 10px 0; */
+}
+.correct-homework-preview {
+  width: 100%;
+  height: 250px;
 }
 .correct-homework-score {
   display: flex;
@@ -165,8 +170,11 @@ function formatCorrectedState(row) {
   justify-content: space-between;
   align-items: center;
 }
+.correct-homework-score-tip {
+  width: 20%;
+}
 .correct-homework-score-input {
-  width: 80%;
+  width: 75%;
 }
 .submit-score {
   width: 15%;

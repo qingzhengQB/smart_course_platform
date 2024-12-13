@@ -211,6 +211,7 @@ Mock.mock(/\/favourite\/getFavourite/, 'get', (options) => {
     return {
         postList: [
             {
+                postId:3,
                 postTitle: "算法疑问",
                 courseName: "数据结构",
                 likeNum: 90,
@@ -219,6 +220,7 @@ Mock.mock(/\/favourite\/getFavourite/, 'get', (options) => {
                 favoriteName: "金的收藏夹"
             },
             {
+                postId: 3,
                 postTitle: "求电子版教材资源",
                 courseName: "数据结构",
                 likeNum: 1,

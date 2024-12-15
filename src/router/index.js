@@ -257,7 +257,7 @@ const routes = [
               },
               {
                 name: "correcting-homework-detail",
-                path: "correcting/:homeWorkId",
+                path: "correcting/:homeWorkNum",
                 component: () =>
                   import(
                     "@/components/TeacherCourseDetailComponent/Homework/CorrectingHomeworkDetail.vue"

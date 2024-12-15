@@ -128,14 +128,7 @@ const handleRemoveFile = (file, fileList) => {
 };
 
 // 提交作业
-const
-
-
-
-
-  submitHomework = async () => {
-  // const { homeworkNum, deadline, content } = form.value;
-
+const submitHomework = async () => {
   // 验证输入
   if (!homeworkNum || !deadline || !content) {
     ElMessage.error("请填写完整的作业信息!");

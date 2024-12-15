@@ -41,22 +41,30 @@ const fetchHomeworkList = async () => {
     const response = await axios.get(
       `http://localhost:8000/teacher/course/${courseId}/homeworkList`
     );
-    homeworkList.value = response.data.homeworkList;
+    
+    const homeworkData = response.data.homeworkList;
+    const homeworkStats = response.data.homeworkStats;
 
-    // 如果后端返回的数据包含日期字符串，确保转换为 Date 对象
-    if (homeworkList.value.length > 0) {
-      homeworkList.value.forEach((homework) => {
-        // 如果返回的 submissionDeadline 是字符串，转换为 Date 对象
-        if (homework.submissionDeadline) {
-          homework.submissionDeadline = new Date(homework.submissionDeadline);
-        }
-      });
-    }
+    // 将统计信息与作业数据结合
+    homeworkList.value = homeworkData.map(homework => {
+      // 找到对应作业的统计信息
+      const stats = homeworkStats.find(stat => stat.homeworkNum === homework.homeworkNum);
+      
+      // 计算提交人数
+      const totalSubmit = stats ? `${stats.alreadySubmit}/${stats.totalNum}` : "0/0";
+      
+      return {
+        ...homework,  // 保留其他字段
+        totalSubmit,  // 添加 totalSubmit 字段
+      };
+    });
   } catch (error) {
     ElMessage.error("获取作业列表失败，请稍后再试");
   }
 };
+
 function handleCorrect(row) {
+  console.log(row)
   router.push({
     name: "correcting-homework-detail",
     params: { homeWorkNum: row.homeworkNum },

@@ -378,7 +378,29 @@ export const postFavor = async (postId) => {
 }
 
 export const getStudentHomeworkList = async (courseId, homeworkNum) => {
-  
+  const response = await axios.get("http://localhost:8000/teacher/course/homework/homeworkDetailList",{
+    params: {
+      homeworkNum: homeworkNum,
+      courseId: Number(courseId),
+    }
+  });
+  return response.data;
+}
+export const getStudentHomeworkDetial = async (homeworkId) => {
+  const response = await axios.get("http://localhost:8000/teacher/course/homework/homeworkCorrect", {
+    params: {
+      homeworkId: homeworkId,
+    }
+  });
+  return response.data;
+}
+export const submitGradeByTeacher = async (homeworkId, grade) => {
+  await axios.post("http://localhost:8000/teacher/course/homework/submitGrade", null, {
+    params: {
+      homeworkId: Number(homeworkId),
+      grade:grade,
+    }
+  })
 }
   // 导出所有 API 请求
 export default {
@@ -403,5 +425,7 @@ export default {
   deletePostByTeacher,
   postLike,
   postFavor,
-  getStudentHomeworkList
+  getStudentHomeworkList,
+  getStudentHomeworkDetial,
+  submitGradeByTeacher
 };

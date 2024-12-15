@@ -128,7 +128,12 @@ const handleRemoveFile = (file, fileList) => {
 };
 
 // 提交作业
-const submitHomework = async () => {
+const
+
+
+
+
+  submitHomework = async () => {
   // const { homeworkNum, deadline, content } = form.value;
 
   // 验证输入

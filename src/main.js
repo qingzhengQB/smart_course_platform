@@ -1,4 +1,4 @@
-import "./mock/mock"; // 引入 Mock.js
+//import "./mock/mock"; // 引入 Mock.js
 
 import { createApp } from "vue";
 import App from "./App.vue";

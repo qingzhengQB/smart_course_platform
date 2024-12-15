@@ -2,7 +2,7 @@
   <div class="correcting-homework-detail">
     <div class="correcting-homework-detail-content">
       <el-table :data="submitList" style="width: 100%; margin-top: 30px">
-        <el-table-column label="学生ID" prop="studentID"></el-table-column>
+        <el-table-column label="学生ID" prop="studentId"></el-table-column>
         <el-table-column label="学生姓名" prop="studentName"></el-table-column>
         <el-table-column label="提交时间" prop="submitTime"></el-table-column>
         <el-table-column
@@ -86,8 +86,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRoute } from "vue-router";
+import { getStudentHomeworkList} from "@/api/CoursePageApi"
 const route = useRoute();
-const homeworkID = route.params.homeWorkId;
+const homeworkNum = route.params.homeWorkNum;
 const correctHomeworkDialogVisible = ref(false),
   homeworkScoreDialogVisible = ref(false);
 // 定义响应式变量 fileUrl

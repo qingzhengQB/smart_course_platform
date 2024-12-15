@@ -28,30 +28,43 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import axios from "axios";
+// 获取路由信息
+const route = useRoute();
 const router = useRouter();
-const homeworkList = ref([
-  {
-    homeworkNum: "1",
-    content: "作业内容",
-    totalSubmit: 10,
-  },
-  {
-    homeworkNum: "2",
-    content: "作业内容",
-    totalSubmit: 10,
-  },
-  {
-    homeworkNum: "3",
-    content: "作业内容",
-    totalSubmit: 8,
-  },
-]);
+const courseId = route.params.id;
+const homeworkList = ref([]);
+// 获取已发布作业列表
+const fetchHomeworkList = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/teacher/course/${courseId}/homeworkList`
+    );
+    homeworkList.value = response.data.homeworkList;
+
+    // 如果后端返回的数据包含日期字符串，确保转换为 Date 对象
+    if (homeworkList.value.length > 0) {
+      homeworkList.value.forEach((homework) => {
+        // 如果返回的 submissionDeadline 是字符串，转换为 Date 对象
+        if (homework.submissionDeadline) {
+          homework.submissionDeadline = new Date(homework.submissionDeadline);
+        }
+      });
+    }
+  } catch (error) {
+    ElMessage.error("获取作业列表失败，请稍后再试");
+  }
+};
 function handleCorrect(row) {
   router.push({
     name: "correcting-homework-detail",
-    params: { homeWorkId: row.homeworkNum },
+    params: { homeWorkNum: row.homeworkNum },
   });
 }
+onMounted(() => {
+  fetchHomeworkList();
+});
 </script>
 
 <style lang="scss" scoped>

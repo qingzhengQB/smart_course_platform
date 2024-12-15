@@ -376,6 +376,10 @@ export const postLike = async (postId) => {
 export const postFavor = async (postId) => {
   
 }
+
+export const getStudentHomeworkList = async (courseId, homeworkNum) => {
+  
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -398,5 +402,6 @@ export default {
   setTeacherInfo,
   deletePostByTeacher,
   postLike,
-  postFavor
+  postFavor,
+  getStudentHomeworkList
 };

@@ -1,34 +1,19 @@
 <template>
   <div class="statistics-homework-container">
     <el-table :data="homeworkList" style="width: 90%; margin-top: 20px">
-      <el-table-column
-        label="作业编号"
-        prop="homeworkNum"
-        width="300"
-      ></el-table-column>
-      <el-table-column
-        label="作业标题"
-        prop="content"
-        width="300"
-      ></el-table-column>
-      <el-table-column
-        label="提交人数"
-        prop="totalSubmit"
-        width="300"
-      ></el-table-column>
+      <el-table-column label="作业编号" prop="homeworkNum" width="300"></el-table-column>
+      <el-table-column label="作业标题" prop="content" width="300"></el-table-column>
+      <el-table-column label="提交人数" prop="totalSubmit" width="300"></el-table-column>
+      <el-table-column label="均分" prop="avgGrade" width="300"></el-table-column>
       <el-table-column label="查看统计">
         <template #default="{ row }">
-          <el-button type="primary" @click="handleStatistics(row)"
-            >查看统计</el-button
-          >
+          <el-button type="primary" @click="handleStatistics(row)">查看统计</el-button>
         </template>
       </el-table-column>
     </el-table>
+
     <div class="total-chart-container">
-      <div
-        class="chart-conainer pip-chart-container"
-        style="height: 400px; width: 1000px"
-      >
+      <div class="chart-conainer pip-chart-container" style="height: 400px; width: 1000px">
         <v-chart
           autoresize
           :option="allScoreLineChartOption"
@@ -37,6 +22,7 @@
       </div>
     </div>
   </div>
+
   <el-dialog
     class="statistics-homework-content-dialog"
     v-model="statisticsHomeworkDialogVisible"
@@ -52,38 +38,25 @@
           style="height: 400px; width: 700px"
         ></v-chart>
       </div>
-      <div class="avarage-score-container">作业均分：{{ avarageScore }}</div>
     </div>
   </el-dialog>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import { getHomeworkStatics } from "@/api/CoursePageApi"
+import axios from "axios";
 
+// 获取路由信息
+const route = useRoute();
+const courseId = route.params.id;
 const statisticsHomeworkDialogVisible = ref(false);
-const avarageScore = ref(90);
-const homeworkList = ref([
-  {
-    homeworkNum: "1",
-    content: "作业内容",
-    totalSubmit: 10,
-  },
-  {
-    homeworkNum: "2",
-    content: "作业内容",
-    totalSubmit: 10,
-  },
-  {
-    homeworkNum: "3",
-    content: "作业内容",
-    totalSubmit: 8,
-  },
-]);
-
+const homeworkList = ref([]);
 const chartOptions = ref({
   title: {
     text: "分数比例分布",
-    subtext: "xxx",
     left: "center",
   },
   tooltip: {
@@ -104,7 +77,7 @@ const chartOptions = ref({
         { value: 580, name: "70 < score <= 80" },
         { value: 484, name: "60 < score <= 70" },
         { value: 300, name: "score <= 60" },
-      ],
+      ], // 默认值
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
@@ -115,46 +88,91 @@ const chartOptions = ref({
     },
   ],
 });
-const allScoreLineChartOption = {
+
+const allScoreLineChartOption = ref({
   title: {
-    text: "作业平均成绩变化折线图",
-    subtext: "数据展示",
+    text: "作业均分变化趋势",
+    subtext: "作业成绩分析",
     left: "center",
   },
   tooltip: {
-    trigger: "axis", // 提示框触发方式：轴触发
+    trigger: "axis", // 触发类型为轴触发
     axisPointer: {
-      type: "line", // 轴指示器类型：直线
+      type: "line", // 直线指示器
     },
   },
   legend: {
-    data: ["平均成绩"], // 图例名称
-    top: "10%", // 图例位置
+    data: ["均分"],
+    top: "10%",
   },
   xAxis: {
-    type: "category", // 横轴类型：类目轴
-    boundaryGap: false, // 坐标轴刻度从头开始（折线图推荐设置为 false）
-    data: ["1月", "2月", "3月", "4月", "5月", "6月"], // 横轴数据
+    type: "category", // 横轴为类目轴
+    boundaryGap: false, // 从零开始
+    data: [], // 动态填充作业编号
   },
   yAxis: {
-    type: "value", // 纵轴类型：数值轴
+    type: "value", // 纵轴为数值轴
     axisLabel: {
-      formatter: "{value}", // 显示格式，例如单位可以加 "°C" 或 "万元"
+      formatter: "{value}", // 显示格式，显示均分
     },
   },
   series: [
     {
-      name: "销量", // 系列名称
+      name: "均分", // 系列名称
       type: "line", // 图表类型：折线图
-      data: [120, 132, 101, 134, 90, 230], // 数据
+      data: [], // 动态填充均分数据
       smooth: true, // 平滑曲线
     },
   ],
+});
+
+// 获取作业列表和统计数据
+const fetchHomeworkList = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/teacher/course/${courseId}/homeworkList`
+    );
+    
+    const homeworkData = response.data.homeworkList;
+    const homeworkStats = response.data.homeworkStats;
+
+    // 将统计信息与作业数据结合
+    homeworkList.value = homeworkData.map(homework => {
+      const stats = homeworkStats.find(stat => stat.homeworkNum === homework.homeworkNum);
+      const totalSubmit = stats ? `${stats.alreadySubmit}/${stats.totalNum}` : "0/0";
+      const avgGrade = stats ? stats.avgGrade : 0;
+      return { ...homework, totalSubmit, avgGrade };
+    });
+
+    // 更新折线图数据
+    allScoreLineChartOption.value.xAxis.data = homeworkList.value.map(homework => homework.homeworkNum);
+    allScoreLineChartOption.value.series[0].data = homeworkList.value.map(homework => homework.avgGrade);
+
+  } catch (error) {
+    ElMessage.error("获取作业列表失败，请稍后再试");
+  }
 };
 
-function handleStatistics(row) {
+// 处理查看统计按钮点击
+async function handleStatistics(row) {
+  const response = await getHomeworkStatics(row.courseId, row.homeworkNum);
+  const stats = response;
+
   statisticsHomeworkDialogVisible.value = true;
+
+  // 更新饼图数据
+  chartOptions.value.series[0].data = [
+    { value: stats.grade_100_90, name: "100 < score <= 90" },
+    { value: stats.grade_90_80, name: "90 < score <= 80" },
+    { value: stats.grade_80_70, name: "80 < score <= 70" },
+    { value: stats.grade_70_60, name: "70 < score <= 60" },
+    { value: stats.grade_60_0, name: "score <= 60" },
+  ];
 }
+
+onMounted(() => {
+  fetchHomeworkList();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -165,13 +183,11 @@ function handleStatistics(row) {
   padding: 20px 10px;
   gap: 30px;
 }
-// .statistics-homework-content-dialog-content {
-//   width: 1000px;
-//   height: 600px;
-// }
+
 .statistics-homework-content-dialog {
   height: 75vh;
 }
+
 .statistics-dialog-container {
   overflow-x: hidden;
   overflow-y: auto;
@@ -181,13 +197,8 @@ function handleStatistics(row) {
   gap: 20px;
   margin-top: 20px;
 }
+
 .avarage-score-container {
   font-size: 1.8rem;
-}
-</style>
-
-<style lang="scss">
-.el-dialog__body {
-  height: 70vh;
 }
 </style>

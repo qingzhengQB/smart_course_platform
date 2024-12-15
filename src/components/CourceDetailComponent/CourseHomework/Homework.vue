@@ -345,11 +345,12 @@ const submit = async () => {
     const files = attachments.value.map((file) => file.raw);
 
     // 调用 submitHomework 函数，传递作业 ID、内容和附件（文件对象数组）
-    const response = await submitHomework(homeworkId, studentContent, files);
+    const response = await submitHomework(homeworkId,courseId, studentContent, files);
 
     console.log("提交结果:", response);
     closeModal(); // 提交后关闭模态框
     isCheckModalOpen.value = false;
+    getMyHomework();
     // 提交成功后，显示成功的提示信息
     ElMessage({
       message: "作业提交成功！",

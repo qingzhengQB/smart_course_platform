@@ -184,10 +184,11 @@ const FavorPost = async () => {
 
 const submitComment = async () => {
   if (newComment.value.content.trim() !== "") {
+    const encodedContent = encodeURIComponent(newComment.value.content); // 对评论内容进行 URL 编码
     if (store.getters.getIsTeacher) {
-      await submitPostCommentByTeacher(postId, newComment.value.content, userNum.value);
+      await submitPostCommentByTeacher(postId, encodedContent, userNum.value);
     } else {
-      await submitPostComment(postId, newComment.value.content, userNum.value);
+      await submitPostComment(postId, encodedContent, userNum.value);
     }
     await fetchPostDetails();
     showCommentForm.value = false;
@@ -196,6 +197,7 @@ const submitComment = async () => {
     alert("评论内容不能为空！");
   }
 };
+
 
 const openReplyForm = (index) => {
   replyFormIndex.value = index;
@@ -208,10 +210,11 @@ const closeReplyForm = () => {
 
 const submitReply = async () => {
   if (replyComment.value.content.trim() !== "") {
+    const encodedContent = encodeURIComponent(replyComment.value.content); // 对回复内容进行 URL 编码
     if (store.getters.getIsTeacher) {
-      await submitPostCommentByTeacher(postId, replyComment.value.content, userNum.value);
+      await submitPostCommentByTeacher(postId, encodedContent, userNum.value);
     } else {
-      await submitPostComment(postId, replyComment.value.content, userNum.value);
+      await submitPostComment(postId, encodedContent, userNum.value);
     }
     await fetchPostDetails();
     closeReplyForm();
@@ -219,6 +222,7 @@ const submitReply = async () => {
     alert("回复内容不能为空！");
   }
 };
+
 
 onMounted(() => {
   fetchPostDetails();

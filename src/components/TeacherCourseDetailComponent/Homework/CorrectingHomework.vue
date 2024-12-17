@@ -28,30 +28,51 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import axios from "axios";
+// 获取路由信息
+const route = useRoute();
 const router = useRouter();
-const homeworkList = ref([
-  {
-    homeworkNum: "1",
-    content: "作业内容",
-    totalSubmit: 10,
-  },
-  {
-    homeworkNum: "2",
-    content: "作业内容",
-    totalSubmit: 10,
-  },
-  {
-    homeworkNum: "3",
-    content: "作业内容",
-    totalSubmit: 8,
-  },
-]);
+const courseId = route.params.id;
+const homeworkList = ref([]);
+// 获取已发布作业列表
+const fetchHomeworkList = async () => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8000/teacher/course/${courseId}/homeworkList`
+    );
+    
+    const homeworkData = response.data.homeworkList;
+    const homeworkStats = response.data.homeworkStats;
+
+    // 将统计信息与作业数据结合
+    homeworkList.value = homeworkData.map(homework => {
+      // 找到对应作业的统计信息
+      const stats = homeworkStats.find(stat => stat.homeworkNum === homework.homeworkNum);
+      
+      // 计算提交人数
+      const totalSubmit = stats ? `${stats.alreadySubmit}/${stats.totalNum}` : "0/0";
+      
+      return {
+        ...homework,  // 保留其他字段
+        totalSubmit,  // 添加 totalSubmit 字段
+      };
+    });
+  } catch (error) {
+    ElMessage.error("获取作业列表失败，请稍后再试");
+  }
+};
+
 function handleCorrect(row) {
+  console.log(row)
   router.push({
     name: "correcting-homework-detail",
-    params: { homeWorkId: row.homeworkNum },
+    params: { homeWorkNum: row.homeworkNum },
   });
 }
+onMounted(() => {
+  fetchHomeworkList();
+});
 </script>
 
 <style lang="scss" scoped>

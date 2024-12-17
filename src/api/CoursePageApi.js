@@ -1,5 +1,4 @@
 import axios from "axios";
-import { number } from "echarts";
 export const fetchMyHomework = async (userNum,courseId) => {
     try {
         const response = await axios.get('http://localhost:8000/student/course/homework', {
@@ -40,20 +39,20 @@ export const fetchHomeworkAttachments = async (courseId, homeworkId) => {
         homeworkId: Number(homeworkId),
       }
     });
-    console.log("获取mock数据", response.data); // 打印返回的数据
     return response.data.Attachments; // 假设返回的数据结构中包含 Attachments 数组
   } catch (error) {
     console.error("获取作业附件失败", error);
     throw error; // 抛出错误以便调用者处理
   }
 }
-export const submitHomework = async (homeworkId, homeworkContent, attachments) => {
+export const submitHomework = async (homeworkId,courseId, homeworkContent, attachments) => {
   try {
     // 创建 FormData 对象
     const formData = new FormData();
     
     // 将作业 ID 和学生内容添加到 FormData
     formData.append('homeworkId', Number(homeworkId));  // 作业 ID
+    formData.append('courseId', Number(courseId));
     formData.append('studentContent', String(homeworkContent));  // 学生提交的内容
 
     // 检查附件并添加到 FormData
@@ -365,6 +364,73 @@ export const setTeacherInfo = async (courseId, phoneNum, content) => {
 export const deletePostByTeacher = async (postId) => {
   return await axios.delete(`http://localhost:8000/teacher/course/deletePost/${postId}`).data;
 };
+
+export const postLike = async (postId) => {
+  await axios.post("http://localhost:8000/post/addLikeNum", null, {
+    params: {
+      postId:Number(postId),
+    }
+  })
+};
+export const postDisLike = async (postId) => {
+  await axios.post("http://localhost:8000/post/decreaseLikeNum", null, {
+    params: {
+      postId:Number(postId),
+    }
+  })
+};
+
+//TODO 
+export const postFavor = async (postId,studentNum) => {
+  await axios.post("http://localhost:8000/post/addFavorNum", null, {
+    params: {
+      postId: Number(postId),
+      studentNum:studentNum,
+    }
+  })
+}
+export const postUnFavor = async (postId) => {
+  await axios.post("http://localhost:8000/post/decreaseFavorNum", null, {
+    params: {
+      postId: Number(postId),
+      studentNum:studentNum,
+    }
+  })
+}
+export const getStudentHomeworkList = async (courseId, homeworkNum) => {
+  const response = await axios.get("http://localhost:8000/teacher/course/homework/homeworkDetailList",{
+    params: {
+      homeworkNum: homeworkNum,
+      courseId: Number(courseId),
+    }
+  });
+  return response.data;
+}
+export const getStudentHomeworkDetial = async (homeworkId) => {
+  const response = await axios.get("http://localhost:8000/teacher/course/homework/homeworkCorrect", {
+    params: {
+      homeworkId: homeworkId,
+    }
+  });
+  return response.data;
+}
+export const submitGradeByTeacher = async (homeworkId, grade) => {
+  await axios.post("http://localhost:8000/teacher/course/homework/submitGrade", null, {
+    params: {
+      homeworkId: Number(homeworkId),
+      grade:grade,
+    }
+  })
+}
+export const getHomeworkStatics = async (courseId, homeworkNum) => {
+  const response = await axios.get("http://localhost:8000/teacher/course/homework/static", {
+    params: {
+      courseId: Number(courseId),
+      homeworkNum:homeworkNum,
+    }
+  });
+  return response.data;
+}
   // 导出所有 API 请求
 export default {
   fetchMyHomework,
@@ -386,4 +452,12 @@ export default {
   getCourseTeacherInfo,
   setTeacherInfo,
   deletePostByTeacher,
+  postLike,
+  postDisLike,
+  postFavor,
+  postUnFavor,
+  getStudentHomeworkList,
+  getStudentHomeworkDetial,
+  submitGradeByTeacher,
+  getHomeworkStatics
 };

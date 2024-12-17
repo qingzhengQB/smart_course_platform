@@ -21,24 +21,22 @@
         <el-date-picker
           v-model="deadline"
           type="datetime"
-          placeholder="请选择截止时间"
-          format="YYYY-MM-DD HH:mm:ss"
-        ></el-date-picker>
+          placeholder="Select date and time"
+        />
       </el-form-item>
 
       <!-- 作业内容 -->
       <el-form-item label="作业内容" prop="content">
         <el-input
           v-model.trim.lazy="content"
-          typ
-          e="textarea"
+          type="textarea"
           placeholder="请输入作业内容"
           rows="4"
         ></el-input>
       </el-form-item>
 
-      <!-- 文件上传 -->
-      <el-form-item label="上传文件" prop="file">
+      <!-- 上传附件 -->
+      <el-form-item label="上传附件">
         <el-upload
           class="upload-file"
           :on-change="handleFileChange"
@@ -49,9 +47,12 @@
           auto-upload="false"
           :before-upload="beforeUpload"
         >
-          <el-button type="primary">选择附件</el-button>
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         </el-upload>
-        <div v-if="fileList.length > 0">已选择文件：{{ fileList[0].name }}</div>
+        <div v-if="attachments.length > 0">
+          已选择附件：{{ attachments.map((att) => att.name).join(", ") }}
+        </div>
       </el-form-item>
 
       <!-- 提交按钮 -->
@@ -68,11 +69,6 @@
         label="截止时间"
         prop="submissionDeadline"
       ></el-table-column>
-      <el-table-column label="文件" prop="file">
-        <template #default="{ row }">
-          <a v-if="row.fileUrl" :href="row.fileUrl" target="_blank">查看附件</a>
-        </template>
-      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -89,71 +85,50 @@ const router = useRouter();
 const courseId = route.params.id;
 
 // 表单数据
-// const form = ref({
 const homeworkNum = ref(""),
-  deadline = ref(""), // Ensure it starts as a proper Date object or null
+  deadline = ref(null), // 默认为 null，确保可以在页面渲染时处理日期
   content = ref("");
-// });
 
-// 文件列表
-const fileList = ref([]);
+// 附件列表
+const attachments = ref([]);
 
 // 作业列表
 const homeworkList = ref([]);
 
 // 校验文件上传限制
-const beforeUpload = (file) => {
-  const isValid =
-    file.type === "application/pdf" ||
-    file.type ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-    file.type ===
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-    file.type ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-  if (!isValid) {
-    ElMessage.error("只能上传 PDF, DOCX, PPTX 或 XLSX 文件!");
-  }
-  return isValid;
-};
-
-// 文件更改处理
-const handleFileChange = (file, fileList) => {
-  fileList.value = fileList;
-};
-
-// 文件移除处理
-const handleRemoveFile = (file, fileList) => {
-  fileList.value = fileList;
+const handleFileUpload = (file, fileList) => {
+  attachments.value = fileList;
 };
 
 // 提交作业
 const submitHomework = async () => {
-  // const { homeworkNum, deadline, content } = form.value;
-
   // 验证输入
   if (!homeworkNum || !deadline || !content) {
     ElMessage.error("请填写完整的作业信息!");
     return;
   }
 
-  // 格式化截止时间
-  const formattedDeadline = new Date(deadline).toISOString();
+  console.log(deadline);
+  // 检查截止时间是否有效
+  const deadlineDate = new Date(deadline.value);
+
+  // 格式化截止时间为 ISO 8601 格式
+  const formattedDeadline = deadlineDate.toISOString();
 
   // 准备上传数据
   const formData = new FormData();
-  formData.append("homeworkNum", homeworkNum);
+  formData.append("homeworkNum", homeworkNum.value);
   formData.append("deadline", formattedDeadline);
-  formData.append("content", content);
+  formData.append("content", content.value);
 
-  // 如果有文件，追加文件
-  if (fileList.value.length > 0) {
-    formData.append("file", fileList.value[0].raw);
-  }
+  // 如果有附件，追加文件
+  attachments.value.forEach((file, index) => {
+    formData.append(`file${index}`, file.raw);
+  });
 
   try {
     const response = await axios.post(
-      `http://localhost:8000/course/${courseId}/uploadHomework`,
+      `http://localhost:8000/teacher/course/${courseId}/uploadHomework`,
       formData,
       {
         headers: {
@@ -179,7 +154,6 @@ const fetchHomeworkList = async () => {
     // 如果后端返回的数据包含日期字符串，确保转换为 Date 对象
     if (homeworkList.value.length > 0) {
       homeworkList.value.forEach((homework) => {
-        // 如果返回的 submissionDeadline 是字符串，转换为 Date 对象
         if (homework.submissionDeadline) {
           homework.submissionDeadline = new Date(homework.submissionDeadline);
         }
@@ -206,7 +180,7 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.upload-file {
+.upload-demo {
   width: 100%;
 }
 

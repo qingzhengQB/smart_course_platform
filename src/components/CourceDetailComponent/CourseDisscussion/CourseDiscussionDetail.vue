@@ -17,9 +17,7 @@
           {{ postDetail[0]?.content }}
         </div>
         <div class="discussion-stats-container">
-          点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{
-            postDetail[0]?.favoNum
-          }}
+          点赞数： {{ postDetail[0]?.likeNum }} 收藏数：{{ postDetail[0]?.favoNum }}
           <button class="comment-button" @click="showCommentForm = true">
             评论
           </button>
@@ -34,36 +32,22 @@
             <button @click="submitComment" class="comment-submit-button">
               提交评论
             </button>
-            <button
-              @click="showCommentForm = false"
-              class="comment-cancel-button"
-            >
+            <button @click="showCommentForm = false" class="comment-cancel-button">
               取消
             </button>
           </div>
         </div>
         <div class="discussion-comment-container">
-          <div
-            v-for="(commentItem, index) in postComment"
-            class="single-comment"
-          >
+          <div v-for="(commentItem, index) in postComment" class="single-comment">
             <div class="comment-content-container">
               <div class="main-comment-container">
                 <div class="comment-row-container">
                   <div class="comment-author-container">
                     <div class="comment-author-avatar">
-                      <img
-                        class="user-avatar"
-                        src="@/assets/avatar.png"
-                        alt="avatar"
-                      />
+                      <img class="user-avatar" src="@/assets/avatar.png" alt="avatar" />
                     </div>
                     <div class="comment-author">
-                      {{
-                        commentItem.studentName !== null
-                          ? commentItem.studentName
-                          : commentItem.teacherName
-                      }}
+                      {{ commentItem.studentName !== null ? commentItem.studentName : commentItem.teacherName }}
                       回复 {{ commentItem.commentedName }}
                     </div>
                   </div>
@@ -81,56 +65,49 @@
                       ></i>
                       <span class="like-count">{{ commentItem.likeNum }}</span>
                     </div>
-                    <i
-                      class="fa-regular fa-comment"
-                      @click="openReplyForm(index)"
-                    ></i>
+                    <i class="fa-regular fa-comment" @click="openReplyForm(index)"></i>
                   </div>
                 </div>
                 <div class="comment-content">
                   {{ commentItem.content }}
                 </div>
-                <div
-                  v-if="replyFormIndex === index"
-                  class="reply-form-container"
-                >
+                <div v-if="replyFormIndex === index" class="reply-form-container">
                   <textarea
                     v-model="replyComment.content"
                     placeholder="回复评论..."
                     class="comment-form-textarea"
                   ></textarea>
                   <div class="comment-form-buttons">
-                    <button
-                      @click="submitReply()"
-                      class="comment-submit-button"
-                    >
+                    <button @click="submitReply" class="comment-submit-button">
                       提交回复
                     </button>
-                    <button
-                      @click="closeReplyForm"
-                      class="comment-cancel-button"
-                    >
+                    <button @click="closeReplyForm" class="comment-cancel-button">
                       取消
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-            <div
-              v-if="index !== postComment.length - 1"
-              class="comment-divider"
-            ></div>
+            <div v-if="index !== postComment.length - 1" class="comment-divider"></div>
           </div>
         </div>
         <div class="post-options-container-row">
           <div class="post-options-container">
             <div class="single-option-container">
-              <i v-if="isLikePost" class="fa-solid fa-thumbs-up post-like"></i>
-              <i v-else class="fa-regular fa-thumbs-up"></i>
+              <i
+                v-if="isLikePost"
+                class="fa-solid fa-thumbs-up post-like"
+                @click="LikePost"
+              ></i>
+              <i v-else class="fa-regular fa-thumbs-up" @click="LikePost"></i>
             </div>
             <div class="single-option-container">
-              <i v-if="isCollectPost" class="fa-solid fa-star"></i>
-              <i v-else class="fa-regular fa-star"></i>
+              <i
+                v-if="isCollectPost"
+                class="fa-solid fa-star"
+                @click="FavorPost"
+              ></i>
+              <i v-else class="fa-regular fa-star" @click="FavorPost"></i>
             </div>
           </div>
         </div>
@@ -149,9 +126,12 @@ import {
   commentDisLike,
   submitPostComment,
   submitPostCommentByTeacher,
+  postLike,
+  postFavor,
+  postDisLike,
+  postUnFavor
 } from "@/api/CoursePageApi";
 const store = useStore();
-// 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const route = useRoute();
 const postId = route.params.id;
@@ -165,60 +145,59 @@ const isLikePost = ref(false);
 const isCollectPost = ref(false);
 
 const fetchPostDetails = async () => {
-  console.log("尝试获取帖子详情");
   const response = await getCoursePostDetial(postId);
   postDetail.value = response.postDetial;
-  console.log(postDetail.value);
   postComment.value = response.postComments;
+  isLikePost.value = response.postDetial.isLiked;  // 根据返回的详情设置点赞状态
+  isCollectPost.value = response.postDetial.isFavorited;  // 根据返回的详情设置收藏状态
 };
 
 const clickLike = async (commentItem) => {
   commentItem.isLiked = !commentItem.isLiked;
   await commentLike(commentItem.commentId);
-  commentItem.likeNum++;
+  commentItem.likeNum += commentItem.isLiked ? 1 : -1;
 };
 
 const clickDisLike = async (commentItem) => {
   commentItem.isLiked = !commentItem.isLiked;
   await commentDisLike(commentItem.commentId);
-  commentItem.likeNum--;
+  commentItem.likeNum -= commentItem.isLiked ? 1 : -1;
+};
+
+const LikePost = async () => {
+  if (isLikePost.value) {
+    await postDisLike(postId); // 取消点赞
+  } else {
+    await postLike(postId); // 点赞
+  }
+  isLikePost.value = !isLikePost.value;
+};
+
+const FavorPost = async () => {
+  if (isCollectPost.value) {
+    await postUnFavor(postId,userNum.value); // 取消收藏
+  } else {
+    await postFavor(postId,userNum.value); // 收藏
+  }
+  isCollectPost.value = !isCollectPost.value;
 };
 
 const submitComment = async () => {
   if (newComment.value.content.trim() !== "") {
+    const encodedContent = encodeURIComponent(newComment.value.content); // 对评论内容进行 URL 编码
     if (store.getters.getIsTeacher) {
-      try {
-        console.log(postId);
-        await submitPostCommentByTeacher(
-          postId,
-          newComment.value.content,
-          userNum.value
-        );
-        await fetchPostDetails();
-        showCommentForm.value = false;
-        newComment.value = { content: "" };
-      } catch (error) {
-        console.error("提交评论失败", error);
-      }
+      await submitPostCommentByTeacher(postId, encodedContent, userNum.value);
     } else {
-      try {
-        console.log(postId);
-        await submitPostComment(
-          postId,
-          newComment.value.content,
-          userNum.value
-        );
-        await fetchPostDetails();
-        showCommentForm.value = false;
-        newComment.value = { content: "" };
-      } catch (error) {
-        console.error("提交评论失败", error);
-      }
+      await submitPostComment(postId, encodedContent, userNum.value);
     }
+    await fetchPostDetails();
+    showCommentForm.value = false;
+    newComment.value = { content: "" };
   } else {
     alert("评论内容不能为空！");
   }
 };
+
 
 const openReplyForm = (index) => {
   replyFormIndex.value = index;
@@ -231,35 +210,19 @@ const closeReplyForm = () => {
 
 const submitReply = async () => {
   if (replyComment.value.content.trim() !== "") {
+    const encodedContent = encodeURIComponent(replyComment.value.content); // 对回复内容进行 URL 编码
     if (store.getters.getIsTeacher) {
-      try {
-        await submitPostCommentByTeacher(
-          postId,
-          replyComment.value.content,
-          userNum.value
-        );
-        await fetchPostDetails();
-        closeReplyForm();
-      } catch (error) {
-        console.error("提交回复失败", error);
-      }
+      await submitPostCommentByTeacher(postId, encodedContent, userNum.value);
     } else {
-      try {
-        await submitPostComment(
-          postId,
-          replyComment.value.content,
-          userNum.value
-        );
-        await fetchPostDetails();
-        closeReplyForm();
-      } catch (error) {
-        console.error("提交回复失败", error);
-      }
+      await submitPostComment(postId, encodedContent, userNum.value);
     }
+    await fetchPostDetails();
+    closeReplyForm();
   } else {
     alert("回复内容不能为空！");
   }
 };
+
 
 onMounted(() => {
   fetchPostDetails();

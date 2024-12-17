@@ -173,30 +173,50 @@
       <el-button @click="isShowCorrectScoreView = true">查看互评得分</el-button>
     </div>
     <div v-if="!isShowCorrectScoreView" class="correct-dialog-body">
-      <div class="correct-homework-content">作业互评</div>
-      <div class="pdf-container">
-        <iframe
-          :src="previewFileUrl"
-          width="100%"
-          height="100%"
-          type="application/pdf"
-          class="pdf-iframe"
-        ></iframe>
-      </div>
-      <el-input
-        type="textarea"
-        v-model="correctHomeworkContent"
-        placeholder="作业内容"
-        rows="10"
-        readonly
-      ></el-input>
-      <div class="correct-homework-score">
+      <div class="correct-homework-aria">
+        <div class="correct-homework-content">
+          作业互评 {{ selectHomeworkIndex + 1 }}
+        </div>
+        <div class="pdf-container">
+          <iframe
+            :src="homeworkUrl"
+            width="100%"
+            height="100%"
+            type="application/pdf"
+            class="pdf-iframe"
+          ></iframe>
+        </div>
         <el-input
-          class="correct-homework-score-input"
-          v-model="homeworkScore"
-          placeholder="请输入互评分数"
+          type="textarea"
+          v-model="correctHomeworkContent"
+          placeholder="作业内容"
+          rows="10"
+          readonly
         ></el-input>
-        <el-button type="primary" class="submit-score">提交</el-button>
+        <div class="correct-homework-score">
+          <el-input
+            class="correct-homework-score-input"
+            type="textarea"
+            :rows="10"
+            v-model="homeworkeCommentList[selectHomeworkIndex]"
+            placeholder="请输入评语"
+          ></el-input>
+
+          <el-input
+            class="correct-homework-score-input"
+            v-model="homeworkScoreList[selectHomeworkIndex]"
+            placeholder="请输入互评分数"
+          ></el-input>
+          <el-button type="primary" class="submit-score" @click="submitScore()"
+            >提交</el-button
+          >
+        </div>
+      </div>
+      <div class="page-left-button page-button" @click="turnPage('left')">
+        <i class="fa-solid fa-angle-left"></i>
+      </div>
+      <div class="page-right-button page-button" @click="turnPage('right')">
+        <i class="fa-solid fa-angle-right"></i>
       </div>
     </div>
     <div class="correct-dialog-body" v-else>
@@ -227,6 +247,7 @@ import {
   fetchHomeworkAttachments,
 } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
+import axios from "axios";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
 const isCheckModalOpen = ref(false);
@@ -246,6 +267,12 @@ const currentPage = ref(1);
 const pageSize = 6;
 const store = useStore();
 const route = useRoute();
+const homeworkUrl = ref("/2411.02310v1.pdf");
+const correctHomeworkList = ref([]);
+// 以下两项在获取到互评列表后，按照 selectHomeworkIndex 赋值为列表指定项
+const homeworkScoreList = ref([]); // 互评分数列表
+const homeworkeCommentList = ref([]); // 互评评语列表
+const selectHomeworkIndex = ref(0);
 // 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const courseId = route.params.id;
@@ -275,7 +302,61 @@ const getHomeworkAttachment = async (homeworkId) => {
     console.error("获取作业详情失败", error);
   }
 };
-
+const getConrrctHomework = async (homeworkNum) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:8080http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`
+    );
+    correctHomeworkList.value = response.homeworkList;
+    correctHomeworkList.value.length = Array(
+      correctHomeworkList.value.length
+    ).fill("");
+    homeworkeCommentList.value = Array(correctHomeworkList.value.length).fill(
+      ""
+    );
+    selectHomeworkIndex.value = 0;
+    console.log("success");
+  } catch (error) {
+    console.error("获取作业失败", error);
+  }
+};
+const submitScore = async (homeworkId) => {
+  try {
+    const formData = new FormData();
+    formData.append("score", homeworkScoreList.value[selectHomeworkIndex]);
+    formData.append(
+      "comments",
+      homeworkeCommentList.value[selectHomeworkIndex]
+    );
+    const response = await axios.post(
+      `http://localhost:8080http://localhost:8000/student/homework/${homeworkId}/review`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log("success");
+  } catch (error) {
+    console.error("获取作业失败", error);
+  }
+};
+const turnPage = (direction) => {
+  if (direction === "left") {
+    if (selectHomeworkIndex.value === 0) {
+      selectHomeworkIndex.value = correctHomeworkList.value.length - 1;
+    } else {
+      selectHomeworkIndex.value -= 1;
+    }
+  } else {
+    if (selectHomeworkIndex.value === correctHomeworkList.value.length - 1) {
+      selectHomeworkIndex.value = 0;
+    } else {
+      selectHomeworkIndex.value += 1;
+    }
+  }
+};
 onMounted(() => {
   getMyHomework();
 });
@@ -314,6 +395,7 @@ const openSubmitModal = (homework) => {
 function homeworkMutualCorrecting(homework) {
   console.log("作业互评", homework);
   correctHomeworkDialogVisible.value = true;
+  getConrrctHomework(homework.homeworkNum);
 }
 
 const confirmSubmit = () => {
@@ -368,7 +450,9 @@ const handlePageChange = (page) => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$pagebuttonwidth: 20px;
+$pagebuttonheight: 100px;
 .homework-item {
   margin-bottom: 10px;
   padding: 15px;
@@ -406,12 +490,18 @@ const handlePageChange = (page) => {
   color: #909399;
   padding: 50px 0;
 }
+.homework-submit-detail {
+  position: relative;
+}
 .correct-dialog-options-container {
   display: flex;
   gap: 10px;
   /* justify-content: center; */
   align-items: center;
   margin: 10px 80px;
+}
+.el-dialog__body {
+  position: relative;
 }
 .correct-dialog-body {
   width: 80%;
@@ -421,7 +511,7 @@ const handlePageChange = (page) => {
   gap: 15px;
   margin: auto;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: visible;
 }
 .correct-homework-content {
   font-size: 1.2rem;
@@ -445,5 +535,27 @@ const handlePageChange = (page) => {
 }
 .submit-score {
   width: 15%;
+}
+.page-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: $pagebuttonwidth;
+  height: $pagebuttonheight;
+  background-color: var(--main-page-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 100px 20px;
+  border: #000 2px solid;
+  z-index: 10000;
+  font-size: 2rem;
+}
+.page-left-button {
+  left: calc(#{$pagebuttonwidth});
+}
+.page-right-button {
+  right: calc(#{$pagebuttonwidth});
 }
 </style>

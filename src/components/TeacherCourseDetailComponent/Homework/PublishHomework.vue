@@ -41,12 +41,12 @@
       <el-form-item label="上传文件" prop="file">
         <el-upload
           class="upload-file"
-          action="http://localhost:8000/course/{{ courseId }}/uploadHomework"
           :on-change="handleFileChange"
           :on-remove="handleRemoveFile"
           :limit="1"
           :file-list="fileList"
           accept=".pdf,.docx,.pptx,.xlsx"
+          auto-upload="false"
           :before-upload="beforeUpload"
         >
           <el-button type="primary">选择附件</el-button>

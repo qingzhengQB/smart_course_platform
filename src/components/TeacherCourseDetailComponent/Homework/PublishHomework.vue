@@ -106,7 +106,6 @@ const submitHomework = async () => {
     return;
   }
 
-  console.log(deadline)
   // 检查截止时间是否有效
   const deadlineDate = new Date(deadline.value);
 
@@ -119,10 +118,15 @@ const submitHomework = async () => {
   formData.append("deadline", formattedDeadline);
   formData.append("content", content.value);
 
-  // 如果有附件，追加文件
+  if (attachments.value && attachments.value.length > 0) {
+  // 有文件上传，继续处理
   attachments.value.forEach((file, index) => {
-    formData.append(`file${index}`, file.raw);
+    formData.append(`file`, file.raw);
   });
+} else {
+  // 没有文件上传
+  console.log("没有文件上传");
+}
 
   try {
     const response = await axios.post(

@@ -304,8 +304,13 @@ const getHomeworkAttachment = async (homeworkId) => {
 };
 const getConrrctHomework = async (homeworkNum) => {
   try {
+    console.log(store.state.userinfo.userNum)
     const response = await axios.get(
-      `http://localhost:8080http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`
+      `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,{
+        params:{
+          studentNum:store.state.userinfo.userNum
+        }
+      }
     );
     correctHomeworkList.value = response.homeworkList;
     correctHomeworkList.value.length = Array(
@@ -329,7 +334,7 @@ const submitScore = async (homeworkId) => {
       homeworkeCommentList.value[selectHomeworkIndex]
     );
     const response = await axios.post(
-      `http://localhost:8080http://localhost:8000/student/homework/${homeworkId}/review`,
+      `http://localhost:8000/student/homework/${homeworkId}/review`,
       formData,
       {
         headers: {

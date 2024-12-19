@@ -36,10 +36,11 @@ export const fetchHomeworkAttachments = async (courseId, homeworkId) => {
     const response = await axios.get('http://localhost:8000/student/course/homework/attachments', {
       params: {
         courseId: Number(courseId),
-        homeworkId: Number(homeworkId),
+        homeworkNum: Number(homeworkId),
       }
     });
-    return response.data.Attachments; // 假设返回的数据结构中包含 Attachments 数组
+    console.log("获取附件成功")
+    return response; 
   } catch (error) {
     console.error("获取作业附件失败", error);
     throw error; // 抛出错误以便调用者处理

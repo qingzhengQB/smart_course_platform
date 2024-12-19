@@ -117,25 +117,11 @@
             <span v-else>未批改</span>
           </p>
           <!-- 添加附件下载链接 -->
-          <p
-            v-if="
-              detailHomework.attachments &&
-              detailHomework.attachments.length > 0
-            "
-          >
-            <strong>附件:</strong>
-            <span
-              v-for="(attachment, index) in detailHomework.attachments"
-              :key="index"
-            >
-              <a :href="attachment.url" target="_blank">{{
-                attachment.name
-              }}</a>
-              <span v-if="index < detailHomework.attachments.length - 1"
-                >,
-              </span>
-            </span>
-          </p>
+          <p><strong>附件:</strong>
+              <a href="#" @click.prevent="downloadAttachment(resourceId)">
+                {{ filename }}
+              </a>
+            </p>
           <!-- 显示已提交的作业内容
     <p v-if="detailHomework.submittedContent">
       <strong>已提交的作业内容:</strong>
@@ -245,9 +231,11 @@ import {
   fetchMyHomework,
   submitHomework,
   fetchHomeworkAttachments,
+  downLoadCourseResource
 } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 import axios from "axios";
+import { number } from "echarts";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
 const isCheckModalOpen = ref(false);
@@ -276,8 +264,9 @@ const selectHomeworkIndex = ref(0);
 // 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const courseId = route.params.id;
-
-console.log(courseId);
+const attachment = ref([]);
+const filename=ref("无");
+const resourceId = ref([])
 // Simulated function to fetch homework
 const getMyHomework = async () => {
   try {
@@ -289,15 +278,20 @@ const getMyHomework = async () => {
   }
 };
 // 在获取作业详情的函数中添加获取附件的逻辑
-const getHomeworkAttachment = async (homeworkId) => {
+const getHomeworkAttachment = async (homeworkNum) => {
   try {
     console.log("获取附件");
+    console.log(courseId);
+    console.log(homeworkNum);
     // 获取作业附件
-    detailHomework.value.attachments = await fetchHomeworkAttachments(
+    attachment.value = await fetchHomeworkAttachments(
       courseId,
-      homeworkId
+      homeworkNum
     );
-    console.log(detailHomework.value.attachments);
+    resourceId.value = attachment.value.data.resourceId
+    filename.value = attachment.value.data.URL.split('http://localhost:8000/src/main/resources/static/course/').pop();
+    console.log(resourceId.value);
+    console.log(attachment.value);
   } catch (error) {
     console.error("获取作业详情失败", error);
   }
@@ -374,7 +368,7 @@ const paginatedHomeworks = computed(() => {
 
 // View homework details
 const viewHomeworkDetails = (homework) => {
-  getHomeworkAttachment(homework.homeworkId); // 获取作业附件
+  getHomeworkAttachment(homework.homeworkNum); // 获取作业附件
   detailHomework.value = homework;
   isDetailVisible.value = true;
 };
@@ -459,6 +453,64 @@ const submit = async () => {
 
 const handlePageChange = (page) => {
   currentPage.value = page;
+};
+
+// 添加下载附件的方法
+const downloadAttachment = async (id) => {
+  alert(`下载文件 ID: ${id}`);
+
+  try {
+    // 获取文件 URL 和文件类型
+    const response = await downLoadCourseResource(id);
+    const fileUrl = response.URL;
+    const fileType = response.fileType;
+
+    let fileExtension = "unknown";
+    switch (fileType) {
+      case "application/pdf":
+        fileExtension = "pdf";
+        break;
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        fileExtension = "pptx";
+        break;
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        fileExtension = "docx";
+        break;
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        fileExtension = "xlsx";
+        break;
+      default:
+        fileExtension = "bin"; // 默认二进制文件
+    }
+
+    if (!fileUrl) {
+      throw new Error("文件 URL 无效。");
+    }
+
+    // 通过 fetch 获取文件并创建 Blob 对象，避免浏览器跳转
+    const fileResponse = await fetch(fileUrl);
+    const blob = await fileResponse.blob();
+
+    const link = document.createElement("a");
+    const downloadUrl = window.URL.createObjectURL(blob);
+    link.href = downloadUrl;
+    link.download = `文件${id}.${fileExtension}`; // 使用动态扩展名
+
+    link.style.display = "none"; // 隐藏链接元素
+    document.body.appendChild(link); // 将链接添加到页面中
+
+    // 模拟点击以触发下���
+    link.click();
+
+    // 下载后移除链接元素
+    document.body.removeChild(link);
+
+    // 释放 URL 对象
+    window.URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+    console.error("文件下载失败:", error);
+    alert("文件下载失败，请稍后再试。");
+  }
 };
 </script>
 
@@ -569,5 +621,33 @@ $pagebuttonheight: 100px;
 }
 .page-right-button {
   right: calc(#{$pagebuttonwidth});
+}
+.attachments-section {
+  margin-top: 15px;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.attachment-list {
+  margin-top: 10px;
+}
+
+.attachment-item {
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  a {
+    color: #151516;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+      color: #409EFF;
+    }
+  }
 }
 </style>

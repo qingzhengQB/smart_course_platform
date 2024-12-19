@@ -23,7 +23,8 @@
           </div>
         </div>
         <div class="personal-action">
-          <el-button type="primary">编辑资料</el-button>
+          <el-button type="primary" @click="showEditDialog">修改密码
+          </el-button>
         </div>
       </div>
       <button class="return-button" @click="() => router.push('/')" >
@@ -45,6 +46,27 @@
       </div>
     </div>
   </div>
+  <!-- 编辑个人资料 -->
+  <el-dialog
+    v-model="dialogVisible"
+    title="编辑个人资料"
+    width="30%"
+  >
+    <el-form :model="form" label-width="100px">
+      <el-form-item label="新密码">
+        <el-input v-model="form.password" type="password" show-password></el-input>
+      </el-form-item>
+      <el-form-item label="确认新密码">
+        <el-input v-model="form.confirmPassword" type="password" show-password></el-input>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleUpdate">确认</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -52,13 +74,28 @@ import router from "@/router";
 import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus";
+import axios from "axios";
 const route = useRoute();
 const store = useStore();
+const dialogVisible = ref(false)
 const userNum = store.state.userinfo.userNum;
 const personalInfo = {
   userName: "",
   email:"",
 };
+const form = ref({
+  password: '',
+  confirmPassword: ''
+})
+
+const showEditDialog = () => {
+  dialogVisible.value = true
+  form.value = {
+    password: '',
+    confirmPassword: ''
+  }
+}
 store.commit("setPagename", "个人主页");
 const isOther = window.location.pathname.startsWith("/other-personal"); // 是否是别人的主页
 const otherId=isOther?route.params.id:"";
@@ -84,6 +121,30 @@ const personalItem = [
 function returnHomePage(){
   router.push('/')
 };
+const handleUpdate = async () => {
+  if (form.value.password !== form.value.confirmPassword) {
+    ElMessage.error('两次输入的密码不一致')
+    return
+  }
+  
+  try {
+    const response = await axios.post('http://localhost:8000/student/update', null,{
+      params: {
+        studentNum: store.state.userinfo.userNum,
+        password: form.value.password
+      }
+    })
+    
+    if (response.data.message === 'Update successful') {
+      ElMessage.success('密码修改成功')
+      dialogVisible.value = false
+    } else {
+      ElMessage.error('修改失败')
+    }
+  } catch (error) {
+    ElMessage.error('修改失败：' + error.message)
+  }
+}
 // 页面挂载时获取用户信息
 onMounted(() => {
 });

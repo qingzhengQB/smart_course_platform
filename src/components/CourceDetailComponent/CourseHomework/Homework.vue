@@ -304,12 +304,13 @@ const getHomeworkAttachment = async (homeworkId) => {
 };
 const getConrrctHomework = async (homeworkNum) => {
   try {
-    console.log(store.state.userinfo.userNum)
+    console.log(store.state.userinfo.userNum);
     const response = await axios.get(
-      `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,{
-        params:{
-          studentNum:store.state.userinfo.userNum
-        }
+      `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,
+      {
+        params: {
+          studentNum: store.state.userinfo.userNum,
+        },
       }
     );
     correctHomeworkList.value = response.homeworkList;
@@ -432,7 +433,12 @@ const submit = async () => {
     const files = attachments.value.map((file) => file.raw);
 
     // 调用 submitHomework 函数，传递作业 ID、内容和附件（文件对象数组）
-    const response = await submitHomework(homeworkId,courseId, studentContent, files);
+    const response = await submitHomework(
+      homeworkId,
+      courseId,
+      studentContent,
+      files
+    );
 
     console.log("提交结果:", response);
     closeModal(); // 提交后关闭模态框

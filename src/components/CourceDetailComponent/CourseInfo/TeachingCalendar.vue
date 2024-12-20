@@ -2,9 +2,8 @@
   <div class="container">
     <div class="pdf-preview">
       <!-- PDF 渲染区域，包含所有页面 -->
-      <div v-if="true">
+      <div v-if="pdfLoaded">
         <div
-          v-if="pdfLoaded"
           :class="['pdf-viewer', { 'pdf-previewr-teacher': isTeacher }]"
         >
           <div v-for="(page, index) in pages" :key="index" class="pdf-page">
@@ -12,9 +11,9 @@
             <canvas :ref="(el) => (pageRefs[index] = el)"></canvas>
           </div>
         </div>
-        <div v-else>
-          <p>加载中...</p>
-        </div>
+      </div>
+      <div v-else>
+        <p>加载中...</p>
       </div>
     </div>
     
@@ -56,7 +55,7 @@ const pdfUrl = ref(""); // 使用 ref 来存储 pdfUrl，以保证响应式更�
 // 动态生成上传文件的 URL
 const uploadUrl = ref(`http://localhost:8000/teacher/course/${courseId}/uploadCourseCalendar`);
 
-// 获取课程大纲 URL
+// 获取课程日历 URL
 const fetchCourseCalendarUrl = async () => {
   try {
     const response = await getCourseCalendar(courseId);
@@ -68,7 +67,7 @@ const fetchCourseCalendarUrl = async () => {
 
 // 上传成功后的处理函数
 const handleUploadSuccess = async () => {
-  // 上传成功后，重新获取课程大纲并重新渲染 PDF
+  // 上传成功后，重新获取课程日历并重新渲染 PDF
   await fetchCourseCalendarUrl();
   renderPDF(pdfUrl.value); // 重新渲染 PDF 文件
 };
@@ -84,7 +83,7 @@ onMounted(async () => {
 // 使用 watchEffect 监控 pages 数组的变化，确保 canvas 元素已挂载
 watchEffect(async () => {
   if (pages.value.length > 0) {
-    await renderAllPages();
+    await renderAllPages(); // 渲染所有页面
   }
 });
 
@@ -111,10 +110,9 @@ const renderPDF = async (url) => {
 
 // 渲染所有页面到各自的 canvas 上
 const renderAllPages = async () => {
+  const pdf = await pdfjsLib.getDocument(pdfUrl.value).promise; // 获取最新的 PDF 文件
   for (let pageNum = 1; pageNum <= pages.value.length; pageNum++) {
-    const page = await pdfjsLib
-      .getDocument(pdfUrl.value) // 使用响应式的 pdfUrl
-      .promise.then((pdf) => pdf.getPage(pageNum));
+    const page = await pdf.getPage(pageNum);
     const canvas = pageRefs[pageNum - 1];
     if (!canvas) {
       console.error(`Canvas 元素未找到：页码 ${pageNum}`);
@@ -131,6 +129,7 @@ const renderAllPages = async () => {
       viewport: viewport,
     };
 
+    // 渲染每个页面到独立的 canvas 上
     await page.render(renderContext).promise;
   }
 };
@@ -174,6 +173,7 @@ canvas {
 .pdf-previewr-teacher {
   height: 80vh;
 }
+
 .upload-file-container {
   width: 75vw;
   display: flex;
@@ -181,8 +181,10 @@ canvas {
   align-items: center;
   margin-top: 15px;
 }
+
 .upload-file {
 }
+
 .el-upload {
   margin-left: auto;
 }

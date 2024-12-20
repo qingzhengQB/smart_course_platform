@@ -28,6 +28,7 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted, watchEffect } from "vue";
 import * as pdfjsLib from "pdfjs-dist/webpack";
@@ -48,6 +49,7 @@ const pdfLoaded = ref(false); // 表示 PDF 是否加载完成
 const pdfUrl = ref(""); // 使用 ref 来存储 pdfUrl，以保证响应式更新
 // 动态生成上传文件的 URL
 const uploadUrl = ref(`http://localhost:8000/teacher/course/${courseId}/uploadCourseOutLine`);
+
 // 获取课程大纲 URL
 const fetchCourseOutLineUrl = async () => {
   try {
@@ -73,6 +75,7 @@ watchEffect(async () => {
     await renderAllPages();
   }
 });
+
 // 上传成功后的处理函数
 const handleUploadSuccess = () => {
   // 上传成功后，重新获取课程大纲并重新渲染 PDF
@@ -80,6 +83,7 @@ const handleUploadSuccess = () => {
     renderPDF(pdfUrl.value); // 重新渲染 PDF 文件
   });
 };
+
 // PDF 渲染函数：加载 PDF 并创建页面列表
 const renderPDF = async (url) => {
   if (!url) {
@@ -108,10 +112,9 @@ const renderPDF = async (url) => {
 
 // 渲染所有页面到各自的 canvas 上
 const renderAllPages = async () => {
+  const pdf = await pdfjsLib.getDocument(pdfUrl.value).promise; // 确保在这里获取最新的 PDF
   for (let pageNum = 1; pageNum <= pages.value.length; pageNum++) {
-    const page = await pdfjsLib
-      .getDocument(pdfUrl.value) // 使用响应式的 pdfUrl
-      .promise.then((pdf) => pdf.getPage(pageNum));
+    const page = await pdf.getPage(pageNum);
     const canvas = pageRefs[pageNum - 1];
     if (!canvas) {
       console.error(`Canvas 元素未找到：页码 ${pageNum}`);

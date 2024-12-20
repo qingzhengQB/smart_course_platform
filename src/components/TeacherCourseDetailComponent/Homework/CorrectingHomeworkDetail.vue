@@ -43,7 +43,7 @@
         rows="6"
         readonly
       ></el-input>
-      <el-button type="primary" class="correct-homework-content">
+      <el-button type="primary" class="correct-homework-content"  @click="downloadFile">
         提交文件下载
       </el-button>
       <div class="correct-homework-preview">
@@ -154,6 +154,15 @@ async function submitGrade(row) {
     ElMessage.error("提交分数详情失败");
   }
 }
+function downloadFile() {
+  const url = previewFileUrl.value;  // 直接访问 ref 的值
+  const link = document.createElement('a');  // 创建一个临时的 <a> 元素
+  link.href = url;  // 设置下载链接
+  link.download = url.split('/').pop();  // 设置文件名（从 URL 中获取文件名）
+  link.target = '_blank';  // 在新标签页中打开链接
+  link.click();  // 触发下载
+}
+
 
 onMounted(() => {
   getstudentHomeworkList();

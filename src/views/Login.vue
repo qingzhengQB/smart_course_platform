@@ -11,10 +11,7 @@
         <el-radio value="student">学生</el-radio>
         <el-radio value="teacher">老师</el-radio>
       </el-radio-group>
-      <div class="vartify">
-        <el-input placeholder="请输入验证码" class="vartify-input"></el-input>
-        <img src="@/assets/LoginAjax.png" />
-      </div>
+      
       <el-button class="login-btn" type="primary" @click="handleLogin">
         登 录
       </el-button>

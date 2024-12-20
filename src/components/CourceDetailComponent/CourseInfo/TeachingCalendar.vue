@@ -182,8 +182,6 @@ canvas {
   margin-top: 15px;
 }
 
-.upload-file {
-}
 
 .el-upload {
   margin-left: auto;

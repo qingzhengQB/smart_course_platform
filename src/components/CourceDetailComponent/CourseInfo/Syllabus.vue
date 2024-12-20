@@ -171,8 +171,7 @@ const renderAllPages = async () => {
   align-items: center;
   margin-top: 15px;
 }
-.upload-file {
-}
+
 .el-upload {
   margin-left: auto;
 }

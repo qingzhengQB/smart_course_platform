@@ -19,9 +19,9 @@
       <!-- 截止时间 -->
       <el-form-item label="截止时间" prop="deadline">
         <el-date-picker
-          v-model="deadline"
-          type="datetime"
-          placeholder="Select date and time"
+        v-model="deadline"
+        type="datetime"
+        placeholder="Select date and time"
         />
       </el-form-item>
 
@@ -38,21 +38,22 @@
       <!-- 上传附件 -->
       <el-form-item label="上传附件">
         <el-upload
-          class="upload-file"
-          :on-change="handleFileChange"
-          :on-remove="handleRemoveFile"
-          :limit="1"
-          :file-list="fileList"
-          accept=".pdf,.docx,.pptx,.xlsx"
-          auto-upload="false"
-          :before-upload="beforeUpload"
+          class="upload-demo"
+          drag
+          multiple
+          :on-change="handleFileUpload"
+          :file-list="attachments"
+          :auto-upload="false"
+          :show-file-list="true"
+          :limit="5"
+          accept=".pdf,.doc,.docx,.jpg,.png"
         >
           <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__text">
+            将文件拖到此处，或<em>点击上传</em>
+          </div>
         </el-upload>
-        <div v-if="attachments.length > 0">
-          已选择附件：{{ attachments.map((att) => att.name).join(", ") }}
-        </div>
+        <div v-if="attachments.length > 0">已选择附件：{{ attachments.map(att => att.name).join(', ') }}</div>
       </el-form-item>
 
       <!-- 提交按钮 -->
@@ -65,10 +66,7 @@
     <el-table :data="homeworkList" style="width: 100%; margin-top: 30px">
       <el-table-column label="作业编号" prop="homeworkNum"></el-table-column>
       <el-table-column label="作业内容" prop="content"></el-table-column>
-      <el-table-column
-        label="截止时间"
-        prop="submissionDeadline"
-      ></el-table-column>
+      <el-table-column label="截止时间" prop="submissionDeadline"></el-table-column>
     </el-table>
   </div>
 </template>
@@ -86,7 +84,7 @@ const courseId = route.params.id;
 
 // 表单数据
 const homeworkNum = ref(""),
-  deadline = ref(null), // 默认为 null，确保可以在页面渲染时处理日期
+  deadline = ref(null),  // 默认为 null，确保可以在页面渲染时处理日期
   content = ref("");
 
 // 附件列表
@@ -108,7 +106,6 @@ const submitHomework = async () => {
     return;
   }
 
-  console.log(deadline);
   // 检查截止时间是否有效
   const deadlineDate = new Date(deadline.value);
 
@@ -121,10 +118,15 @@ const submitHomework = async () => {
   formData.append("deadline", formattedDeadline);
   formData.append("content", content.value);
 
-  // 如果有附件，追加文件
+  if (attachments.value && attachments.value.length > 0) {
+  // 有文件上传，继续处理
   attachments.value.forEach((file, index) => {
-    formData.append(`file${index}`, file.raw);
+    formData.append(`file`, file.raw);
   });
+} else {
+  // 没有文件上传
+  console.log("没有文件上传");
+}
 
   try {
     const response = await axios.post(

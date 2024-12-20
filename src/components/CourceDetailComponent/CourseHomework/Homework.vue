@@ -376,6 +376,8 @@ const viewHomeworkDetails = (homework) => {
 // Close the homework detail dialog
 const closeDetailModal = () => {
   isDetailVisible.value = false;
+  filename.value=ref("无");
+  resourceId.value = ref([]);
 };
 
 // Open the submit modal

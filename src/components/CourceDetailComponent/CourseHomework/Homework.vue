@@ -117,11 +117,12 @@
             <span v-else>未批改</span>
           </p>
           <!-- 添加附件下载链接 -->
-          <p><strong>附件:</strong>
-              <a href="#" @click.prevent="downloadAttachment(resourceId)">
-                {{ filename }}
-              </a>
-            </p>
+          <p>
+            <strong>附件:</strong>
+            <a href="#" @click.prevent="downloadAttachment(resourceId)">
+              {{ filename }}
+            </a>
+          </p>
           <!-- 显示已提交的作业内容
     <p v-if="detailHomework.submittedContent">
       <strong>已提交的作业内容:</strong>
@@ -165,7 +166,7 @@
         </div>
         <div class="pdf-container">
           <iframe
-            :src="homeworkUrl"
+            :src="correctHomeworkList[selectHomeworkIndex].URL"
             width="100%"
             height="100%"
             type="application/pdf"
@@ -176,7 +177,7 @@
           type="textarea"
           v-model="correctHomeworkContent"
           placeholder="作业内容"
-          rows="10"
+          :rows="10"
           readonly
         ></el-input>
         <div class="correct-homework-score">
@@ -231,7 +232,7 @@ import {
   fetchMyHomework,
   submitHomework,
   fetchHomeworkAttachments,
-  downLoadCourseResource
+  downLoadCourseResource,
 } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 import axios from "axios";
@@ -265,8 +266,8 @@ const selectHomeworkIndex = ref(0);
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const courseId = route.params.id;
 const attachment = ref([]);
-const filename=ref("无");
-const resourceId = ref([])
+const filename = ref("无");
+const resourceId = ref([]);
 // Simulated function to fetch homework
 const getMyHomework = async () => {
   try {
@@ -284,38 +285,45 @@ const getHomeworkAttachment = async (homeworkNum) => {
     console.log(courseId);
     console.log(homeworkNum);
     // 获取作业附件
-    attachment.value = await fetchHomeworkAttachments(
-      courseId,
-      homeworkNum
-    );
-    resourceId.value = attachment.value.data.resourceId
-    filename.value = attachment.value.data.URL.split('http://localhost:8000/src/main/resources/static/course/').pop();
+    attachment.value = await fetchHomeworkAttachments(courseId, homeworkNum);
+    resourceId.value = attachment.value.data.resourceId;
+    filename.value = attachment.value.data.URL.split(
+      "http://localhost:8000/src/main/resources/static/course/"
+    ).pop();
     console.log(resourceId.value);
     console.log(attachment.value);
   } catch (error) {
     console.error("获取作业详情失败", error);
   }
 };
-const getConrrctHomework = async (homeworkNum) => {
+const getConrrctHomework = (homeworkNum) => {
   try {
-    console.log(store.state.userinfo.userNum);
-    const response = await axios.get(
-      `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,
-      {
-        params: {
-          studentNum: store.state.userinfo.userNum,
-        },
-      }
-    );
-    correctHomeworkList.value = response.homeworkList;
-    correctHomeworkList.value.length = Array(
-      correctHomeworkList.value.length
-    ).fill("");
-    homeworkeCommentList.value = Array(correctHomeworkList.value.length).fill(
-      ""
-    );
-    selectHomeworkIndex.value = 0;
-    console.log("success");
+    axios
+      .get(
+        `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,
+        {
+          // headers: {
+          //   "Content-Type": "application/json",
+          // },
+          params: {
+            studentNum: store.state.userinfo.userNum,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("data", response);
+        correctHomeworkList.value = response.data;
+        correctHomeworkList.value.length = Array(
+          correctHomeworkList.value.length
+        ).fill("");
+        homeworkeCommentList.value = Array(
+          correctHomeworkList.value.length
+        ).fill("");
+        selectHomeworkIndex.value = 0;
+        console.log(correctHomeworkList.value);
+        correctHomeworkDialogVisible.value = true;
+        console.log("success");
+      });
   } catch (error) {
     console.error("获取作业失败", error);
   }
@@ -394,7 +402,6 @@ const openSubmitModal = (homework) => {
 
 function homeworkMutualCorrecting(homework) {
   console.log("作业互评", homework);
-  correctHomeworkDialogVisible.value = true;
   getConrrctHomework(homework.homeworkNum);
 }
 
@@ -635,18 +642,18 @@ $pagebuttonheight: 100px;
 .attachment-item {
   padding: 8px;
   border-bottom: 1px solid #f0f0f0;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   a {
     color: #151516;
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
-      color: #409EFF;
+      color: #409eff;
     }
   }
 }

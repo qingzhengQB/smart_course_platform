@@ -162,11 +162,11 @@
     <div v-if="!isShowCorrectScoreView" class="correct-dialog-body">
       <div class="correct-homework-aria">
         <div class="correct-homework-content">
-          作业互评 {{ selectHomeworkIndex + 1 }}
+          作业互评 {{ c_selectHomeworkIndex + 1 }}
         </div>
         <div class="pdf-container">
           <iframe
-            :src="correctHomeworkList[selectHomeworkIndex].URL"
+            :src="c_selectHomeworkFileURL"
             width="100%"
             height="100%"
             type="application/pdf"
@@ -175,7 +175,7 @@
         </div>
         <el-input
           type="textarea"
-          v-model="correctHomeworkContent"
+          v-model="c_homeworkContent"
           placeholder="作业内容"
           :rows="10"
           readonly
@@ -185,13 +185,13 @@
             class="correct-homework-score-input"
             type="textarea"
             :rows="10"
-            v-model="homeworkeCommentList[selectHomeworkIndex]"
+            v-model="c_homeworkeComment"
             placeholder="请输入评语"
           ></el-input>
 
           <el-input
             class="correct-homework-score-input"
-            v-model="homeworkScoreList[selectHomeworkIndex]"
+            v-model="c_homeworkScore"
             placeholder="请输入互评分数"
           ></el-input>
           <el-button type="primary" class="submit-score" @click="submitScore()"
@@ -236,7 +236,6 @@ import {
 } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 import axios from "axios";
-import { number } from "echarts";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
 const isCheckModalOpen = ref(false);
@@ -256,18 +255,20 @@ const currentPage = ref(1);
 const pageSize = 6;
 const store = useStore();
 const route = useRoute();
-const homeworkUrl = ref("/2411.02310v1.pdf");
-const correctHomeworkList = ref([]);
-// 以下两项在获取到互评列表后，按照 selectHomeworkIndex 赋值为列表指定项
-const homeworkScoreList = ref([]); // 互评分数列表
-const homeworkeCommentList = ref([]); // 互评评语列表
-const selectHomeworkIndex = ref(0);
 // 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const courseId = route.params.id;
 const attachment = ref([]);
 const filename = ref("无");
 const resourceId = ref([]);
+
+const c_homeworkScore = ref(0);
+const c_homeworkeComment = ref("");
+const c_selectHomeworkFileURL = ref("/2411.02310v1.pdf");
+const c_homeworkContent = ref("这是随机到的互评学生的作业内容");
+const c_selectHomeworkIndex = ref(0);
+const c_homeworkList = ref([]);
+
 // Simulated function to fetch homework
 const getMyHomework = async () => {
   try {
@@ -312,15 +313,12 @@ const getConrrctHomework = (homeworkNum) => {
       )
       .then((response) => {
         console.log("data", response);
-        correctHomeworkList.value = response.data;
-        correctHomeworkList.value.length = Array(
-          correctHomeworkList.value.length
-        ).fill("");
-        homeworkeCommentList.value = Array(
-          correctHomeworkList.value.length
-        ).fill("");
-        selectHomeworkIndex.value = 0;
-        console.log(correctHomeworkList.value);
+        c_selectHomeworkIndex.value = 0;
+        c_homeworkList.value = response.data;
+        c_homeworkContent.value = c_homeworkList.value[0].content;
+        c_homeworkeComment.value = "";
+        c_homeworkScore.value = 0;
+        c_selectHomeworkFileURL.value = c_homeworkList.value[0].URL;
         correctHomeworkDialogVisible.value = true;
         console.log("success");
       });
@@ -331,11 +329,8 @@ const getConrrctHomework = (homeworkNum) => {
 const submitScore = async (homeworkId) => {
   try {
     const formData = new FormData();
-    formData.append("score", homeworkScoreList.value[selectHomeworkIndex]);
-    formData.append(
-      "comments",
-      homeworkeCommentList.value[selectHomeworkIndex]
-    );
+    formData.append("score", c_homeworkScore.value);
+    formData.append("comments", c_homeworkeComment.value);
     const response = await axios.post(
       `http://localhost:8000/student/homework/${homeworkId}/review`,
       formData,
@@ -352,18 +347,24 @@ const submitScore = async (homeworkId) => {
 };
 const turnPage = (direction) => {
   if (direction === "left") {
-    if (selectHomeworkIndex.value === 0) {
-      selectHomeworkIndex.value = correctHomeworkList.value.length - 1;
+    if (c_selectHomeworkIndex.value === 0) {
+      c_selectHomeworkIndex.value = c_homeworkList.value.length - 1;
     } else {
-      selectHomeworkIndex.value -= 1;
+      c_selectHomeworkIndex.value -= 1;
     }
   } else {
-    if (selectHomeworkIndex.value === correctHomeworkList.value.length - 1) {
-      selectHomeworkIndex.value = 0;
+    if (c_selectHomeworkIndex.value === c_homeworkList.value.length - 1) {
+      c_selectHomeworkIndex.value = 0;
     } else {
-      selectHomeworkIndex.value += 1;
+      c_selectHomeworkIndex.value += 1;
     }
   }
+  c_homeworkContent.value =
+    c_homeworkList.value[c_selectHomeworkIndex.value].content;
+  c_homeworkScore.value = 0;
+  c_homeworkeComment.value = "";
+  c_selectHomeworkFileURL.value =
+    c_homeworkList.value[c_selectHomeworkIndex.value].URL;
 };
 onMounted(() => {
   getMyHomework();

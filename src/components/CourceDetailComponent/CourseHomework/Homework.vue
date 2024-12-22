@@ -194,7 +194,7 @@
             v-model="c_homeworkScore"
             placeholder="请输入互评分数"
           ></el-input>
-          <el-button type="primary" class="submit-score" @click="submitScore()"
+          <el-button type="primary" class="submit-score" @click="submitScore"
             >提交</el-button
           >
         </div>
@@ -326,11 +326,13 @@ const getConrrctHomework = (homeworkNum) => {
     console.error("获取作业失败", error);
   }
 };
-const submitScore = async (homeworkId) => {
+const submitScore = async () => {
   try {
     const formData = new FormData();
     formData.append("score", c_homeworkScore.value);
     formData.append("comments", c_homeworkeComment.value);
+    const homeworkId =
+      c_homeworkList.value[c_selectHomeworkIndex.value].homeworkId;
     const response = await axios.post(
       `http://localhost:8000/student/homework/${homeworkId}/review`,
       formData,

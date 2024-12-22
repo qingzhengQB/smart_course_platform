@@ -344,6 +344,10 @@ const submitScore = async () => {
       }
     );
     console.log("success");
+    ElMessage({
+      message: "互评提交成功",
+      type: "success",
+    });
   } catch (error) {
     console.error("获取作业失败", error);
   }

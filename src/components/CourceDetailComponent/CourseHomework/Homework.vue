@@ -331,6 +331,7 @@ const submitScore = async () => {
     const formData = new FormData();
     formData.append("score", c_homeworkScore.value);
     formData.append("comments", c_homeworkeComment.value);
+    formData.append("studentNum", store.state.userinfo.userNum);
     const homeworkId =
       c_homeworkList.value[c_selectHomeworkIndex.value].homeworkId;
     const response = await axios.post(

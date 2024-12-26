@@ -117,11 +117,12 @@
             <span v-else>未批改</span>
           </p>
           <!-- 添加附件下载链接 -->
-          <p><strong>附件:</strong>
-              <a href="#" @click.prevent="downloadAttachment(resourceId)">
-                {{ filename }}
-              </a>
-            </p>
+          <p>
+            <strong>附件:</strong>
+            <a href="#" @click.prevent="downloadAttachment(resourceId)">
+              {{ filename }}
+            </a>
+          </p>
           <!-- 显示已提交的作业内容
     <p v-if="detailHomework.submittedContent">
       <strong>已提交的作业内容:</strong>
@@ -161,11 +162,11 @@
     <div v-if="!isShowCorrectScoreView" class="correct-dialog-body">
       <div class="correct-homework-aria">
         <div class="correct-homework-content">
-          作业互评 {{ selectHomeworkIndex + 1 }}
+          作业互评 {{ c_selectHomeworkIndex + 1 }}
         </div>
         <div class="pdf-container">
           <iframe
-            :src="homeworkUrl"
+            :src="c_selectHomeworkFileURL"
             width="100%"
             height="100%"
             type="application/pdf"
@@ -174,9 +175,9 @@
         </div>
         <el-input
           type="textarea"
-          v-model="correctHomeworkContent"
+          v-model="c_homeworkContent"
           placeholder="作业内容"
-          rows="10"
+          :rows="10"
           readonly
         ></el-input>
         <div class="correct-homework-score">
@@ -184,16 +185,16 @@
             class="correct-homework-score-input"
             type="textarea"
             :rows="10"
-            v-model="homeworkeCommentList[selectHomeworkIndex]"
+            v-model="c_homeworkeComment"
             placeholder="请输入评语"
           ></el-input>
 
           <el-input
             class="correct-homework-score-input"
-            v-model="homeworkScoreList[selectHomeworkIndex]"
+            v-model="c_homeworkScore"
             placeholder="请输入互评分数"
           ></el-input>
-          <el-button type="primary" class="submit-score" @click="submitScore()"
+          <el-button type="primary" class="submit-score" @click="submitScore"
             >提交</el-button
           >
         </div>
@@ -231,11 +232,10 @@ import {
   fetchMyHomework,
   submitHomework,
   fetchHomeworkAttachments,
-  downLoadCourseResource
+  downLoadCourseResource,
 } from "@/api/CoursePageApi";
 import { useRoute } from "vue-router";
 import axios from "axios";
-import { number } from "echarts";
 const homeworks = ref([]);
 const isModalOpen = ref(false);
 const isCheckModalOpen = ref(false);
@@ -255,18 +255,20 @@ const currentPage = ref(1);
 const pageSize = 6;
 const store = useStore();
 const route = useRoute();
-const homeworkUrl = ref("/2411.02310v1.pdf");
-const correctHomeworkList = ref([]);
-// 以下两项在获取到互评列表后，按照 selectHomeworkIndex 赋值为列表指定项
-const homeworkScoreList = ref([]); // 互评分数列表
-const homeworkeCommentList = ref([]); // 互评评语列表
-const selectHomeworkIndex = ref(0);
 // 使用 computed 获取 userNum
 const userNum = computed(() => store.getters.getUserInfo.userNum);
 const courseId = route.params.id;
 const attachment = ref([]);
-const filename=ref("无");
-const resourceId = ref([])
+const filename = ref("无");
+const resourceId = ref([]);
+
+const c_homeworkScore = ref(0);
+const c_homeworkeComment = ref("");
+const c_selectHomeworkFileURL = ref("/2411.02310v1.pdf");
+const c_homeworkContent = ref("这是随机到的互评学生的作业内容");
+const c_selectHomeworkIndex = ref(0);
+const c_homeworkList = ref([]);
+
 // Simulated function to fetch homework
 const getMyHomework = async () => {
   try {
@@ -284,50 +286,54 @@ const getHomeworkAttachment = async (homeworkNum) => {
     console.log(courseId);
     console.log(homeworkNum);
     // 获取作业附件
-    attachment.value = await fetchHomeworkAttachments(
-      courseId,
-      homeworkNum
-    );
-    resourceId.value = attachment.value.data.resourceId
-    filename.value = attachment.value.data.URL.split('http://localhost:8000/src/main/resources/static/course/').pop();
+    attachment.value = await fetchHomeworkAttachments(courseId, homeworkNum);
+    resourceId.value = attachment.value.data.resourceId;
+    filename.value = attachment.value.data.URL.split(
+      "http://localhost:8000/src/main/resources/static/course/"
+    ).pop();
     console.log(resourceId.value);
     console.log(attachment.value);
   } catch (error) {
     console.error("获取作业详情失败", error);
   }
 };
-const getConrrctHomework = async (homeworkNum) => {
+const getConrrctHomework = (homeworkNum) => {
   try {
-    console.log(store.state.userinfo.userNum);
-    const response = await axios.get(
-      `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,
-      {
-        params: {
-          studentNum: store.state.userinfo.userNum,
-        },
-      }
-    );
-    correctHomeworkList.value = response.homeworkList;
-    correctHomeworkList.value.length = Array(
-      correctHomeworkList.value.length
-    ).fill("");
-    homeworkeCommentList.value = Array(correctHomeworkList.value.length).fill(
-      ""
-    );
-    selectHomeworkIndex.value = 0;
-    console.log("success");
+    axios
+      .get(
+        `http://localhost:8000/student/homework/${courseId}/${homeworkNum}/homeworkReviews`,
+        {
+          // headers: {
+          //   "Content-Type": "application/json",
+          // },
+          params: {
+            studentNum: store.state.userinfo.userNum,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("data", response);
+        c_selectHomeworkIndex.value = 0;
+        c_homeworkList.value = response.data;
+        c_homeworkContent.value = c_homeworkList.value[0].content;
+        c_homeworkeComment.value = "";
+        c_homeworkScore.value = 0;
+        c_selectHomeworkFileURL.value = c_homeworkList.value[0].URL;
+        correctHomeworkDialogVisible.value = true;
+        console.log("success");
+      });
   } catch (error) {
     console.error("获取作业失败", error);
   }
 };
-const submitScore = async (homeworkId) => {
+const submitScore = async () => {
   try {
     const formData = new FormData();
-    formData.append("score", homeworkScoreList.value[selectHomeworkIndex]);
-    formData.append(
-      "comments",
-      homeworkeCommentList.value[selectHomeworkIndex]
-    );
+    formData.append("score", c_homeworkScore.value);
+    formData.append("comments", c_homeworkeComment.value);
+    formData.append("studentNum", store.state.userinfo.userNum);
+    const homeworkId =
+      c_homeworkList.value[c_selectHomeworkIndex.value].homeworkId;
     const response = await axios.post(
       `http://localhost:8000/student/homework/${homeworkId}/review`,
       formData,
@@ -338,24 +344,34 @@ const submitScore = async (homeworkId) => {
       }
     );
     console.log("success");
+    ElMessage({
+      message: "互评提交成功",
+      type: "success",
+    });
   } catch (error) {
     console.error("获取作业失败", error);
   }
 };
 const turnPage = (direction) => {
   if (direction === "left") {
-    if (selectHomeworkIndex.value === 0) {
-      selectHomeworkIndex.value = correctHomeworkList.value.length - 1;
+    if (c_selectHomeworkIndex.value === 0) {
+      c_selectHomeworkIndex.value = c_homeworkList.value.length - 1;
     } else {
-      selectHomeworkIndex.value -= 1;
+      c_selectHomeworkIndex.value -= 1;
     }
   } else {
-    if (selectHomeworkIndex.value === correctHomeworkList.value.length - 1) {
-      selectHomeworkIndex.value = 0;
+    if (c_selectHomeworkIndex.value === c_homeworkList.value.length - 1) {
+      c_selectHomeworkIndex.value = 0;
     } else {
-      selectHomeworkIndex.value += 1;
+      c_selectHomeworkIndex.value += 1;
     }
   }
+  c_homeworkContent.value =
+    c_homeworkList.value[c_selectHomeworkIndex.value].content;
+  c_homeworkScore.value = 0;
+  c_homeworkeComment.value = "";
+  c_selectHomeworkFileURL.value =
+    c_homeworkList.value[c_selectHomeworkIndex.value].URL;
 };
 onMounted(() => {
   getMyHomework();
@@ -396,7 +412,6 @@ const openSubmitModal = (homework) => {
 
 function homeworkMutualCorrecting(homework) {
   console.log("作业互评", homework);
-  correctHomeworkDialogVisible.value = true;
   getConrrctHomework(homework.homeworkNum);
 }
 
@@ -637,18 +652,18 @@ $pagebuttonheight: 100px;
 .attachment-item {
   padding: 8px;
   border-bottom: 1px solid #f0f0f0;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
+
   a {
     color: #151516;
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
-      color: #409EFF;
+      color: #409eff;
     }
   }
 }
